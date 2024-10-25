@@ -16,7 +16,7 @@ export default function LandingPageView() {
         <p className="text-2xl md:text-4xl font-semibold text-gray-200">
           You're at the right place,
         </p>
-        <p className="text-2xl md:text-4xl font-semibold text-red-400 animate-pulse">
+        <p className="text-2xl md:text-4xl font-semibold text-white animate-pulse">
           but the wrong time!
         </p>
       </div>
