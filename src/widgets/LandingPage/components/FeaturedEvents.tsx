@@ -7,25 +7,63 @@ import React, { useEffect, useRef, useState } from "react";
 export default function FeaturedEvents() {
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const [selectedEvent, setSelectedEvent] = useState<string | null>(null);
-  const scrollAmount = 300; // Scroll by 300px each time
+  const [isVisible, setIsVisible] = useState<boolean>(false); // Track visibility
+  const scrollAmount = 1000; // Scroll by 300px each time
   const delay = 3000; // 3 seconds delay
+  let scrollInterval: NodeJS.Timeout | null = null; // Store interval ID
 
   useEffect(() => {
-    const scrollInterval = setInterval(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            // Start scrolling when the section is in view
+            setIsVisible(true);
+          } else {
+            // Stop scrolling when the section is out of view
+            setIsVisible(false);
+          }
+        });
+      },
+      { threshold: 0.1 } // Trigger when 10% of the section is visible
+    );
+
+    if (scrollRef.current) {
+      observer.observe(scrollRef.current); // Observe the scrollRef
+    }
+
+    return () => {
       if (scrollRef.current) {
-        const maxScrollLeft = scrollRef.current.scrollWidth - scrollRef.current.clientWidth;
-
-        // Check if reached the end, then reset to the start
-        if (scrollRef.current.scrollLeft >= maxScrollLeft) {
-          scrollRef.current.scrollLeft = 0;
-        } else {
-          scrollRef.current.scrollLeft += scrollAmount; // Scroll left by 300px
-        }
+        observer.unobserve(scrollRef.current); // Cleanup observer on unmount
       }
-    }, delay);
-
-    return () => clearInterval(scrollInterval); // Clean up interval on component unmount
+    };
   }, []);
+
+  useEffect(() => {
+    if (isVisible) {
+      // Start scrolling effect
+      scrollInterval = setInterval(() => {
+        if (scrollRef.current) {
+          const maxScrollLeft = scrollRef.current.scrollWidth - scrollRef.current.clientWidth;
+
+          // Check if reached the end, then reset to the start
+          if (scrollRef.current.scrollLeft >= maxScrollLeft) {
+            scrollRef.current.scrollLeft = 0;
+          } else {
+            scrollRef.current.scrollLeft += scrollAmount; // Scroll left by 1000px
+          }
+        }
+      }, delay);
+    } else if (scrollInterval) {
+      clearInterval(scrollInterval); // Stop scrolling when out of view
+    }
+
+    return () => {
+      if (scrollInterval) {
+        clearInterval(scrollInterval); // Cleanup interval on component unmount
+      }
+    };
+  }, [isVisible]);
 
   useEffect(() => {
     if (selectedEvent) {
@@ -35,7 +73,7 @@ export default function FeaturedEvents() {
       // Enable scrolling on the body when the modal is closed
       document.body.classList.remove("overflow-hidden");
     }
-  
+
     // Cleanup: Remove class on component unmount
     return () => {
       document.body.classList.remove("overflow-hidden");
@@ -72,30 +110,30 @@ export default function FeaturedEvents() {
 
       {/* Modal */}
       {selectedEvent && (
-  <div
-    className="fixed inset-0 z-50 flex items-center justify-center bg-black-900 backdrop-blur-md bg-opacity-30"
-    onClick={() => setSelectedEvent(null)} // Close modal on background click
-  >
-    <div
-      className="relative bg-yellow-400 rounded-lg p-6 w-[90vw] max-w-lg mx-auto flex flex-col items-center gap-4"
-      onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside the modal
-    >
-      <Image src={selectedEvent} alt="Selected Event" height={300} width={600} className="rounded-lg" />
-      <button
-        className="absolute top-2 right-2 text-black-950 font-bold text-lg"
-        onClick={() => setSelectedEvent(null)} // Close the modal when the close button is clicked
-      >
-       X
-      </button>
-      <button
-        className="bg-black-950 text-white w-full px-6 py-2 rounded-md font-semibold shadow-md hover:bg-yellow-600 transition"
-        onClick={() => alert("Register Now button clicked!")} // Placeholder action for the button
-      >
-        Register Now
-      </button>
-    </div>
-  </div>
-)}
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black-900 backdrop-blur-md bg-opacity-30"
+          onClick={() => setSelectedEvent(null)} // Close modal on background click
+        >
+          <div
+            className="relative bg-yellow-400 rounded-lg p-6 w-[90vw] max-w-lg mx-auto flex flex-col items-center gap-4"
+            onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside the modal
+          >
+            <Image src={selectedEvent} alt="Selected Event" height={300} width={600} className="rounded-lg" />
+            <button
+              className="absolute top-2 right-2 text-black-950 font-bold text-lg"
+              onClick={() => setSelectedEvent(null)} // Close the modal when the close button is clicked
+            >
+              X
+            </button>
+            <button
+              className="bg-black-950 text-white w-full px-6 py-2 rounded-md font-semibold shadow-md hover:bg-yellow-600 transition"
+              onClick={() => alert("Register Now button clicked!")} // Placeholder action for the button
+            >
+              Register Now
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
