@@ -9,19 +9,19 @@ export default function About() {
       title: "About CCET",
       img: "/logo/carmel.png",
       content:
-        "By spreading ideas worthy enough to be shared, the power of inspiration and change is created. A global community striving towards spreading ideas from every discipline and culture, that is TED in a nutshell. It is a non-profit organisation that helps people get the deeper meaning of ideas, attitudes and the world itself. From its origin in 1984, TED talks have touched people’s hearts. It continues to be watched all around the world. The impact a TED event creates is unmatched. TED conferences and events inspire and motivate people towards becoming a better version of themselves.",
-    },
-    {
-      title: "About Department of CSE",
-      img: "/logo/dep.webp",
-      content:
-        "By spreading ideas worthy enough to be shared, the power of inspiration and change is created. A global community striving towards spreading ideas from every discipline and culture, that is TED in a nutshell. It is a non-profit organisation that helps people get the deeper meaning of ideas, attitudes and the world itself. From its origin in 1984, TED talks have touched people’s hearts. It continues to be watched all around the world. The impact a TED event creates is unmatched. TED conferences and events inspire and motivate people towards becoming a better version of themselves.",
+        "Carmel College of Engineering & Technology (CCET), Punnapra, Alappuzha, is a premier institution founded in 2014-15 by the St. Joseph’s Carmel Educational & Charitable Trust of CMI. As a self-financing college approved by AICTE and affiliated with APJ Abdul Kalam Technological University, CCET provides accessible, quality engineering education. In addition to academics, CCET promotes all-round development through extracurricular activities and a dedicated placement cell, shaping socially responsible engineers for a positive impact.",
     },
     {
       title: "About OBCYDIANS",
+      img: "/logo/dep.webp",
+      content:
+        "Obcydians is the dynamic team representing the Department of Computer Science and Engineering at Carmel College of Engineering & Technology (CCET). Comprising of talented students and dedicated faculty, Obcydians fosters innovation, technical excellence, and collaborative growth in computer science. Through workshops, hackathons, and seminars, the team provides a platform for students to explore emerging technologies and gain practical experience, preparing them to make meaningful contributions to the tech industry.",
+    },
+    {
+      title: "About OBCYFEST",
       img: "/logo/obcydians.svg",
       content:
-        "By spreading ideas worthy enough to be shared, the power of inspiration and change is created. A global community striving towards spreading ideas from every discipline and culture, that is TED in a nutshell. It is a non-profit organisation that helps people get the deeper meaning of ideas, attitudes and the world itself. From its origin in 1984, TED talks have touched people’s hearts. It continues to be watched all around the world. The impact a TED event creates is unmatched. TED conferences and events inspire and motivate people towards becoming a better version of themselves.",
+        "ObcyFest is the annual mini-tech fest organized by the Department of Computer Science and Engineering at Carmel College of Engineering & Technology (CCET). Designed to inspire and engage students, ObcyFest features a variety of events, including coding competitions, workshops, fun activities and games. It provides a platform for students to demonstrate their technical skills, collaborate with peers, and explore emerging technologies. ObcyFest nurtures creativity, fosters teamwork, and enhances the learning experience, making it a highlight of the academic calendar for CSE students.",
     },
   ];
 
