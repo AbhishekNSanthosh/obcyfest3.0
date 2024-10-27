@@ -5,7 +5,7 @@ import { GiRocket } from "react-icons/gi"; // Rocket icon
 
 export default function HeroText() {
   return (
-    <div className="relative px-[5vw] pt-[100px] flex flex-col items-center justify-center w-full min-h-[100vh] gap-[3vh] bg-black text-gray-100 overflow-hidden">
+    <div className="relative px-[5vw] pt-[13vh] flex flex-col items-center justify-center w-full min-h-[100vh] gap-3 bg-black text-gray-100 overflow-hidden">
       {/* Background Animated Icons */}
       <div className="absolute inset-0 z-0">
         <div className="moving-icon icon-1">
@@ -35,7 +35,7 @@ export default function HeroText() {
       </div>
 
       {/* Plain "presents" Text */}
-      <div className="text-center text-sm text-gray-300 mb-4 z-10">presents</div>
+      <div className="text-center text-sm text-gray-300 mb-3 z-10">presents</div>
 
       <div className="bg-gray-100 bg-opacity-15 p-2 rounded-full text-center shadow-lg animate-pulse z-10">
         <span className="flex items-center justify-center gap-3 text-lg font-normal">
@@ -49,7 +49,7 @@ export default function HeroText() {
       </h1>
 
       {/* Date & Call to Action */}
-      <div className="text-center mt-2 mb-8 text-xl z-10">
+      <div className="text-center mt-2 mb-5 text-xl z-10">
         <p>
           Kickstarting Innovation on <span className="text-yellow-400 font-bold">October 30, 2024</span>
         </p>

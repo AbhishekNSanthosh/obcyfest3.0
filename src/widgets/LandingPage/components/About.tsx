@@ -1,4 +1,5 @@
 "use client";
+import TitleBar from "@components/TitleBar";
 import Image from "next/image";
 import React, { useState } from "react";
 
@@ -27,9 +28,8 @@ export default function About() {
   const [activeTab, setActiveTab] = useState(0);
 
   return (
-    <div className="flex px-[5vw] flex-col w-full gap-5 h-auto py-[5vh]">
-      {/* Left Column - Tabs */}
-      <div className="p-4 text-3xl font-bold">About Us</div>
+    <div className="flex px-[5vw] flex-col w-full gap-5 h-auto py-[15vh]">
+     <TitleBar title="About us" className="text-3xl capitalize font-semibold"/>
       <div className="flex">
         <div className="flex-1 flex flex-col gap-8">
           <div className="flex flex-col gap-1">
