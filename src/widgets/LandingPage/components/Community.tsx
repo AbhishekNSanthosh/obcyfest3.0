@@ -5,7 +5,7 @@ import React from "react";
 
 export default function Community() {
   const imgurls = [
-    "/clubs/obcydians.svg",
+    "/clubs/obcywhite.svg",
     "/clubs/coding.svg",
     "/clubs/ieee.svg",
     "/clubs/mulearn.svg",
