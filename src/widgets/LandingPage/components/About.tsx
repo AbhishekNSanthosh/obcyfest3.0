@@ -29,7 +29,7 @@ export default function About() {
 
   return (
     <div className="flex px-[5vw] flex-col w-full gap-5 h-auto py-[15vh]">
-     <TitleBar title="About us" className="text-3xl capitalize font-semibold"/>
+     <TitleBar title="About us" className="text-3xl capitalize font-semibold text-yellow-400"/>
       <div className="flex">
         <div className="flex-1 flex flex-col gap-8">
           <div className="flex flex-col gap-1">

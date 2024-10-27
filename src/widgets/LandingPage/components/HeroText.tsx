@@ -1,3 +1,4 @@
+import Link from "next/link";
 import React from "react";
 import { BsLightningCharge } from "react-icons/bs";
 import { FaRobot, FaUsers, FaGamepad } from "react-icons/fa";
@@ -35,7 +36,9 @@ export default function HeroText() {
       </div>
 
       {/* Plain "presents" Text */}
-      <div className="text-center text-sm text-gray-300 mb-3 z-10">presents</div>
+      <div className="text-center text-sm text-gray-300 mb-3 z-10">
+        presents
+      </div>
 
       <div className="bg-gray-100 bg-opacity-15 p-2 rounded-full text-center shadow-lg animate-pulse z-10">
         <span className="flex items-center justify-center gap-3 text-lg font-normal">
@@ -44,16 +47,22 @@ export default function HeroText() {
         </span>
       </div>
 
-      <h1 className="hero glitch1 layerstext-4xl font-bold tracking-tight text-8xl z-10" data-text="OBCYFEST 3.0">
+      <h1
+        className="hero glitch1 layerstext-4xl font-bold tracking-tight text-8xl z-10"
+        data-text="OBCYFEST 3.0"
+      >
         <span>OBCYFEST 3.0</span>
       </h1>
 
       {/* Date & Call to Action */}
       <div className="text-center mt-2 mb-5 text-xl z-10">
         <p>
-          Kickstarting Innovation on <span className="text-yellow-400 font-bold">October 30, 2024</span>
+          Kickstarting Innovation on{" "}
+          <span className="text-yellow-400 font-bold">October 30, 2024</span>
         </p>
-        <p className="text-lg text-gray-300">Join us for a day of tech, creativity, and endless inspiration!</p>
+        <p className="text-lg text-gray-300">
+          Join us for a day of tech, creativity, and endless inspiration!
+        </p>
       </div>
 
       {/* Key Points with Icons */}
@@ -73,9 +82,11 @@ export default function HeroText() {
       </div>
 
       {/* Call to Action Button */}
-      <button className="mt-10 px-8 py-3 bg-yellow-400 rounded-lg font-semibold text-black-950 hover:bg-yellow-500 transition-colors z-10">
-        Register Now
-      </button>
+        <button className="mt-10 px-8 py-3 bg-yellow-400 rounded-lg cursor-pointer font-semibold text-black-950 hover:bg-yellow-500 transition-colors z-10">
+      <Link href={"/events"}>
+          Register Now
+      </Link>
+        </button>
     </div>
   );
 }

@@ -2,6 +2,7 @@
 import TitleBar from "@components/TitleBar";
 import { events } from "@utils/constants";
 import Image from "next/image";
+import Link from "next/link";
 import React, { useEffect, useRef, useState } from "react";
 
 export default function FeaturedEvents() {
@@ -44,7 +45,8 @@ export default function FeaturedEvents() {
       // Start scrolling effect
       scrollInterval = setInterval(() => {
         if (scrollRef.current) {
-          const maxScrollLeft = scrollRef.current.scrollWidth - scrollRef.current.clientWidth;
+          const maxScrollLeft =
+            scrollRef.current.scrollWidth - scrollRef.current.clientWidth;
 
           // Check if reached the end, then reset to the start
           if (scrollRef.current.scrollLeft >= maxScrollLeft) {
@@ -84,7 +86,7 @@ export default function FeaturedEvents() {
     <div className="px-[5vw] pt-[10vh] flex flex-col gap-8">
       <TitleBar
         title="Featured Events"
-        className="text-3xl font-semibold capitalize text-yellow-500"
+        className="text-3xl font-semibold capitalize text-yellow-400"
       />
       <div
         ref={scrollRef}
@@ -103,10 +105,18 @@ export default function FeaturedEvents() {
           />
         ))}
       </div>
-
-      <span className="text-gray-500 text-left text-xs italic tracking-wide">
-        *Click to register for the event
-      </span>
+      <div className="">
+        <span className="text-gray-500 text-left text-xs italic tracking-wide">
+          *Click to register for the event
+        </span>
+      </div>
+      <div className="w-full items-center justify-center flex">
+        <Link href={"/events"}>
+          <button className="bg-yellow-400 text-black-950 px-3 py-2 rounded-[5px] font-semibold">
+            View All Events
+          </button>
+        </Link>
+      </div>
 
       {/* Modal */}
       {selectedEvent && (
@@ -118,7 +128,13 @@ export default function FeaturedEvents() {
             className="relative bg-yellow-400 rounded-lg p-6 w-[90vw] max-w-lg mx-auto flex flex-col items-center gap-4"
             onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside the modal
           >
-            <Image src={selectedEvent} alt="Selected Event" height={300} width={600} className="rounded-lg" />
+            <Image
+              src={selectedEvent}
+              alt="Selected Event"
+              height={300}
+              width={600}
+              className="rounded-lg"
+            />
             <button
               className="absolute top-2 right-2 text-black-950 font-bold text-lg"
               onClick={() => setSelectedEvent(null)} // Close the modal when the close button is clicked

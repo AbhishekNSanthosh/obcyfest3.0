@@ -64,10 +64,16 @@ export default function FooterContent() {
               <br />
             </p>
             <Link
-              href="mailto:contact@obcyfest.com"
+              href="mailto:obcyfest@carmelcet.in"
               className="hover:text-black-950 text-gray-800 transition-colors mt-4"
             >
-              contact@obcyfest.com
+              obcyfest@carmelcet.in
+            </Link>
+            <Link
+              href="https://wa.me/+917907247909" target="_blank"
+              className="hover:text-black-950 text-gray-800 transition-colors mt-4"
+            >
+             +91 7907247909
             </Link>
           </div>
         </div>

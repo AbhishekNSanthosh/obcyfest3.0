@@ -1,19 +1,21 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import React, { useEffect, useState } from "react";
 
 export default function HeaderContent() {
   const [isScrolled, setIsScrolled] = useState(false);
+  const location = usePathname();
 
   const navItems = [
     {
       title: "About",
-      link: "",
+      link: "/#about",
     },
     {
       title: "FAQs",
-      link: "",
+      link: "/#faqs",
     },
     // {
     //   title: "Community Partners",
@@ -21,7 +23,7 @@ export default function HeaderContent() {
     // },
     {
       title: "Contact",
-      link: "",
+      link: "/#contact",
     },
   ];
 
@@ -45,32 +47,43 @@ export default function HeaderContent() {
       }`}
     >
       <div className="flex flex-1 items-center justify-start">
-        <Image
-          src={"/logo/obcylogomain.svg"}
-          height={500}
-          width={500}
-          alt=""
-          className="cursor-pointer w-[3rem] h-[3rem]"
-        />
+        <Link href={"/"}>
+          <Image
+            src={"/logo/obcylogomain.svg"}
+            height={500}
+            width={500}
+            alt=""
+            className="cursor-pointer w-[3rem] h-[3rem]"
+          />
+        </Link>
       </div>
       <div className="flex flex-2 items-center justify-center gap-[4vw]">
         <div className="flex flex-row gap-[2vw] rounded-[50px] p-2 px-4">
           {navItems.map((item, index) => (
-            <div
+            <Link
+              href={item?.link}
               key={index}
               className="py-1 relative cursor-pointer text-yellow-400 font-medium after:absolute after:left-0 after:bottom-0 after:h-[3px] after:w-0 after:bg-yellow-400 after:transition-all after:duration-300 hover:after:w-full"
             >
               <span className="capitalize">{item.title}</span>
-            </div>
+            </Link>
           ))}
         </div>
       </div>
       <div className="flex flex-1 items-center justify-end gap-[4vw]">
-        <Link href={'/events'}>
-          <button className="bg-yellow-400 rounded-lg px-[1rem] py-2 text-black-950 font-semibold">
-            Events
-          </button>
-        </Link>
+        {location === "/events" ? (
+          <Link href={"/"}>
+            <button className="bg-yellow-400 rounded-lg px-[1rem] py-2 text-black-950 font-semibold">
+              Go to Home
+            </button>
+          </Link>
+        ) : (
+          <Link href={"/events"}>
+            <button className="bg-yellow-400 rounded-lg px-[1rem] py-2 text-black-950 font-semibold">
+              Events
+            </button>
+          </Link>
+        )}
       </div>
     </div>
   );

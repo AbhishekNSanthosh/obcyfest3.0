@@ -11,12 +11,18 @@ export default function LandingPageView() {
   return (
     <main>
       <HeaderView />
-      <HeroText/>
-      <Marquee/>
-      <FeaturedEvents/>
-      <About/>
-      <Info/>
-      <FooterView/>
+      <HeroText />
+      <Marquee />
+      <FeaturedEvents />
+      <section id="about">
+        <About />
+      </section>
+      <section id="faqs">
+        <Info />
+      </section>
+      <section id="contact">
+        <FooterView />
+      </section>
     </main>
   );
 }
