@@ -5,6 +5,7 @@ import FooterView from "@widgets/Footer";
 import Marquee from "./components/Marquee";
 import About from "./components/About";
 import Info from "./components/Info";
+import FeaturedEvents from "./components/FeaturedEvents";
 
 export default function LandingPageView() {
   return (
@@ -12,6 +13,7 @@ export default function LandingPageView() {
       <HeaderView />
       <HeroText/>
       <Marquee/>
+      <FeaturedEvents/>
       <About/>
       <Info/>
       <FooterView/>
