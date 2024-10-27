@@ -91,15 +91,15 @@ export default function FeaturedEvents() {
         className="relative flex overflow-x-scroll scrolldiv whitespace-nowrap gap-2 rounded-lg p-2 bg-gradient-to-r from-yellow-400 via-yellow-300 to-yellow-500 shadow-lg"
       >
         {/* Duplicate images array to create a seamless scroll */}
-        {[...events, ...events].map((event, index) => (
+        {events.map((event, index) => (
           <Image
             key={index}
-            src={event}
+            src={event?.image}
             alt={`Event ${index}`}
             height={100}
             width={300}
             className="rounded-lg shadow-md hover:shadow-xl transition-transform duration-300 hover:scale-105 cursor-pointer"
-            onClick={() => setSelectedEvent(event)} // Set selected image on click
+            onClick={() => setSelectedEvent(event?.image)} // Set selected image on click
           />
         ))}
       </div>
