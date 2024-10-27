@@ -28,7 +28,7 @@ export default function About() {
   const [activeTab, setActiveTab] = useState(0);
 
   return (
-    <div className="flex px-[5vw] flex-col w-full gap-5 h-auto py-[15vh]">
+    <div className="flex px-[5vw] flex-col w-full gap-5 h-auto md:py-[15vh] lg:py-[15vh] py-[8vh]">
      <TitleBar title="About us" className="text-3xl capitalize font-semibold text-yellow-400"/>
       <div className="flex">
         <div className="flex-1 flex flex-col gap-8">
@@ -52,9 +52,9 @@ export default function About() {
             </div>
           </div>
         </div>
-        <div className="w-[1px] h-[90%] bg-yellow-400"></div>
+        <div className="w-[1px] h-[90%] bg-yellow-400 hidden md:flex lg:flex"></div>
         {/* Right Column - Content */}
-        <div className="flex-1 p-4 flex items-center justify-center w-full">
+        <div className="flex-1 p-4 items-center justify-center w-full hidden md:flex lg:flex">
           <Image
             src={aboutus[activeTab].img}
             alt="About Image"

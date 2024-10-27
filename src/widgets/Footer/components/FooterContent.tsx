@@ -11,11 +11,11 @@ export default function FooterContent() {
   ];
 
   return (
-    <footer className="p-[2vw] w-full bg-black-950 text-gray-100">
-      <div className="w-full p-10 bg-yellow-400 rounded-md flex flex-col justify-start items-center gap-5">
+    <footer className="md:p-[2vw] lg:p-[2vw] p-[4vw] w-full bg-black-950">
+      <div className="w-full md:p-10 lg:p-10 p-5 bg-yellow-400 rounded-md flex flex-col justify-start items-center gap-5">
         {/* Logo Section */}
-        <div className="flex w-full flex-row items-start justify-between">
-          <div className="flex flex-col items-center md:items-start flex-[2]">
+        <div className="flex w-full md:flex-row lg:flex-row flex-col gap-10 md:gap-0 lg:gap-0 items-start justify-between">
+          <div className="flex flex-col items-start md:items-start flex-[2]">
             <Image
               src={"/logo/black.svg"}
               height={1000}
@@ -37,7 +37,7 @@ export default function FooterContent() {
             <h3 className="text-xl font-semibold text-gray-800 mb-3">
               Quick Links
             </h3>
-            <ul className="space-y-2 text-sm text-gray-800">
+            <ul className="md:space-y-2 lg:space-y-2 space-y-0 text-sm text-gray-800">
               {navItems.map((item, index) => (
                 <li key={index}>
                   {"->"}{" "}
@@ -53,7 +53,7 @@ export default function FooterContent() {
           </div>
 
           {/* Contact Section */}
-          <div className="flex flex-col items-center md:items-start justify-start flex-1">
+          <div className="flex flex-col items-start md:items-start justify-start flex-1">
             <h3 className="text-xl font-semibold text-gray-800 mb-3">
               Contact Us
             </h3>
@@ -80,11 +80,11 @@ export default function FooterContent() {
 
         {/* Bottom Footer Text */}
         <div className="h-[0.5px] w-[100%] bg-black-950 mt-5"></div>
-        <div className="flex justify-between items-center mt-4 text-black-950 text-sm w-full">
+        <div className="flex justify-between items-center md:flex-row lg:flex-row flex-col mt-4 text-black-950 text-sm w-full gap-2">
           <div className="">
             Made with 🖤 by Obcydians.
           </div>
-          <div className="">
+          <div className="text-sm">
             © {new Date().getFullYear()} Obcyfest 3.0. All rights reserved.
           </div>
         </div>

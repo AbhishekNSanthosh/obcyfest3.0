@@ -9,7 +9,7 @@ export default function FeaturedEvents() {
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const [selectedEvent, setSelectedEvent] = useState<string | null>(null);
   const [isVisible, setIsVisible] = useState<boolean>(false); // Track visibility
-  const scrollAmount = 1000; // Scroll by 300px each time
+  const scrollAmount = 300; // Scroll by 300px each time
   const delay = 3000; // 3 seconds delay
   let scrollInterval: NodeJS.Timeout | null = null; // Store interval ID
 
@@ -83,7 +83,7 @@ export default function FeaturedEvents() {
   }, [selectedEvent]);
 
   return (
-    <div className="px-[5vw] pt-[10vh] flex flex-col gap-8">
+    <div className="px-[5vw] md:pt-[10vh] lg:pt-[10vh] pt-[3vh] flex flex-col gap-8">
       <TitleBar
         title="Featured Events"
         className="text-3xl font-semibold capitalize text-yellow-400"
