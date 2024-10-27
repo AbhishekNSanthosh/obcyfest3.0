@@ -50,7 +50,7 @@ export default function HeaderContent() {
       <div className="flex flex-1 items-center justify-start">
         <Link href={"/"}>
           <Image
-            src={"/logo/obcylogomain.svg"}
+            src={"/logo/Obcylogomain.svg"}
             height={500}
             width={500}
             alt=""
