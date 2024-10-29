@@ -5,9 +5,15 @@ import Image from "next/image";
 import Link from "next/link";
 import React, { useEffect, useRef, useState } from "react";
 
+type Event = {
+  image: string;
+  regLink: string;
+  type: "technical" | "nonTechnical";
+};
+
 export default function FeaturedEvents() {
   const scrollRef = useRef<HTMLDivElement | null>(null);
-  const [selectedEvent, setSelectedEvent] = useState<string | null>(null);
+  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [isVisible, setIsVisible] = useState<boolean>(false); // Track visibility
   const scrollAmount = 310; // Scroll by 300px each time
   const delay = 3000; // 3 seconds delay
@@ -101,7 +107,7 @@ export default function FeaturedEvents() {
             height={100}
             width={300}
             className="rounded-lg shadow-md hover:shadow-xl transition-transform duration-300 hover:scale-105 cursor-pointer"
-            onClick={() => setSelectedEvent(event?.image)} // Set selected image on click
+            onClick={() => setSelectedEvent(event)} // Set entire event on click
           />
         ))}
       </div>
@@ -129,7 +135,7 @@ export default function FeaturedEvents() {
             onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside the modal
           >
             <Image
-              src={selectedEvent}
+              src={selectedEvent.image}
               alt="Selected Event"
               height={300}
               width={600}
@@ -143,7 +149,9 @@ export default function FeaturedEvents() {
             </button>
             <button
               className="bg-black-950 text-white w-full px-6 py-2 rounded-md font-semibold shadow-md hover:bg-yellow-600 transition"
-              onClick={() => alert("Register Now button clicked!")} // Placeholder action for the button
+              onClick={() => {
+                window.open(selectedEvent.regLink, "_blank");
+              }}
             >
               Register Now
             </button>

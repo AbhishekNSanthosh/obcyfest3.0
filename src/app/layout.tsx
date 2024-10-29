@@ -32,47 +32,48 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
     <html lang="en">
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
         <link rel="canonical" href="https://obcyfest3.vercel.app/" />
-        <script type="application/ld+json">
-          {JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "Event",
-            name: "Obcyfest 3.0",
-            startDate: "2024-10-28",
-            endDate: "2024-11-05",
-            eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode",
-            eventStatus: "https://schema.org/EventScheduled",
-            location: {
-              "@type": "Place",
-              name: "CCET",
-              address: {
-                "@type": "PostalAddress",
-                streetAddress: "Your Address Here",
-                addressLocality: "City",
-                addressRegion: "State",
-                postalCode: "ZIP",
-                addressCountry: "Country",
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Event",
+              name: "Obcyfest 3.0",
+              startDate: "2024-10-28",
+              endDate: "2024-11-05",
+              eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode",
+              eventStatus: "https://schema.org/EventScheduled",
+              location: {
+                "@type": "Place",
+                name: "CCET",
+                address: {
+                  "@type": "PostalAddress",
+                  streetAddress: "Your Address Here",
+                  addressLocality: "City",
+                  addressRegion: "State",
+                  postalCode: "ZIP",
+                  addressCountry: "Country",
+                },
               },
-            },
-            image: [
-              "https://obcyfest3.vercel.app/images/og-image.jpg",
-            ],
-            description: "Join us at Obcyfest 3.0, a premier tech fest at CCET!",
-            organizer: {
-              "@type": "Organization",
-              name: "CCET",
-              url: "https://obcyfest3.vercel.app/",
-            },
-          })}
-        </script>
+              image: ["https://obcyfest3.vercel.app/images/og-image.jpg"],
+              description: "Join us at Obcyfest 3.0, a premier tech fest at CCET!",
+              organizer: {
+                "@type": "Organization",
+                name: "CCET",
+                url: "https://obcyfest3.vercel.app/",
+              },
+            }),
+          }}
+        />
       </head>
       <body className="bg-black-950 text-gray-100">{children}</body>
     </html>
