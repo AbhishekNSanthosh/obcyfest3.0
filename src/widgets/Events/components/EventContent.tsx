@@ -3,12 +3,14 @@
 import TitleBar from "@components/TitleBar"; // Ensure this imports your event data
 import { events } from "@utils/constants";
 import Image from "next/image";
+import Link from "next/link";
 import React, { useEffect, useState } from "react";
 
 type Event = {
   image: string;
   regLink: string;
-  type: "technical" | "nonTechnical";
+  type: "technical" | "nonTechnical" | "sports";
+  id: string | number;
 };
 
 export default function EventContent() {
@@ -83,53 +85,19 @@ export default function EventContent() {
             className="relative cursor-pointer p-2 border-[0.5px] border-black-900"
             onClick={() => setSelectedEvent(event)}
           >
+            <Link href={`/events/${event.id}`}>
             <Image
               src={event.image}
               alt={`Event ${index}`}
-              height={195}
+              height={200}
               quality={70}
-              width={290}
+              width={300}
               className="shadow-[5px]"
             />
+            </Link>
           </div>
         ))}
       </div>
-
-      {/* Modal */}
-      {selectedEvent && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black-900 backdrop-blur-md bg-opacity-30"
-          onClick={() => setSelectedEvent(null)} // Close modal on background click
-        >
-          <div
-            className="relative bg-yellow-400 rounded-lg p-6 w-[90vw] max-w-lg mx-auto flex flex-col items-center gap-4"
-            onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside the modal
-          >
-            <Image
-              src={selectedEvent.image}
-              alt="Selected Event"
-              height={300}
-              width={600}
-              className="rounded-lg"
-            />
-            <button
-              className="bg-black-950 text-white w-full px-6 py-2 rounded-md font-semibold shadow-md hover:bg-yellow-600 transition"
-              onClick={() => {
-                window.open(selectedEvent.regLink, "_blank"); // Open registration link in a new tab
-                setSelectedEvent(null); // Close modal after clicking
-              }}
-            >
-              Register Now
-            </button>
-            <button
-              className="absolute top-2 right-2 text-black-950 font-bold text-lg"
-              onClick={() => setSelectedEvent(null)} // Close the modal when the close button is clicked
-            >
-              X
-            </button>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

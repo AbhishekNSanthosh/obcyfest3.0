@@ -5,6 +5,8 @@ import "./globals.css";
 
 // Next.js font imports
 import { Poppins, Rubik_Wet_Paint, Fugaz_One } from "next/font/google";
+import HeaderView from "@widgets/Header/view";
+import FooterView from "@widgets/Footer/view";
 
 // Define fonts with weights you need
 const poppins = Poppins({
@@ -40,7 +42,13 @@ export default function RootLayout({
       lang="en"
       className={`${poppins.variable} ${rubikWetPaint.variable} ${fugazOne.variable}`}
     >
-      <body className="bg-black-950 text-gray-100">{children}</body>
+      <body className="bg-black-950 text-gray-100">
+        <HeaderView/>
+        {children}
+        <section id="contact">
+        <FooterView />
+      </section>
+      </body>
     </html>
   );
 }

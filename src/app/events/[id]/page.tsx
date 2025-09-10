@@ -1,10 +1,29 @@
-import FooterView from '@widgets/Footer'
-import HeaderView from '@widgets/Header'
 import { events } from '@utils/constants'
 import { notFound } from 'next/navigation'
 import React from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
+import { LuMapPin, LuCalendar, LuUsers, LuIndianRupee, LuTrophy } from 'react-icons/lu';
+
+// Assuming the updated Event type is available in @utils/constants
+// interface Event {
+//     id: string;
+//     title: string;
+//     image: string;
+//     regLink: string;
+//     type: 'technical' | 'nonTechnical' | 'sports';
+//     date?: string;
+//     description: string;
+//     venue?: string;
+//     eventType: string;
+//     maxParticipation?: string;
+//     minParticipation?: string;
+//     totalParticipation?: string;
+//     registrationFee: string;
+//     firstPrize: string;
+//     secondPrize?: string;
+//     coordinators: string[];
+// }
 
 interface EventPageProps {
   params: {
@@ -19,42 +38,145 @@ export default function EventPage({ params }: EventPageProps) {
     notFound()
   }
 
+  const getTypeColor = (type: string) => {
+    switch(type) {
+      case 'technical':
+        return 'bg-yellow-400 text-black-950';
+      case 'nonTechnical':
+        return 'bg-yellow-400 text-black-950';
+      case 'sports':
+        return 'bg-yellow-400 text-black-950';
+      default:
+        return 'bg-yellow-400 text-black-950';
+    }
+  };
+
+  const getTypeName = (type: string) => {
+    switch(type) {
+      case 'technical':
+        return 'Technical Event';
+      case 'nonTechnical':
+        return 'Non-Technical Event';
+      case 'sports':
+        return 'Sports Event';
+      default:
+        return 'Event';
+    }
+  };
+
   return (
-    <main className="min-h-screen bg-black text-white">
-      <HeaderView />
-      
-      <div className="px-[5vw] py-[10vh] flex flex-col items-center gap-8">
-        {/* Event Image */}
-        <div className="relative w-full max-w-4xl">
+    <div className="min-h-screen bg text-white">
+      {/* Hero Section with Image and Title */}
+      <div className="relative h-[50vh] overflow-hidden">
+        {/* Background Image */}
+        <div className="absolute inset-0">
           <Image
             src={event.image}
             alt={event.title}
-            width={800}
-            height={400}
-            className="w-full h-auto rounded-lg shadow-2xl"
+            fill
+            className="object-cover"
+            priority
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent rounded-lg"></div>
+          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/70 to-black/30"></div>
         </div>
+        
+        {/* Hero Content */}
+        <div className="relative z-10 h-full flex flex-col justify-end px-[5vw] pb-[6vh]">
+          <div className="max-w-4xl mx-auto w-full">
+            
+            {/* Event Title */}
+            <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold text-yellow-400 tracking-tight leading-tight mb-4">
+              {event.title}
+            </h1>
+            
+            {/* Event Description */}
+            <p className="text-gray-300 text-md md:text-lg max-w-3xl leading-relaxed">
+              {event.description}
+            </p>
+          </div>
+        </div>
+      </div>
 
-        {/* Event Details */}
-        <div className="w-full max-w-4xl text-center space-y-6">
-          <h1 className="text-4xl md:text-5xl font-bold text-yellow-400">
-            {event.title}
-          </h1>
-          
-          <div className="flex items-center justify-center gap-4">
-            <span className={`px-4 py-2 rounded-full text-sm font-semibold ${
-              event.type === 'technical' 
-                ? 'bg-yellow-400 text-black-950' 
-                : 'bg-gray-700 text-gray-300'
-            }`}>
-              {event.type === 'technical' ? 'Technical Event' : 'Non-Technical Event'}
-            </span>
+      {/* Main Content Section */}
+      <div className="px-[5vw] py-[5vh]">
+        <div className="max-w-5xl mx-auto">
+
+          {/* Event Details Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+            {event.date && (
+              <div className="bg-black-950 bg-opacity-80 p-6 rounded-xl flex items-center space-x-4 shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-yellow-400/20 border border-black-900">
+                <div className="bg-yellow-400/20 p-3 rounded-lg">
+                  <LuCalendar className="text-yellow-400 text-2xl" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-semibold text-gray-400 text-sm mb-1">Date</h3>
+                  <p className="text-lg text-white font-medium">{event.date}</p>
+                </div>
+              </div>
+            )}
+            
+            {event.venue && (
+              <div className="bg-black-950 bg-opacity-80 p-6 rounded-xl flex items-center space-x-4 shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-yellow-400/20 border border-black-900">
+                <div className="bg-yellow-400/20 p-3 rounded-lg">
+                  <LuMapPin className="text-yellow-400 text-2xl" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-semibold text-gray-400 text-sm mb-1">Venue</h3>
+                  <p className="text-lg text-white font-medium">{event.venue}</p>
+                </div>
+              </div>
+            )}
+
+            <div className="bg-black-950 bg-opacity-80 p-6 rounded-xl flex items-center space-x-4 shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-yellow-400/20 border border-black-900">
+              <div className="bg-yellow-400/20 p-3 rounded-lg">
+                <LuUsers className="text-yellow-400 text-2xl" />
+              </div>
+              <div className="flex-1">
+                <h3 className="font-semibold text-gray-400 text-sm mb-1">Participation</h3>
+                <p className="text-lg text-white font-medium">
+                  {event.eventType}
+                </p>
+              </div>
+            </div>
+
+            <div className="bg-black-950 bg-opacity-80 p-6 rounded-xl flex items-center space-x-4 shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-yellow-400/20 border border-black-900">
+              <div className="bg-yellow-400/20 p-3 rounded-lg">
+                <LuIndianRupee className="text-yellow-400 text-2xl" />
+              </div>
+              <div className="flex-1">
+                <h3 className="font-semibold text-gray-400 text-sm mb-1">Registration Fee</h3>
+                <p className="text-lg text-white font-medium">{event.registrationFee}</p>
+              </div>
+            </div>
+
+            <div className="bg-black-950 bg-opacity-80 p-6 rounded-xl flex items-center space-x-4 shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-yellow-400/20 border border-black-900">
+              <div className="bg-yellow-400/20 p-3 rounded-lg">
+                <LuTrophy className="text-yellow-400 text-2xl" />
+              </div>
+              <div className="flex-1">
+                <h3 className="font-semibold text-gray-400 text-sm mb-1">Prizes</h3>
+                <p className="text-lg text-white font-medium">
+                  1st: {event.firstPrize}
+                  {event.secondPrize && ` | 2nd: ${event.secondPrize}`}
+                </p>
+              </div>
+            </div>
           </div>
 
-          <p className="text-gray-300 text-lg max-w-2xl mx-auto">
-            Join us for this exciting event and be part of the innovation journey at Obcyfest 3.0!
-          </p>
+          {/* Coordinators Section */}
+          <div className="bg-black-950 bg-opacity-60 p-6 rounded-xl mb-8 border border-black-900">
+            <h3 className="text-2xl font-bold text-yellow-400 mb-6 text-center">Event Coordinators</h3>
+            <div className="flex flex-wrap justify-center gap-3">
+              {event.coordinators.map((coordinator, index) => (
+                <div 
+                  key={index} 
+                  className="bg-yellow-400/10 text-gray-300 text-base px-4 py-2 rounded-lg shadow-lg border border-yellow-400/30 hover:bg-yellow-400/20 transition-all duration-300"
+                >
+                  {coordinator}
+                </div>
+              ))}
+            </div>
+          </div>
 
           {/* Action Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
@@ -62,23 +184,21 @@ export default function EventPage({ params }: EventPageProps) {
               href={event.regLink}
               target="_blank"
               rel="noopener noreferrer"
-              className="bg-yellow-400 text-black-950 px-8 py-3 rounded-lg font-semibold hover:bg-yellow-500 transition-colors"
+              className="bg-yellow-400 text-black-950 px-8 py-3 rounded-lg font-semibold text-base shadow-lg hover:bg-yellow-500 transition-all duration-300 transform hover:scale-105"
             >
               Register Now
             </a>
             
             <Link
               href="/events"
-              className="border border-yellow-400 text-yellow-400 px-8 py-3 rounded-lg font-semibold hover:bg-yellow-400 hover:text-black-950 transition-colors"
+              className="border border-yellow-400 text-yellow-400 px-8 py-3 rounded-lg font-semibold text-base shadow-lg hover:bg-yellow-400 hover:text-black-950 transition-all duration-300 transform hover:scale-105"
             >
               Back to Events
             </Link>
           </div>
         </div>
       </div>
-
-      <FooterView />
-    </main>
+    </div>
   )
 }
 

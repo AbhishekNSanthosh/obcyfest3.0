@@ -6,6 +6,12 @@ body {
   font-family: $font-family;
 }
 
+button {
+  cursor: pointer;
+  font-family: $font-family;
+  transition: all 0.3s ease;
+}
+
 .logo{
   font-family: "Rubik Wet Paint", system-ui;
 }
