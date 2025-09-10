@@ -1,0 +1,111 @@
+@layer theme, base, components, utilities;
+
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/preflight.css" layer(base);
+@theme {
+  /* SLK custom colors */
+  --color-slk-regular: #133c25;
+  --color-slk-light: #239254;
+  --color-slk-dark: #d5e6dc;
+
+  --color-slk-black-100: #161617;
+  --color-slk-black-200: #151515;
+  --color-slk-black-300: #0b0b0c;
+
+  /* White */
+  --color-white: #ffffff;
+
+  /* Black shades */
+  --color-black-50: #f6f6f6;
+  --color-black-100: #e7e7e7;
+  --color-black-200: #d1d1d1;
+  --color-black-300: #b0b0b0;
+  --color-black-400: #888888;
+  --color-black-500: #6d6d6d;
+  --color-black-600: #5d5d5d;
+  --color-black-700: #4f4f4f;
+  --color-black-800: #454545;
+  --color-black-900: #3d3d3d;
+  --color-black-950: #000000;
+
+  /* Gray shades */
+  --color-gray-100: #f7fafc;
+  --color-gray-200: #edf2f7;
+  --color-gray-300: #e2e8f0;
+  --color-gray-400: #cbd5e0;
+  --color-gray-500: #a0aec0;
+  --color-gray-600: #718096;
+  --color-gray-700: #4a5568;
+  --color-gray-800: #2d3748;
+  --color-gray-900: #1a202c;
+
+  /* Yellow shades */
+  --color-yellow-50: #feffe4;
+  --color-yellow-100: #fcffc4;
+  --color-yellow-200: #f7ff90;
+  --color-yellow-300: #edff50;
+  --color-yellow-400: #dfff1b;
+  --color-yellow-500: #c0e600;
+  --color-yellow-600: #95b800;
+  --color-yellow-700: #708b00;
+  --color-yellow-800: #586d07;
+  --color-yellow-900: #4a5c0b;
+  --color-yellow-950: #263400;
+
+  /* Red shades */
+  --color-red-400: #f87171;
+  --color-red-500: #ef4444;
+
+  /* Green */
+  --color-green-400: #4ade80;
+
+  /* Purple */
+  --color-purple-800: #6b21a8;
+}
+@import "tailwindcss/utilities.css";
+
+/* Custom scrollbar styles for FeaturedEvents */
+.scrolldiv {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* Internet Explorer 10+ */
+}
+
+.scrolldiv::-webkit-scrollbar {
+  display: none; /* WebKit */
+}
+
+/* Smooth scrolling behavior */
+.scrolldiv {
+  scroll-behavior: smooth;
+}
+
+/* Custom animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+.animate-slide-in-right {
+  animation: slideInRight 0.6s ease-out;
+}

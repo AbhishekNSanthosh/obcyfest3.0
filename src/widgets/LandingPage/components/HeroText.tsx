@@ -39,7 +39,7 @@ export default function HeroText() {
         presents
       </div>
 
-      <div className="bg-gray-100 bg-opacity-15 p-2 rounded-full text-center shadow-lg animate-pulse z-10">
+      <div className="bg-[#f7fafc26] bg-opacity-15 p-2 rounded-full text-center shadow-lg animate-pulse z-10">
         <span className="flex items-center justify-center gap-2 md:text-lg lg:text-lg text-[3vw] font-normal">
           <BsLightningCharge className="text-yellow-400" />
           Boost Your Productivity at Obcyfest 3.0!
@@ -47,7 +47,7 @@ export default function HeroText() {
       </div>
 
       <h1
-        className="hero glitch1 layerstext-4xl font-bold tracking-tight md:text-8xl lg:text-8xl text-[7vw] z-10 mt-5 lg:mt-0 md:mt-0"
+        className="hero glitch1 layerstext-4xl font-bold md:text-8xl lg:text-8xl text-[7vw] z-10 mt-5 lg:mt-0 md:mt-0"
         data-text="OBCYFEST 3.0"
       >
         <span>OBCYFEST 3.0</span>

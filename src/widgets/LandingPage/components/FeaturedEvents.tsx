@@ -4,13 +4,15 @@ import { events } from "@utils/constants";
 import Image from "next/image";
 import Link from "next/link";
 import React, { useEffect, useRef, useState } from "react";
+import { IoClose } from "react-icons/io5";
 
 export default function FeaturedEvents() {
   const scrollRef = useRef<HTMLDivElement | null>(null);
-  const [selectedEvent, setSelectedEvent] = useState<string | null>(null);
+  const [selectedEvent, setSelectedEvent] = useState<typeof events[0] | null>(null);
   const [isVisible, setIsVisible] = useState<boolean>(false); // Track visibility
+  const [isHovered, setIsHovered] = useState<boolean>(false); // Track hover state
   const scrollAmount = 300; // Scroll by 300px each time
-  const delay = 3000; // 3 seconds delay
+  const delay = 2000; // 2 seconds delay
   let scrollInterval: NodeJS.Timeout | null = null; // Store interval ID
 
   useEffect(() => {
@@ -41,8 +43,8 @@ export default function FeaturedEvents() {
   }, []);
 
   useEffect(() => {
-    if (isVisible) {
-      // Start scrolling effect
+    if (isVisible && !isHovered) {
+      // Start scrolling effect only when visible and not hovered
       scrollInterval = setInterval(() => {
         if (scrollRef.current) {
           const maxScrollLeft =
@@ -52,12 +54,12 @@ export default function FeaturedEvents() {
           if (scrollRef.current.scrollLeft >= maxScrollLeft) {
             scrollRef.current.scrollLeft = 0;
           } else {
-            scrollRef.current.scrollLeft += scrollAmount; // Scroll left by 1000px
+            scrollRef.current.scrollLeft += scrollAmount; // Scroll left by 300px
           }
         }
       }, delay);
     } else if (scrollInterval) {
-      clearInterval(scrollInterval); // Stop scrolling when out of view
+      clearInterval(scrollInterval); // Stop scrolling when out of view or hovered
     }
 
     return () => {
@@ -65,7 +67,7 @@ export default function FeaturedEvents() {
         clearInterval(scrollInterval); // Cleanup interval on component unmount
       }
     };
-  }, [isVisible]);
+  }, [isVisible, isHovered]);
 
   useEffect(() => {
     if (selectedEvent) {
@@ -86,70 +88,122 @@ export default function FeaturedEvents() {
     <div className="px-[5vw] md:pt-[10vh] lg:pt-[10vh] pt-[3vh] flex flex-col gap-8">
       <TitleBar
         title="Featured Events"
-        className="text-3xl font-semibold capitalize text-yellow-400"
+        className="text-3xl capitalize font-semibold text-yellow-400"
       />
-      <div
-        ref={scrollRef}
-        className="relative flex overflow-x-scroll scrolldiv whitespace-nowrap gap-2 rounded-lg p-2 bg-gradient-to-r from-yellow-400 via-yellow-300 to-yellow-500 shadow-lg"
-      >
-        {/* Duplicate images array to create a seamless scroll */}
-        {events.map((event, index) => (
-          <Image
-            key={index}
-            src={event?.image}
-            alt={`Event ${index}`}
-            height={100}
-            width={300}
-            className="rounded-lg shadow-md hover:shadow-xl transition-transform duration-300 hover:scale-105 cursor-pointer"
-            onClick={() => setSelectedEvent(event?.image)} // Set selected image on click
-          />
-        ))}
+      
+      {/* Enhanced scroll container with better styling */}
+      <div className="relative group">
+        {/* Gradient overlays for better visual effect */}
+        <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-black to-transparent z-10 pointer-events-none rounded-l-lg"></div>
+        <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-black to-transparent z-10 pointer-events-none rounded-r-lg"></div>
+        
+        <div
+          ref={scrollRef}
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
+          className="relative flex overflow-x-scroll scrolldiv whitespace-nowrap gap-4 rounded-lg p-4 bg-black-950 shadow-lg border border-yellow-400/20 hover:border-yellow-400/50 transition-all duration-300 group"
+          style={{
+            scrollbarWidth: 'none',
+            msOverflowStyle: 'none',
+          }}
+        >
+          {/* Duplicate images array to create a seamless scroll */}
+          {events.map((event, index) => (
+            <div
+              key={index}
+              className="relative group/item flex-shrink-0"
+            >
+              <div 
+                className="relative overflow-hidden rounded-lg cursor-pointer transform transition-all duration-500 hover:-translate-y-4 hover:scale-105 group-hover/item:shadow-2xl"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setSelectedEvent(event);
+                }}
+              >
+                <Image
+                  src={event?.image}
+                  alt={event?.title || `Event ${index}`}
+                  height={120}
+                  width={320}
+                  className="rounded-lg shadow-md transition-all duration-500 border-2 border-transparent hover:border-yellow-400/60 group-hover/item:brightness-110 transform-gpu"
+                />
+                {/* Overlay effect on hover */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover/item:opacity-100 transition-all duration-300 rounded-lg flex flex-col items-center justify-center">
+                  <h3 className="text-white font-bold text-lg mb-2 text-center px-2">
+                    {event?.title || `Event ${index + 1}`}
+                  </h3>
+                  <span className="text-black-950 font-semibold text-sm px-3 py-1 bg-yellow-400 rounded-md">
+                    Click to View
+                  </span>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
-      <div className="">
-        <span className="text-gray-500 text-left text-xs italic tracking-wide">
-          *Click to register for the event
+      
+      <div className="flex items-center gap-2">
+        <div className="w-2 h-2 bg-yellow-400 rounded-full animate-pulse"></div>
+        <span className="text-gray-400 text-sm italic tracking-wide">
+          Hover to pause • Click any event to register
         </span>
       </div>
+      
       <div className="w-full items-center justify-center flex">
         <Link href={"/events"}>
-          <button className="bg-yellow-400 text-black-950 px-3 py-2 rounded-[5px] font-semibold">
+          <button className="bg-yellow-400 rounded-lg px-8 py-3 text-black-950 font-semibold hover:bg-yellow-500 transition-colors">
             View All Events
           </button>
         </Link>
       </div>
 
-      {/* Modal */}
+      {/* Enhanced Modal */}
       {selectedEvent && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black-900 backdrop-blur-md bg-opacity-30"
-          onClick={() => setSelectedEvent(null)} // Close modal on background click
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-lg"
+          onClick={() => setSelectedEvent(null)}
         >
           <div
-            className="relative bg-yellow-400 rounded-lg p-6 w-[90vw] max-w-lg mx-auto flex flex-col items-center gap-4"
-            onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside the modal
+            className="relative bg-black-950 rounded-lg p-6 w-[95vw] max-w-lg mx-auto flex flex-col items-center gap-4 shadow-lg border border-yellow-400/20"
+            onClick={(e) => e.stopPropagation()}
           >
+            {/* Close button */}
+            <button
+              className="absolute top-2 right-2 text-gray-400 hover:text-white w-8 h-8 rounded-full bg-transparent hover:bg-red-600 transition-all duration-300 flex items-center justify-center"
+              onClick={() => setSelectedEvent(null)}
+            >
+              <IoClose className="text-xl" />
+            </button>
+            
+            {/* Event image */}
             <Image
-              src={selectedEvent}
-              alt="Selected Event"
+              src={selectedEvent.image}
+              alt={selectedEvent.title}
               height={300}
               width={600}
               className="rounded-lg"
             />
-            <button
-              className="absolute top-2 right-2 text-black-950 font-bold text-lg"
-              onClick={() => setSelectedEvent(null)} // Close the modal when the close button is clicked
-            >
-              X
-            </button>
-            <button
-              className="bg-black-950 text-white w-full px-6 py-2 rounded-md font-semibold shadow-md hover:bg-yellow-600 transition"
-              onClick={() => alert("Register Now button clicked!")} // Placeholder action for the button
-            >
-              Register Now
-            </button>
+            
+            {/* Event details */}
+            <div className="text-center space-y-2">
+              <h3 className="text-2xl font-bold text-yellow-400">{selectedEvent.title}</h3>
+            </div>
+            
+            {/* Action button */}
+            <div className="w-full">
+              <a
+                href={selectedEvent.regLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="bg-yellow-400 text-black-950 w-full px-6 py-2 rounded-md font-semibold shadow-md hover:bg-yellow-500 transition-colors text-center block"
+              >
+                Register Now
+              </a>
+            </div>
           </div>
         </div>
       )}
     </div>
   );
 }
+

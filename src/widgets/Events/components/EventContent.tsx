@@ -76,7 +76,7 @@ export default function EventContent() {
       </div>
 
       {/* Event Grid */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-14">
         {filteredEvents.map((event, index) => (
           <div
             key={index}
@@ -86,8 +86,9 @@ export default function EventContent() {
             <Image
               src={event.image}
               alt={`Event ${index}`}
-              height={200}
-              width={300}
+              height={195}
+              quality={70}
+              width={290}
               className="shadow-[5px]"
             />
           </div>

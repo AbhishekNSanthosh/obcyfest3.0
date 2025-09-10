@@ -8,7 +8,7 @@ $primary-color: #dfff1b;
 $theme-color: #dfff1b;
 
 // Fonts & Typography
-$font-family:  "Poppins", serif;
+$font-family: "Poppins", sans-serif !default;
 $font-size-base: 1rem !default;
 $font-size-sm: $font-size-base * 0.875 !default;
 $font-size-lg: $font-size-base * 1.25 !default;
