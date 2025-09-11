@@ -113,12 +113,9 @@ export default function FeaturedEvents() {
               key={index}
               className="relative group/item flex-shrink-0"
             >
+              <Link href={`/events/${event.id}`}>
               <div 
                 className="relative overflow-hidden rounded-lg cursor-pointer transform transition-all duration-500 hover:-translate-y-4 hover:scale-105 group-hover/item:shadow-2xl"
-                onClick={(e) => {
-                  e.preventDefault();
-                  setSelectedEvent(event);
-                }}
               >
                 <Image
                   src={event?.image}
@@ -136,7 +133,8 @@ export default function FeaturedEvents() {
                     Click to View
                   </span>
                 </div>
-              </div>
+                </div>
+                </Link>
             </div>
           ))}
         </div>
@@ -156,53 +154,6 @@ export default function FeaturedEvents() {
           </button>
         </Link>
       </div>
-
-      {/* Enhanced Modal */}
-      {selectedEvent && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-lg"
-          onClick={() => setSelectedEvent(null)}
-        >
-          <div
-            className="relative bg-black-950 rounded-lg p-6 w-[95vw] max-w-lg mx-auto flex flex-col items-center gap-4 shadow-lg border border-yellow-400/20"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Close button */}
-            <button
-              className="absolute top-2 right-2 text-gray-400 hover:text-white w-8 h-8 rounded-full bg-transparent hover:bg-red-600 transition-all duration-300 flex items-center justify-center"
-              onClick={() => setSelectedEvent(null)}
-            >
-              <IoClose className="text-xl" />
-            </button>
-            
-            {/* Event image */}
-            <Image
-              src={selectedEvent.image}
-              alt={selectedEvent.title}
-              height={300}
-              width={600}
-              className="rounded-lg"
-            />
-            
-            {/* Event details */}
-            <div className="text-center space-y-2">
-              <h3 className="text-2xl font-bold text-yellow-400">{selectedEvent.title}</h3>
-            </div>
-            
-            {/* Action button */}
-            <div className="w-full">
-              <a
-                href={selectedEvent.regLink}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="bg-yellow-400 text-black-950 w-full px-6 py-2 rounded-md font-semibold shadow-md hover:bg-yellow-500 transition-colors text-center block"
-              >
-                Register Now
-              </a>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
