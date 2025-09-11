@@ -34,10 +34,10 @@ export async function POST(req: Request) {
             Your teammate is ready to join the mission for <strong>${eventTitle}</strong>! Time to collaborate, code, and create some engineering magic.
           </p>
           <p style="font-size:16px; line-height:1.6;">
-            Head to your <a href="http://localhost:3000/events/profile" style="color:#dfff1b; text-decoration:underline;">event dashboard</a> to see your team in action.
+            Head to your <a href="http://localhost:3000/profile" style="color:#dfff1b; text-decoration:underline;">event dashboard</a> to see your team in action.
           </p>
           <div style="margin-top:30px; text-align:center;">
-            <a href="http://localhost:3000/events/profile"
+            <a href="http://localhost:3000/profile"
                style="background:#dfff1b; color:#111; padding:12px 30px; border-radius:6px; text-decoration:none; font-weight:600; display:inline-block;">
                Check Team 🚀
             </a>
@@ -65,7 +65,7 @@ export async function POST(req: Request) {
             Keep checking the <a href="http://localhost:3000/events/" style="color:#dfff1b; text-decoration:underline;">event dashboard</a> for new team members and updates.
           </p>
           <div style="margin-top:30px; text-align:center;">
-            <a href="http://localhost:3000/events/profile"
+            <a href="http://localhost:3000/profile"
                style="background:#ef4444; color:white; padding:12px 30px; border-radius:6px; text-decoration:none; font-weight:600; display:inline-block;">
                See Team 😎
             </a>
