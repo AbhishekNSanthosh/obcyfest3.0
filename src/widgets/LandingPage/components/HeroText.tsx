@@ -1,3 +1,4 @@
+import { eventName } from "@utils/constants";
 import Link from "next/link";
 import React from "react";
 import { BsLightningCharge } from "react-icons/bs";
@@ -42,15 +43,15 @@ export default function HeroText() {
       <div className="bg-[#f7fafc26] bg-opacity-15 p-2 rounded-full text-center shadow-lg animate-pulse z-10">
         <span className="flex items-center justify-center gap-2 md:text-lg lg:text-lg text-[3vw] font-normal">
           <BsLightningCharge className="text-yellow-400" />
-          Boost Your Productivity at Obcyfest 3.0!
+          Boost Your Productivity at {eventName}!
         </span>
       </div>
 
       <h1
         className="hero glitch1 layerstext-4xl font-bold md:text-8xl lg:text-8xl text-[7vw] z-10 mt-5 lg:mt-0 md:mt-0"
-        data-text="OBCYFEST 3.0"
+        data-text={eventName}
       >
-        <span>OBCYFEST 3.0</span>
+        <span>{eventName}</span>
       </h1>
 
       {/* Date & Call to Action */}
@@ -81,11 +82,11 @@ export default function HeroText() {
       </div>
 
       {/* Call to Action Button */}
-        <button className="md:mt-10 lg:mt-10 mt-2 px-8 py-3 bg-yellow-400 rounded-lg cursor-pointer font-semibold text-black-950 hover:bg-yellow-500 transition-colors z-10">
-      <Link href={"/events"}>
+       <Link className=" z-10" href={"/events"}>
+        <button className="md:mt-10 lg:mt-10 mt-2 px-8 py-3 bg-yellow-400 rounded-lg cursor-pointer font-semibold text-black-950 hover:bg-yellow-500 transition-colors">
           Register Now
+      </button>
       </Link>
-        </button>
     </div>
   );
 }

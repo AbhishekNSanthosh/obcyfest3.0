@@ -1,21 +1,38 @@
-type Event = {
-    id: string;
-    title: string;
-    image: string;
-    regLink: string;
-    type: 'technical' | 'nonTechnical' | 'sports';
-    date?: string;
-    description: string;
-    venue?: string;
-    eventType: string;
-    maxParticipation?: string;
-    minParticipation?: string;
-    totalParticipation?: string;
-    registrationFee: string;
-    firstPrize: string;
-    secondPrize?: string;
-    coordinators: string[];
-};
+import { Event } from "@lib/types";
+
+export const eventName = "ObcyFest 4.0";
+
+export const faqs: Faq[] = [
+    {
+        question: "What is Obcyfest?",
+        answer:
+            "Obcyfest is a tech fest organized by the Computer Science department, featuring workshops, competitions, and talks from industry experts.",
+    },
+    {
+        question: "When will Obcyfest take place?",
+        answer: "Obcyfest will be held from September 22 to September 26, 2025.",
+    },
+    {
+        question: "How can I register for events?",
+        answer:
+            "You can register for events through our official website by filling out the registration form.",
+    },
+    {
+        question: "Is there a participation fee?",
+        answer:
+            "Some events may have a participation fee, which will be mentioned during the registration process.",
+    },
+    {
+        question: "Can I volunteer at Obcyfest?",
+        answer:
+            "Yes! We welcome volunteers to help us with organizing the events. Please reach out to us for more information.",
+    },
+];
+
+export interface Faq {
+    question: string;
+    answer: string;
+}
 
 export const events: Event[] = [
     {

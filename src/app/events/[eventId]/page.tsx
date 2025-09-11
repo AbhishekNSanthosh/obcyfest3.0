@@ -27,13 +27,14 @@ import { LuMapPin, LuCalendar, LuUsers, LuIndianRupee, LuTrophy } from 'react-ic
 
 interface EventPageProps {
   params: {
-    id: string
+    eventId: string
   }
 }
 
-export default function EventPage({ params }: EventPageProps) {
-  const event = events.find(e => e.id === params.id)
-  
+export default async function EventPage({ params }: EventPageProps) {
+  const {eventId} = await params
+  const event = events.find(e => e.id === eventId)
+
   if (!event) {
     notFound()
   }
@@ -65,9 +66,9 @@ export default function EventPage({ params }: EventPageProps) {
   };
 
   return (
-    <div className="min-h-screen bg text-white">
+    <div className="flex flex-col min-h-screen bg text-white">
       {/* Hero Section with Image and Title */}
-      <div className="relative h-[50vh] overflow-hidden">
+      <div className="relative flex h-[40vh] lg:h-[60vh] overflow-scroll-hidden">
         {/* Background Image */}
         <div className="absolute inset-0">
           <Image
@@ -81,11 +82,10 @@ export default function EventPage({ params }: EventPageProps) {
         </div>
         
         {/* Hero Content */}
-        <div className="relative z-10 h-full flex flex-col justify-end px-[5vw] pb-[6vh]">
+        <div className="relative z-10 flex flex-1 flex-col justify-end px-[5vw]  lg:pb-[6vh]">
           <div className="max-w-4xl mx-auto w-full">
-            
             {/* Event Title */}
-            <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold text-yellow-400 tracking-tight leading-tight mb-4">
+            <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold text-yellow-400 tracking-tight leading-tight mb-4 mt-8">
               {event.title}
             </h1>
             
@@ -98,17 +98,17 @@ export default function EventPage({ params }: EventPageProps) {
       </div>
 
       {/* Main Content Section */}
-      <div className="px-[5vw] py-[5vh]">
-        <div className="max-w-5xl mx-auto">
+      <div className="flex flex-1 px-[5vw] py-[5vh]">
+        <div className="flex flex-col max-w-5xl mx-auto w-full">
 
           {/* Event Details Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+          <div className="flex flex-wrap gap-6 mb-8">
             {event.date && (
-              <div className="bg-black-950 bg-opacity-80 p-6 rounded-xl flex items-center space-x-4 shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-yellow-400/20 border border-black-900">
-                <div className="bg-yellow-400/20 p-3 rounded-lg">
+              <div className="flex-1 min-w-[280px] bg-black-950 bg-opacity-80 p-6 rounded-xl flex items-center space-x-4 shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-yellow-400/20 border border-black-900">
+                <div className="bg-yellow-400/20 p-3 rounded-lg flex-shrink-0">
                   <LuCalendar className="text-yellow-400 text-2xl" />
                 </div>
-                <div className="flex-1">
+                <div className="flex-1 min-w-0">
                   <h3 className="font-semibold text-gray-400 text-sm mb-1">Date</h3>
                   <p className="text-lg text-white font-medium">{event.date}</p>
                 </div>
@@ -116,22 +116,22 @@ export default function EventPage({ params }: EventPageProps) {
             )}
             
             {event.venue && (
-              <div className="bg-black-950 bg-opacity-80 p-6 rounded-xl flex items-center space-x-4 shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-yellow-400/20 border border-black-900">
-                <div className="bg-yellow-400/20 p-3 rounded-lg">
+              <div className="flex-1 min-w-[280px] bg-black-950 bg-opacity-80 p-6 rounded-xl flex items-center space-x-4 shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-yellow-400/20 border border-black-900">
+                <div className="bg-yellow-400/20 p-3 rounded-lg flex-shrink-0">
                   <LuMapPin className="text-yellow-400 text-2xl" />
                 </div>
-                <div className="flex-1">
+                <div className="flex-1 min-w-0">
                   <h3 className="font-semibold text-gray-400 text-sm mb-1">Venue</h3>
                   <p className="text-lg text-white font-medium">{event.venue}</p>
                 </div>
               </div>
             )}
 
-            <div className="bg-black-950 bg-opacity-80 p-6 rounded-xl flex items-center space-x-4 shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-yellow-400/20 border border-black-900">
-              <div className="bg-yellow-400/20 p-3 rounded-lg">
+            <div className="flex-1 min-w-[280px] bg-black-950 bg-opacity-80 p-6 rounded-xl flex items-center space-x-4 shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-yellow-400/20 border border-black-900">
+              <div className="bg-yellow-400/20 p-3 rounded-lg flex-shrink-0">
                 <LuUsers className="text-yellow-400 text-2xl" />
               </div>
-              <div className="flex-1">
+              <div className="flex-1 min-w-0">
                 <h3 className="font-semibold text-gray-400 text-sm mb-1">Participation</h3>
                 <p className="text-lg text-white font-medium">
                   {event.eventType}
@@ -139,21 +139,21 @@ export default function EventPage({ params }: EventPageProps) {
               </div>
             </div>
 
-            <div className="bg-black-950 bg-opacity-80 p-6 rounded-xl flex items-center space-x-4 shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-yellow-400/20 border border-black-900">
-              <div className="bg-yellow-400/20 p-3 rounded-lg">
+            <div className="flex-1 min-w-[280px] bg-black-950 bg-opacity-80 p-6 rounded-xl flex items-center space-x-4 shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-yellow-400/20 border border-black-900">
+              <div className="bg-yellow-400/20 p-3 rounded-lg flex-shrink-0">
                 <LuIndianRupee className="text-yellow-400 text-2xl" />
               </div>
-              <div className="flex-1">
+              <div className="flex-1 min-w-0">
                 <h3 className="font-semibold text-gray-400 text-sm mb-1">Registration Fee</h3>
                 <p className="text-lg text-white font-medium">{event.registrationFee}</p>
               </div>
             </div>
 
-            <div className="bg-black-950 bg-opacity-80 p-6 rounded-xl flex items-center space-x-4 shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-yellow-400/20 border border-black-900">
-              <div className="bg-yellow-400/20 p-3 rounded-lg">
+            <div className="flex-1 min-w-[280px] bg-black-950 bg-opacity-80 p-6 rounded-xl flex items-center space-x-4 shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-yellow-400/20 border border-black-900">
+              <div className="bg-yellow-400/20 p-3 rounded-lg flex-shrink-0">
                 <LuTrophy className="text-yellow-400 text-2xl" />
               </div>
-              <div className="flex-1">
+              <div className="flex-1 min-w-0">
                 <h3 className="font-semibold text-gray-400 text-sm mb-1">Prizes</h3>
                 <p className="text-lg text-white font-medium">
                   1st: {event.firstPrize}
@@ -166,11 +166,11 @@ export default function EventPage({ params }: EventPageProps) {
           {/* Coordinators Section */}
           <div className="bg-black-950 bg-opacity-60 p-6 rounded-xl mb-8 border border-black-900">
             <h3 className="text-2xl font-bold text-yellow-400 mb-6 text-center">Event Coordinators</h3>
-            <div className="flex flex-wrap justify-center gap-3">
+            <div className="flex flex-wrap justify-center items-center gap-3">
               {event.coordinators.map((coordinator, index) => (
                 <div 
                   key={index} 
-                  className="bg-yellow-400/10 text-gray-300 text-base px-4 py-2 rounded-lg shadow-lg border border-yellow-400/30 hover:bg-yellow-400/20 transition-all duration-300"
+                  className="flex-shrink-0 bg-yellow-400/10 text-gray-300 text-base px-4 py-2 rounded-lg shadow-lg border border-yellow-400/30 hover:bg-yellow-400/20 transition-all duration-300"
                 >
                   {coordinator}
                 </div>
@@ -181,17 +181,15 @@ export default function EventPage({ params }: EventPageProps) {
           {/* Action Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <a
-              href={event.regLink}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="bg-yellow-400 text-black-950 px-8 py-3 rounded-lg font-semibold text-base shadow-lg hover:bg-yellow-500 transition-all duration-300 transform hover:scale-105"
+              href={`./${eventId}/register`}
+              className="flex-shrink-0 bg-yellow-400 text-black-950 px-8 py-3 rounded-lg font-semibold text-base shadow-lg hover:bg-yellow-500 transition-all duration-300 transform hover:scale-105"
             >
               Register Now
             </a>
             
             <Link
               href="/events"
-              className="border border-yellow-400 text-yellow-400 px-8 py-3 rounded-lg font-semibold text-base shadow-lg hover:bg-yellow-400 hover:text-black-950 transition-all duration-300 transform hover:scale-105"
+              className="flex-shrink-0 border border-yellow-400 text-yellow-400 px-8 py-3 rounded-lg font-semibold text-base shadow-lg hover:bg-yellow-400 hover:text-black-950 transition-all duration-300 transform hover:scale-105"
             >
               Back to Events
             </Link>
