@@ -8,13 +8,11 @@ import toast from "react-hot-toast";
 import {
   doc,
   getDoc,
-  setDoc,
   serverTimestamp,
   collection,
   query,
   where,
   onSnapshot,
-  updateDoc,
   runTransaction,
 } from "firebase/firestore";
 import { useRouter } from "next/navigation";
@@ -129,6 +127,8 @@ export default function ProfilePage() {
     };
   }, [user]);
 
+  console.log("Invites:", invites);
+
   // Real-time registrations listener
   useEffect(() => {
     if (!user) return;
@@ -191,27 +191,51 @@ export default function ProfilePage() {
     }
   };
 
-  const handleInviteResponse = async (inviteId: string, newStatus: "accepted" | "declined") => {
-    setUpdatingInvite(inviteId);
-    try {
-      const ref = doc(db, "invitations", inviteId);
-      await runTransaction(db, async (transaction) => {
-        const inviteDoc = await transaction.get(ref);
-        if (!inviteDoc.exists()) {
-          throw new Error("Invite does not exist!");
-        }
-        if (inviteDoc.data().status === "pending") {
-          transaction.update(ref, { status: newStatus });
-        }
+const handleInviteResponse = async (
+  inviteId: string,
+  newStatus: "accepted" | "declined"
+) => {
+  setUpdatingInvite(inviteId);
+  try {
+    const ref = doc(db, "invitations", inviteId);
+
+    // Run transaction
+    const inviteData = await runTransaction(db, async (transaction) => {
+      const inviteDoc = await transaction.get(ref);
+      if (!inviteDoc.exists()) throw new Error("Invite does not exist!");
+
+      const currentStatus = inviteDoc.data().status;
+      if (currentStatus !== "pending") {
+        throw new Error(`Invite already ${currentStatus}.`);
+      }
+
+      transaction.update(ref, { status: newStatus });
+      return inviteDoc.data(); // return data for email
+    });
+
+    if (inviteData) {
+      await fetch("/api/invite-response", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          inviterEmail: inviteData.inviterEmail,
+          inviteeName: inviteData.inviteeEmail, // optionally displayName
+          eventTitle: inviteData.eventTitle,
+          status: newStatus,
+        }),
       });
-      toast.success(`Invite ${newStatus} successfully.`);
-    } catch (e) {
-      console.error("Failed to update invite status", e);
-      toast.error("Failed to update invite status. Please try again.");
-    } finally {
-      setUpdatingInvite(null);
     }
-  };
+
+    toast.success(`Invite ${newStatus} successfully.`);
+  } catch (e: any) {
+    console.error("Failed to update invite status", e);
+    toast.error(e.message || "Failed to update invite status. Please try again.");
+  } finally {
+    setUpdatingInvite(null);
+  }
+};
+
+
 
   const getStatusClass = (status: string) => {
     switch (status.toLowerCase()) {

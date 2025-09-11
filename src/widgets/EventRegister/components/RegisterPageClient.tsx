@@ -23,7 +23,7 @@ interface RegisterPageClientProps {
 }
 
 const Loader = ({ text }: { text: string }) => (
-    <div className="min-h-screen pt-[12vh] text-white flex items-center justify-center">
+    <div className="min-h-screen flex items-center justify-center text-white">
       <div className="text-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-yellow-400 mx-auto mb-4" />
         <p className="text-gray-300">{text}</p>
@@ -150,7 +150,7 @@ export default function RegisterPageClient({ eventId, event }: RegisterPageClien
       const q = query(collection(db, 'users'), where('email', '==', email))
       const snap = await getDocs(q)
       if (snap.empty) {
-        setInviteErrors('No user found with that email.')
+        setInviteErrors('No user found with that email in obcyFest.')
         return
       }
 
@@ -183,33 +183,22 @@ export default function RegisterPageClient({ eventId, event }: RegisterPageClien
         createdAt: serverTimestamp(),
       })
       setInviteEmail('')
+      await fetch("/api/send-invite", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        to: email,    
+        inviterName: profile.displayName,
+        eventTitle: event?.title,
+        inviteLink: `http://localhost:3000/profile`
+    }),
+});
       toast.success('Invite sent successfully!')
     } catch (err) {
       console.error(err)
       setInviteErrors('Failed to send invite. Please try again.')
     } finally {
       setIsInviting(false)
-    }
-  }
-
-  // Accept/Decline invite (invitee side)
-  const handleRespondInvite = async (inviteId: string, accept: boolean) => {
-    setRespondingInvite(inviteId)
-    try {
-      await runTransaction(db, async (transaction) => {
-        const inviteRef = doc(db, 'invitations', inviteId)
-        const inviteDoc = await transaction.get(inviteRef)
-        if (!inviteDoc.exists()) {
-          throw 'Invite not found'
-        }
-        transaction.update(inviteRef, { status: accept ? 'accepted' : 'declined' })
-      })
-      toast.success(`Invite ${accept ? 'accepted' : 'declined'}.`)
-    } catch (err) {
-      console.error(err)
-      toast.error('Failed to respond to invite.')
-    } finally {
-      setRespondingInvite(null)
     }
   }
 
@@ -337,7 +326,7 @@ export default function RegisterPageClient({ eventId, event }: RegisterPageClien
   }
 
   return (
-    <div className="min-h-screen pt-[12vh] text-white">
+    <div className="min-h-screen py-16 sm:py-24 text-white">
       {!currentUser ? (
         <div className="min-h-screen flex items-center justify-center bg-black-950 text-white">
           <div className="text-center px-4">
@@ -363,22 +352,22 @@ export default function RegisterPageClient({ eventId, event }: RegisterPageClien
       ) : (
         <>
           {/* Header */}
-          <div className="px-[2vw] py-6 border-b border-gray-800">
+          <div className="px-6 sm:px-6 lg:px-8 py-6 border-b border-gray-800">
             <div className="max-w-4xl mx-auto">
-              <h1 className="text-3xl md:text-4xl font-bold text-yellow-400 mb-2">
+              <h1 className="text-xl sm:text-3xl md:text-4xl font-bold text-yellow-400 mb-2">
                 Register for {event?.title}
               </h1>
-              <p className="text-gray-300 text-lg">
+              <p className="text-gray-300 text-base sm:text-lg">
                 {event?.eventType} • Registration Fee: {event?.registrationFee}
               </p>
             </div>
           </div>
 
-          <div className="px-[5vw] py-8">
+          <div className="px-4 sm:px-6 lg:px-8 py-8">
             <div className="max-w-2xl mx-auto space-y-8">
               {/* User details */}
               <div className="bg-black-950 bg-opacity-60 p-6 rounded-xl border border-gray-800">
-                <h2 className="text-xl font-semibold text-yellow-400 mb-6 flex items-center gap-2">
+                <h2 className="text-lg font-semibold text-yellow-400 mb-6 flex items-center gap-2">
                   <LuUser className="text-lg" />
                   Your Details
                 </h2>
@@ -414,7 +403,7 @@ export default function RegisterPageClient({ eventId, event }: RegisterPageClien
               {isGroupEvent && (
                 <div className="bg-black-950 bg-opacity-60 p-6 rounded-xl border border-gray-800">
                   <div className="flex items-center justify-between mb-6">
-                    <h2 className="text-xl font-semibold text-yellow-400 flex items-center gap-2">
+                    <h2 className="text-base sm:text-lg md:text-xl font-semibold text-yellow-400 flex items-center gap-2">
                       <LuUsers className="text-lg" />
                       Invite Members by Email ({1 + invited.filter(i => i.status === 'accepted').length}/{maxGroupSize})
                     </h2>
@@ -424,7 +413,7 @@ export default function RegisterPageClient({ eventId, event }: RegisterPageClien
                     same-day conflict.
                   </p>
 
-                  <div className="flex gap-3 items-start">
+                  <div className="flex flex-col sm:flex-row gap-3">
                     <input
                       type="email"
                       value={inviteEmail}
@@ -436,7 +425,7 @@ export default function RegisterPageClient({ eventId, event }: RegisterPageClien
                     <button
                       type="button"
                       onClick={handleInvite}
-                      className="flex items-center gap-2 px-4 py-3 bg-yellow-400 text-black-950 rounded-lg font-semibold hover:bg-yellow-500 disabled:opacity-50"
+                      className="flex items-center justify-center gap-2 px-4 py-3 bg-yellow-400 text-black-950 rounded-lg font-semibold hover:bg-yellow-500 disabled:opacity-50"
                       disabled={isInviting}
                     >
                       {isInviting ? <LuLoader className="animate-spin" /> : <LuPlus />}
@@ -450,35 +439,22 @@ export default function RegisterPageClient({ eventId, event }: RegisterPageClien
                       {invited.map((m) => (
                         <div
                           key={m.id}
-                          className="flex items-center justify-between bg-gray-900 border border-gray-700 rounded-lg px-4 py-2"
+                          className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 bg-gray-900 border border-gray-700 rounded-lg px-4 py-3 w-full"
                         >
-                          <span className="text-gray-200">{m.email} {m.status ? `(${m.status})` : ''}</span>
-                          <div className="flex gap-2 items-center">
-                            {m.status === 'pending' && profile?.uid !== currentUser?.uid && (
-                              <>
-                                <button
-                                  onClick={() => handleRespondInvite(m.id, true)}
-                                  className="text-green-400 text-sm hover:underline disabled:opacity-50"
-                                  disabled={respondingInvite === m.id}
-                                >
-                                  {respondingInvite === m.id ? 'Accepting...' : 'Accept'}
-                                </button>
-                                <button
-                                  onClick={() => handleRespondInvite(m.id, false)}
-                                  className="text-red-400 text-sm hover:underline disabled:opacity-50"
-                                  disabled={respondingInvite === m.id}
-                                >
-                                  {respondingInvite === m.id ? 'Declining...' : 'Decline'}
-                                </button>
-                              </>
-                            )}
+                          {/* Email and Status */}
+                          <span className="text-gray-200 break-words truncate sm:truncate-none max-w-full sm:max-w-xs">
+                            {m.email} {m.status ? `(${m.status})` : ''}
+                          </span>
+
+                          {/* Buttons */}
+                          <div className="flex flex-wrap sm:flex-nowrap gap-2 items-start sm:items-center mt-2 sm:mt-0">
                             {profile?.uid === currentUser?.uid && (
                               <button
                                 onClick={() => handleCancelInvite(m.id)}
-                                className="text-red-400 text-sm hover:underline disabled:opacity-50"
+                                className="px-3 py-1 text-sm rounded-md bg-red-500 text-white hover:bg-red-600 disabled:opacity-50"
                                 disabled={cancellingInvite === m.id}
                               >
-                                {cancellingInvite === m.id ? 'Cancelling...' : 'Cancel'}
+                                {cancellingInvite === m.id ? 'Removing...' : 'Remove'}
                               </button>
                             )}
                           </div>
