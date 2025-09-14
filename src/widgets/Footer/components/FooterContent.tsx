@@ -59,7 +59,7 @@ export default function FooterContent() {
               Contact Us
             </h3>
             <p className="text-sm text-gray-800">
-              Carmel College of Engineering and Technology,
+              Carmel College of Engineering and Engineering,
               <br />
               Punnapra | Alappuzha-688004, Kerala
               <br />
