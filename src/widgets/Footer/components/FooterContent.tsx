@@ -1,3 +1,4 @@
+import { eventName } from "@utils/constants";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
@@ -24,7 +25,7 @@ export default function FooterContent() {
               className="w-[200px] mb-4"
             />
             <p className="text-black-950 text-sm md:text-base font-medium">
-              Celebrating Innovation and Tech at Obcyfest 3.0
+              Celebrating Innovation and Tech at {eventName}!
             </p>
             <p className="text-sm text-gray-800">
               Join us in celebrating the spirit of innovation and technology. Be
@@ -85,7 +86,7 @@ export default function FooterContent() {
             Made with 🖤 by Obcydians.
           </div>
           <div className="text-sm">
-            © {new Date().getFullYear()} Obcyfest 3.0. All rights reserved.
+            © {new Date().getFullYear()} {eventName}. All rights reserved.
           </div>
         </div>
       </div>

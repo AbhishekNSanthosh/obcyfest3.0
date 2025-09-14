@@ -6,9 +6,7 @@ import EventContent from './components/EventContent'
 export default function EventView() {
   return (
     <main>
-        <HeaderView/>
         <EventContent/>
-        <FooterView/>
     </main>
   )
 }

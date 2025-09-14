@@ -3,39 +3,7 @@ import TitleBar from "@components/TitleBar";
 import React, { useState } from "react";
 import { IoIosArrowDown } from "react-icons/io";
 import { IoIosArrowUp } from "react-icons/io";
-
-// Define the type for a FAQ item
-interface Faq {
-  question: string;
-  answer: string;
-}
-
-const faqs: Faq[] = [
-  {
-    question: "What is Obcyfest?",
-    answer:
-      "Obcyfest is a tech fest organized by the Computer Science department, featuring workshops, competitions, and talks from industry experts.",
-  },
-  {
-    question: "When will Obcyfest take place?",
-    answer: "Obcyfest will be held from October 30 to November 5, 2024.",
-  },
-  {
-    question: "How can I register for events?",
-    answer:
-      "You can register for events through our official website by filling out the registration form.",
-  },
-  {
-    question: "Is there a participation fee?",
-    answer:
-      "Some events may have a participation fee, which will be mentioned during the registration process.",
-  },
-  {
-    question: "Can I volunteer at Obcyfest?",
-    answer:
-      "Yes! We welcome volunteers to help us with organizing the events. Please reach out to us for more information.",
-  },
-];
+import {faqs} from '@utils/constants';
 
 export default function Faqs() {
   return (

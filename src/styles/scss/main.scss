@@ -1,13 +1,15 @@
-@import "custom/variables";
-
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@use "custom/variables" as *;
 
 body {
   padding: 0;
   margin: 0;
   font-family: $font-family;
+}
+
+button {
+  cursor: pointer;
+  font-family: $font-family;
+  transition: all 0.3s ease;
 }
 
 .logo{
@@ -54,7 +56,7 @@ a {
 
 .hero {
   font-family: "Fugaz One", sans-serif;
-  letter-spacing: -0.01em;
+  // letter-spacing: -0.01em;
   display: inline-block;
   color: #DFFF1B;
   z-index: 2;

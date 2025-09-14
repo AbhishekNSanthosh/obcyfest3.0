@@ -1,3 +1,4 @@
+import { eventName } from '@utils/constants';
 import React from 'react';
 
 export default function Marquee() {
@@ -8,12 +9,12 @@ export default function Marquee() {
           {/* Original items */}
           <span className="item uppercase font-semibold">obcydians ccet</span>
           <span className="item uppercase font-semibold">department of computer science & technology</span>
-          <span className="item uppercase font-semibold">obcyfest 3.0</span>
+          <span className="item uppercase font-semibold">{eventName}</span>
 
           {/* Duplicate items for continuous effect */}
           <span className="item uppercase font-semibold">obcydians ccet</span>
           <span className="item uppercase font-semibold">department of computer science & technology</span>
-          <span className="item uppercase font-semibold">obcyfest 3.0</span>
+          <span className="item uppercase font-semibold">{eventName}</span>
         </div>
       </div>
     </div>

@@ -10,7 +10,6 @@ import FeaturedEvents from "./components/FeaturedEvents";
 export default function LandingPageView() {
   return (
     <main>
-      <HeaderView />
       <HeroText />
       <Marquee />
       <FeaturedEvents />
@@ -20,9 +19,7 @@ export default function LandingPageView() {
       <section id="faqs">
         <Info />
       </section>
-      <section id="contact">
-        <FooterView />
-      </section>
+
     </main>
   );
 }
