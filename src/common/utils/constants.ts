@@ -2,6 +2,8 @@ import { Event } from "@lib/types";
 
 export const eventName = "ObcyFest 4.0";
 
+export const semesters = [1, 3, 5, 7];
+
 export const faqs: Faq[] = [
     {
         question: "What is Obcyfest?",
@@ -51,8 +53,8 @@ export const events: Event[] = [
         firstPrize: "900/-",
         secondPrize: "600/-",
         coordinators: [
-            "Alfred Joe Devasia - S7",
-            "Uday Krishna - S7"
+            { name: "Alfred Joe Devasia - S7", phone: "919876543210" },
+            { name: "Uday Krishna - S7", phone: "919876543210" }
         ]
     },
     {
@@ -71,8 +73,8 @@ export const events: Event[] = [
         firstPrize: "600/-",
         secondPrize: "400/-",
         coordinators: [
-            "Safna M S- S7",
-            "Ardra S Anil- S7"
+            { name: "Safna M S- S7", phone: "919876543210" },
+            { name: "Ardra S Anil- S7", phone: "919876543210" }
         ]
     },
     {
@@ -91,8 +93,8 @@ export const events: Event[] = [
         firstPrize: "500/-",
         secondPrize: "250/-",
         coordinators: [
-            "Nandhu Krishnan- S5",
-            "Athul Tomy- S5"
+            { name: "Nandhu Krishnan- S5", phone: "919876543210" },
+            { name: "Athul Tomy- S5", phone: "919876543210" }
         ]
     },
     {
@@ -111,8 +113,8 @@ export const events: Event[] = [
         firstPrize: "1000/-",
         secondPrize: "500/-",
         coordinators: [
-            "Jacs J Jacob - S7 CSE",
-            "Deepak Dayanandhan - S7 CSE"
+            { name: "Jacs J Jacob - S7 CSE", phone: "919876543210" },
+            { name: "Deepak Dayanandhan - S7 CSE", phone: "919876543210" }
         ]
     },
     {
@@ -131,8 +133,8 @@ export const events: Event[] = [
         firstPrize: "1000/-",
         secondPrize: "500/-",
         coordinators: [
-            "Hellan Raichel Benoy - S5",
-            "Khulood Salam - S5"
+            { name: "Hellan Raichel Benoy - S5", phone: "919876543210" },
+            { name: "Khulood Salam - S5", phone: "919876543210" }
         ]
     },
     {
@@ -151,9 +153,9 @@ export const events: Event[] = [
         firstPrize: "600/-",
         secondPrize: "400/-",
         coordinators: [
-            "Akshay U - S3 CSE B",
-            "Akshay V - S3 CSE B",
-            "Akshaya A - S3 CSE B"
+            { name: "Akshay U - S3 CSE B", phone: "919876543210" },
+            { name: "Akshay V - S3 CSE B", phone: "919876543210" },
+            { name: "Akshaya A - S3 CSE B", phone: "919876543210" }
         ]
     },
     {
@@ -171,10 +173,10 @@ export const events: Event[] = [
         registrationFee: "30/-",
         firstPrize: "Subject to the number of participants.",
         coordinators: [
-            "Amal J Anand  S3 CSE A",
-            "Anwin Anto - S3 CSE A",
-            "Savio Ibrahim lype - S3 CSE A",
-            "Tessa Maria Saj - S3 CSE A"
+            { name: "Amal J Anand  S3 CSE A", phone: "919876543210" },
+            { name: "Anwin Anto - S3 CSE A", phone: "919876543210" },
+            { name: "Savio Ibrahim lype - S3 CSE A", phone: "919876543210" },
+            { name: "Tessa Maria Saj - S3 CSE A", phone: "919876543210" }
         ]
     },
     {
@@ -193,8 +195,8 @@ export const events: Event[] = [
         firstPrize: "750/-",
         secondPrize: "500/-",
         coordinators: [
-            "Shaima Yousaf - S5 CSE",
-            "Neha Agnus P.S - S5 CSE"
+            { name: "Shaima Yousaf - S5 CSE", phone: "919876543210" },
+            { name: "Neha Agnus P.S - S5 CSE", phone: "919876543210" }
         ]
     },
     {
@@ -213,8 +215,8 @@ export const events: Event[] = [
         firstPrize: "600/-",
         secondPrize: "400/-",
         coordinators: [
-            "Niharika - S1 CSE B",
-            "Mariya - S1 CSE B"
+            { name: "Niharika - S1 CSE B", phone: "919876543210" },
+            { name: "Mariya - S1 CSE B", phone: "919876543210" }
         ]
     },
     {
@@ -233,8 +235,8 @@ export const events: Event[] = [
         firstPrize: "600/-",
         secondPrize: "400/-",
         coordinators: [
-            "Aravind B - S3 CSE A",
-            "Unnikrishnan A - S3 CSE A"
+            { name: "Aravind B - S3 CSE A", phone: "919876543210" },
+            { name: "Unnikrishnan A - S3 CSE A", phone: "919876543210" }
         ]
     },
     {
@@ -253,8 +255,8 @@ export const events: Event[] = [
         firstPrize: "600/-",
         secondPrize: "400/-",
         coordinators: [
-            "Akshay A - S3 CSE B",
-            "Pavithra Sankar - S3 CSE B"
+            { name: "Akshay A - S3 CSE B", phone: "919876543210" },
+            { name: "Pavithra Sankar - S3 CSE B", phone: "919876543210" }
         ]
     },
     {
@@ -271,8 +273,8 @@ export const events: Event[] = [
         firstPrize: "500/-",
         secondPrize: "250/-",
         coordinators: [
-            "Saheed Muhammed Rafi - S7",
-            "Ajilash - S7"
+            { name: "Saheed Muhammed Rafi - S7", phone: "919876543210" },
+            { name: "Ajilash - S7", phone: "919876543210" }
         ]
     },
     {
@@ -289,8 +291,8 @@ export const events: Event[] = [
         firstPrize: "500/-",
         secondPrize: "250/-",
         coordinators: [
-            "Alan Sabu - S5 CSE",
-            "Melvin K Roy - S5 CSE"
+            { name: "Alan Sabu - S5 CSE", phone: "919876543210" },
+            { name: "Melvin K Roy - S5 CSE", phone: "919876543210" }
         ]
     },
     {
@@ -307,10 +309,10 @@ export const events: Event[] = [
         firstPrize: "1000/-",
         secondPrize: "500/-",
         coordinators: [
-            "Adithyan S- S5 CSE",
-            "Sooraj Anil - S5 CSE",
-            "Razal Sajeem - S5 CSE",
-            "Abhidev Aji - S3 CSE B"
+            { name: "Adithyan S- S5 CSE", phone: "919876543210" },
+            { name: "Sooraj Anil - S5 CSE", phone: "919876543210" },
+            { name: "Razal Sajeem - S5 CSE", phone: "919876543210" },
+            { name: "Abhidev Aji - S3 CSE B", phone: "919876543210" }
         ]
     },
     {
@@ -327,9 +329,9 @@ export const events: Event[] = [
         firstPrize: "600/-",
         secondPrize: "400/-",
         coordinators: [
-            "Abhinav s menon - S3 CSE A",
-            "Akhil krishnan - S3 CSE A",
-            "Anandhu krishna - S3 CSE A"
+            { name: "Abhinav s menon - S3 CSE A", phone: "919876543210" },
+            { name: "Akhil krishnan - S3 CSE A", phone: "919876543210" },
+            { name: "Anandhu krishna - S3 CSE A", phone: "919876543210" }
         ]
     },
     {
@@ -345,7 +347,7 @@ export const events: Event[] = [
         firstPrize: "2000/-",
         secondPrize: "1000/-",
         coordinators: [
-            "Aadith C Joseph - S7 CSE"
+            { name: "Aadith C Joseph - S7 CSE", phone: "919876543210" }
         ]
     }
 ];

@@ -168,12 +168,18 @@ export default async function EventPage({ params }: EventPageProps) {
             <h3 className="text-2xl font-bold text-yellow-400 mb-6 text-center">Event Coordinators</h3>
             <div className="flex flex-wrap justify-center items-center gap-3">
               {event.coordinators.map((coordinator, index) => (
-                <div 
-                  key={index} 
-                  className="flex-shrink-0 bg-yellow-400/10 text-gray-300 text-base px-4 py-2 rounded-lg shadow-lg border border-yellow-400/30 hover:bg-yellow-400/20 transition-all duration-300"
-                >
-                  {coordinator}
-                </div>
+               <a 
+                key={index} 
+                href={`https://wa.me/${coordinator.phone}?text=${encodeURIComponent(
+                  `Hi ${coordinator.name}}, I have a question regarding the event "${event.title}". Could you help me with it?`
+                )}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex-shrink-0 bg-yellow-400/10 text-gray-300 text-base px-4 py-2 rounded-lg shadow-lg border border-yellow-400/30 hover:bg-yellow-400/20 transition-all duration-300"
+              >
+                {coordinator.name}
+              </a>
+ 
               ))}
             </div>
           </div>
