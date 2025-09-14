@@ -16,7 +16,8 @@ import {
   runTransaction,
 } from "firebase/firestore";
 import { useRouter } from "next/navigation";
-import { LuSave, LuLogOut, LuCalendarDays, LuMail, LuCalendarCheck, LuUser, LuUsers } from "react-icons/lu";
+import { LuSave, LuLogOut, LuCalendarDays, LuMail, LuCalendarCheck, LuUser, LuUsers, LuCalendarX } from "react-icons/lu";
+import { semesters } from "@utils/constants";
 
 type Invite = {
   id: string;
@@ -31,6 +32,7 @@ type Registration = {
   eventTitle: string;
   eventDate: string | null;
   isGroup: boolean;
+  leaderUid?: string; // Add leaderUid
 };
 
 export default function ProfilePage() {
@@ -141,6 +143,7 @@ export default function ProfilePage() {
           eventTitle: d.data().eventTitle,
           eventDate: d.data().eventDate,
           isGroup: d.data().isGroup,
+          leaderUid: d.data().leaderUid, // Retrieve leaderUid
         }))
       );
     });
@@ -232,6 +235,44 @@ const handleInviteResponse = async (
     toast.error(e.message || "Failed to update invite status. Please try again.");
   } finally {
     setUpdatingInvite(null);
+  }
+};
+
+
+const handleCancelRegistration = async (registrationId: string) => {
+  if (!user) return;
+
+  if (!confirm("Are you sure you want to cancel this registration?")) {
+    return;
+  }
+
+  try {
+    const regRef = doc(db, "registrations", registrationId);
+    await runTransaction(db, async (transaction) => {
+      const regDoc = await transaction.get(regRef);
+      if (!regDoc.exists()) {
+        throw new Error("Registration not found.");
+      }
+
+      // Check if the current user is the leader of this registration
+      if (regDoc.data().leaderUid !== user.uid) {
+        throw new Error("Only the leader can cancel this registration.");
+      }
+
+      const currentParticipants = regDoc.data().participantUids || [];
+      const updatedParticipants = currentParticipants.filter((uid: string) => uid !== user.uid);
+
+      if (updatedParticipants.length === 0) {
+        transaction.delete(regRef);
+      } else {
+        transaction.update(regRef, { participantUids: updatedParticipants });
+      }
+    });
+
+    toast.success("Registration cancelled successfully.");
+  } catch (e: any) {
+    console.error("Failed to cancel registration", e);
+    toast.error(e.message || "Failed to cancel registration. Please try again.");
   }
 };
 
@@ -330,7 +371,7 @@ const handleInviteResponse = async (
                 required
               >
                 <option value="" disabled>Select Semester</option>
-                {[1, 2, 3, 4, 5, 6, 7, 8].map((s) => (
+                {semesters.map((s) => (
                   <option key={s} value={String(s)}>
                     Semester {s}
                   </option>
@@ -416,6 +457,7 @@ const handleInviteResponse = async (
           {/* Registered Events Section */}
           <div className="bg-black-950 bg-opacity-60 p-6 rounded-xl border border-gray-800">
             <h2 className="text-xl font-semibold text-yellow-400 mb-4 flex items-center gap-2"><LuCalendarCheck /> Registered Events</h2>
+            <p className="text-sm text-gray-400 mb-4">*Only the leader of a group registration can cancel the event.</p>
             {registrations.length === 0 ? (
               <p className="text-gray-400">You have not registered for any events yet.</p>
             ) : (
@@ -429,6 +471,14 @@ const handleInviteResponse = async (
                         {reg.eventDate && <p className="text-gray-400 text-sm">Date: {reg.eventDate}</p>}
                       </div>
                     </div>
+                    {user.uid === reg.leaderUid && (
+                      <button
+                        onClick={() => handleCancelRegistration(reg.id)}
+                        className="px-3 py-1 bg-red-500 rounded text-sm text-white font-semibold hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        Cancel
+                      </button>
+                    )}
                   </div>
                 ))}
               </div>

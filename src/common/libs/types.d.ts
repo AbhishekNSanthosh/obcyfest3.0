@@ -22,5 +22,5 @@ export type Event = {
   registrationFee: string;
   firstPrize: string;
   secondPrize?: string;
-  coordinators: string[];
+  coordinators: { name: string; phone: string }[];
 };
