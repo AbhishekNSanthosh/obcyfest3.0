@@ -171,7 +171,7 @@ export default async function EventPage({ params }: EventPageProps) {
                <a 
                 key={index} 
                 href={`https://wa.me/${coordinator.phone}?text=${encodeURIComponent(
-                  `Hi ${coordinator.name}}, I have a question regarding the event "${event.title}". Could you help me with it?`
+                  `Hi, I have a question regarding the event "**${event.title}**". Could you help me with it?`
                 )}`}
                 target="_blank"
                 rel="noopener noreferrer"

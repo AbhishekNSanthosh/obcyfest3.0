@@ -10,7 +10,7 @@ export type Event = {
   id: string;
   title: string;
   image: string;
-  regLink: string;
+  regLink?: string;
   type: 'technical' | 'nonTechnical' | 'sports';
   date?: string;
   description: string;
