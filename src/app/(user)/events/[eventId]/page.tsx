@@ -82,15 +82,15 @@ export default async function EventPage({ params }: EventPageProps) {
         </div>
         
         {/* Hero Content */}
-        <div className="relative z-10 flex flex-1 flex-col justify-end px-[5vw]  lg:pb-[6vh]">
-          <div className="max-w-4xl mx-auto w-full">
+        <div className="relative z-10 flex flex-1 flex-col items-center justify-end lg:pb-[6vh]">
+          <div className="max-w-6xl px-[5vw] py-[5vh] mx-auto w-full">
             {/* Event Title */}
-            <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold text-yellow-400 tracking-tight leading-tight mb-4 mt-8">
+            <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold text-justify text-yellow-400 tracking-tight leading-tight mb-4 mt-8">
               {event.title}
             </h1>
             
             {/* Event Description */}
-            <p className="text-gray-300 text-md md:text-lg max-w-3xl leading-relaxed">
+            <p className="text-gray-300 text-md md:text-lg max-w-6xl leading-relaxed">
               {event.description}
             </p>
           </div>

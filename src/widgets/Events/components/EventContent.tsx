@@ -67,7 +67,7 @@ export default function EventContent() {
                 key={event.id}
                 className="relative cursor-pointer p-2 border-[0.5px] border-black-900"
               >
-                <Link href={`/events/${event.id}`}>
+                <Link href={`./events/${event.id}`}>
                   <Image
                     src={event.image}
                     alt={`Event ${event.id}`}

@@ -38,10 +38,19 @@ export default function RegisterPageClient({ eventId, event }: RegisterPageClien
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [inviteEmail, setInviteEmail] = useState('')
   const [inviteErrors, setInviteErrors] = useState<string>('')
-  const [invited, setInvited] = useState<Array<{ id: string; email: string; status?: string }>>([])
+  const [invited, setInvited] = useState<Array<{
+    id: string
+    inviterUid?: string
+    inviterEmail?: string
+    inviteeUid?: string
+    inviteeEmail: string
+    status?: string
+    extraData?: Record<string, any> | null
+  }>>([]);
   const [isInviting, setIsInviting] = useState(false)
   const [cancellingInvite, setCancellingInvite] = useState<string | null>(null)
   const [respondingInvite, setRespondingInvite] = useState<string | null>(null)
+  const [extraData, setExtraData] = useState<Record<string, string>>({})
 
   const router = useRouter()
 
@@ -89,9 +98,14 @@ export default function RegisterPageClient({ eventId, event }: RegisterPageClien
     const unsubscribe = onSnapshot(q, (snap) => {
       const invites = snap.docs.map(docSnap => ({
         id: docSnap.id,
-        email: docSnap.data().inviteeEmail,
+        inviteeEmail: docSnap.data().inviteeEmail,
+        inviteeUid: docSnap.data().inviteeUid,
+        inviterUid: docSnap.data().inviterUid,
+        inviterEmail: docSnap.data().inviterEmail,
+        extraData: docSnap.data().extraData || null,
         status: docSnap.data().status,
       }))
+      console.log('Invites updated:', invites)
       setInvited(invites)
     })
 
@@ -142,7 +156,7 @@ export default function RegisterPageClient({ eventId, event }: RegisterPageClien
 
     setIsInviting(true)
     try {
-      if (invited.find(i => i.email === email)) {
+      if (invited.find(i => i.inviteeEmail === email)) {
         setInviteErrors('You already invited this user.')
         return
       }
@@ -162,7 +176,7 @@ export default function RegisterPageClient({ eventId, event }: RegisterPageClien
         return
       }
 
-      if (normalizedEventDate) {
+      if (!event?.isOnline && normalizedEventDate) {
         const regQ = query(collection(db, 'registrations'), where('participantUids', 'array-contains', inviteeUid))
         const regSnap = await getDocs(regQ)
         const conflict = regSnap.docs.some(d => d.data().eventDate === normalizedEventDate)
@@ -171,7 +185,7 @@ export default function RegisterPageClient({ eventId, event }: RegisterPageClien
           return
         }
       }
-
+      console.log(event?.requiresExtraData, event?.extraFields);
       await addDoc(collection(db, 'invitations'), {
         eventId,
         eventTitle: event?.title,
@@ -179,6 +193,8 @@ export default function RegisterPageClient({ eventId, event }: RegisterPageClien
         inviterEmail: profile.email,
         inviteeUid,
         inviteeEmail: email,
+        hasExtraData: event.requiresExtraData,
+        extraData: event.requiresExtraData ? event?.extraFields:null,
         status: 'pending',
         createdAt: serverTimestamp(),
       })
@@ -190,7 +206,7 @@ export default function RegisterPageClient({ eventId, event }: RegisterPageClien
         to: email,    
         inviterName: profile.displayName,
         eventTitle: event?.title,
-        inviteLink: `http://localhost:3000/profile`
+        inviteLink: `${process.env.NEXT_PUBLIC_BASE_URL}/profile` || `${window.location.origin}/profile`,
     }),
 });
       toast.success('Invite sent successfully!')
@@ -203,82 +219,97 @@ export default function RegisterPageClient({ eventId, event }: RegisterPageClien
   }
 
   // Group registration
-  const handleRegisterGroup = async () => {
-    if (!currentUser || !profile) return
+const handleRegisterGroup = async () => {
+  if (!currentUser || !profile) return
 
-    const acceptedInvites = invited.filter(i => i.status === 'accepted')
-    const totalMembers = 1 + acceptedInvites.length
-    if (totalMembers < minGroupSize) {
-      toast.error(`You need at least ${minGroupSize} members.`)
-      return
-    }
-    if (totalMembers > maxGroupSize) {
-      toast.error(`Maximum ${maxGroupSize} members allowed.`)
-      return
-    }
+  const acceptedInvites = invited.filter(i => i.status === 'accepted')
+  const totalMembers = 1 + acceptedInvites.length
+  if (totalMembers < minGroupSize) {
+    toast.error(`You need at least ${minGroupSize} members.`)
+    return
+  }
+  if (totalMembers > maxGroupSize) {
+    toast.error(`Maximum ${maxGroupSize} members allowed.`)
+    return
+  }
 
-    setIsSubmitting(true)
-    try {
-      await runTransaction(db, async (transaction) => {
-        const participants: UserProfile[] = [{
-          uid: profile.uid,
-          email: profile.email,
-          displayName: profile.displayName,
-          semester: profile.semester,
-        }]
+  setIsSubmitting(true)
+  try {
+    await runTransaction(db, async (transaction) => {
+      const participants: any[] = [{
+        uid: profile.uid,
+        email: profile.email,
+        displayName: profile.displayName,
+        semester: profile.semester,
+        ...(extraData || {}),
+      }]
 
-        for (let invite of acceptedInvites) {
-          const q = query(collection(db, 'users'), where('email', '==', invite.email)) // This is inefficient, but will keep for now.
-          const snap = await getDocs(q)
-          if (snap.empty) {
-            throw new Error(`User ${invite.email} not found.`)
-          }
-          const data = snap.docs[0].data()
-          participants.push({
-            uid: data.uid,
-            email: data.email,
-            displayName: data.displayName,
-            semester: data.semester,
-          })
+      // ✅ Use UID instead of querying by email
+      for (let invite of acceptedInvites) {
+        if (!invite.inviteeUid) {
+          throw new Error(`Invitation for ${invite.inviteeEmail} has no UID.`)
         }
 
-        if (normalizedEventDate) {
-          for (let p of participants) {
-            const regQ = query(collection(db, 'registrations'), where('participantUids', 'array-contains', p.uid))
-            const regSnap = await getDocs(regQ)
-            if (regSnap.docs.some(d => d.data().eventDate === normalizedEventDate)) {
-              throw new Error(`${p.displayName || p.email} is already registered for another event on the same day.`)
-            }
-          }
+        const userRef = doc(db, "users", invite.inviteeUid)
+        const userSnap = await getDoc(userRef)
+        if (!userSnap.exists()) {
+          throw new Error(`User ${invite.inviteeEmail} not found.`)
         }
+        const data = userSnap.data()
 
-        const regRef = doc(collection(db, 'registrations'))
-        transaction.set(regRef, {
-          eventId: event?.id,
-          eventTitle: event?.title,
-          eventDate: normalizedEventDate || null,
-          isGroup: true,
-          leaderUid: profile.uid,
-          participantUids: participants.map(p => p.uid),
-          participants,
-          createdAt: serverTimestamp(),
+        participants.push({
+          uid: invite.inviteeUid,
+          email: invite.inviteeEmail,
+          displayName: data.displayName,
+          semester: data.semester,
+          ...(invite.extraData || {}), // 👈 use invite’s extra data
         })
+      }
 
-        for (let invite of acceptedInvites) {
-          const inviteRef = doc(db, 'invitations', invite.id)
-          transaction.delete(inviteRef)
+      // ✅ Check conflicts
+      if (normalizedEventDate) {
+        for (let p of participants) {
+          const regQ = query(
+            collection(db, 'registrations'),
+            where('participantUids', 'array-contains', p.uid)
+          )
+          const regSnap = await getDocs(regQ)
+          if (regSnap.docs.some(d => d.data().eventDate === normalizedEventDate)) {
+            throw new Error(`${p.displayName || p.email} is already registered for another event on the same day.`)
+          }
         }
+      }
+
+      // ✅ Save registration
+      const regRef = doc(collection(db, 'registrations'))
+      transaction.set(regRef, {
+        eventId: event?.id,
+        eventTitle: event?.title,
+        eventDate: normalizedEventDate || null,
+        isGroup: true,
+        leaderUid: profile.uid,
+        participantUids: participants.map(p => p.uid),
+        participants,
+        createdAt: serverTimestamp(),
       })
 
-      toast.success('Group registration successful!')
-      router.push(`/events/${eventId}`)
-    } catch (err: any) {
-      console.error(err)
-      toast.error(err.message || 'Registration failed. Please try again.')
-    } finally {
-      setIsSubmitting(false)
-    }
+      // ✅ Delete invites after successful registration
+      for (let invite of acceptedInvites) {
+        const inviteRef = doc(db, 'invitations', invite.id)
+        transaction.delete(inviteRef)
+      }
+    })
+
+    toast.success('Group registration successful!')
+    router.push(`/events/${eventId}`)
+  } catch (err: any) {
+    console.error(err)
+    toast.error(err.message || 'Registration failed. Please try again.')
+  } finally {
+    setIsSubmitting(false)
   }
+}
+
 
   // Individual registration
   const handleRegisterIndividual = async () => {
@@ -308,6 +339,7 @@ export default function RegisterPageClient({ eventId, event }: RegisterPageClien
           email: profile.email,
           displayName: profile.displayName,
           semester: profile.semester || null,
+          ...extraData,
         }],
         createdAt: serverTimestamp(),
       })
@@ -359,7 +391,8 @@ export default function RegisterPageClient({ eventId, event }: RegisterPageClien
               </h1>
               <p className="text-gray-300 text-base sm:text-lg">
                 {event?.eventType} • Registration Fee: {event?.registrationFee}
-              </p>
+                  </p>
+                  {event.isOnline && ( <p className="text-green-400 text-sm mt-1">This is an online event (no schedule conflicts).</p> )}
             </div>
           </div>
 
@@ -397,7 +430,31 @@ export default function RegisterPageClient({ eventId, event }: RegisterPageClien
                     />
                   </div>
                 </div>
-              </div>
+                  </div>
+                  {/* Extra fields */}
+                  {event.requiresExtraData && Array.isArray(event.extraFields) && (
+                    <div className="bg-black-950 bg-opacity-60 p-6 rounded-xl border border-gray-800">
+                      <h2 className="text-lg font-semibold text-yellow-400 mb-6">Additional Info</h2>
+                      <div className="space-y-4">
+                        {event.extraFields.map((field: { name: string; type: string }) => (
+                          <div key={field.name}>
+                            <label className="block text-sm font-medium text-gray-300 mb-2">{field.name}</label>
+                            <input
+                              type={field.type}
+                              value={extraData[field.name] || ''}
+                              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                                setExtraData((prev: Record<string, string>) => ({
+                                  ...prev,
+                                  [field.name]: e.target.value,
+                                }))
+                              }
+                              className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg text-white"
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
 
               {/* Group Invite */}
               {isGroupEvent && (
@@ -443,7 +500,7 @@ export default function RegisterPageClient({ eventId, event }: RegisterPageClien
                         >
                           {/* Email and Status */}
                           <span className="text-gray-200 break-words truncate sm:truncate-none max-w-full sm:max-w-xs">
-                            {m.email} {m.status ? `(${m.status})` : ''}
+                            {m.inviteeEmail} {m.status ? `(${m.status})` : ''}
                           </span>
 
                           {/* Buttons */}

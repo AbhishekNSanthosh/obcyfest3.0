@@ -52,6 +52,7 @@ export const events: Event[] = [
         registrationFee: "150/-",
         firstPrize: "900/-",
         secondPrize: "600/-",
+        requiresExtraData: false,
         coordinators: [
             { name: "Alfred Joe Devasia - S7", phone: "919876543210" },
             { name: "Uday Krishna - S7", phone: "919876543210" }
@@ -269,6 +270,7 @@ export const events: Event[] = [
         description: "Step onto the virtual pitch and showcase your football skills in this competitive PES tournament. Test your strategy, reflexes, and precision as you go head-to-head with fellow gamers in the ultimate digital football experience.",
         eventType: "Individual",
         minParticipation: "16 participants",
+        isOnline: true,
         registrationFee: "30/-",
         firstPrize: "500/-",
         secondPrize: "250/-",
@@ -288,6 +290,7 @@ export const events: Event[] = [
         eventType: "Individual",
         minParticipation: "25 participants",
         registrationFee: "30/-",
+        isOnline: true,
         firstPrize: "500/-",
         secondPrize: "250/-",
         coordinators: [
@@ -304,10 +307,16 @@ export const events: Event[] = [
         date: "22-09-2025 to 26-09-2025",
         description: "Gear up for an action-packed BGMI competition where teamwork, strategy, and quick decision-making are the keys to survival. Compete against the best and prove your dominance in this high-intensity battle royale challenge.",
         eventType: "Group (4)",
+        isOnline: true,
         minParticipation: "15 Teams",
         registrationFee: "70/-",
         firstPrize: "1000/-",
         secondPrize: "500/-",
+        requiresExtraData: true,
+        extraFields: [
+            { name: "UserID", type: "text" },
+            { name: "In-GameName", type: "text" }
+        ],
         coordinators: [
             { name: "Adithyan S- S5 CSE", phone: "919876543210" },
             { name: "Sooraj Anil - S5 CSE", phone: "919876543210" },
@@ -322,6 +331,7 @@ export const events: Event[] = [
         regLink: "https://example.com/register15",
         type: "nonTechnical",
         date: "22-09-2025 to 26-09-2025",
+        isOnline: true,
         description: "Build, strategize, and conquer in the world of Clash of Clans. This event challenges participants to demonstrate tactical planning, resource management, and execution skills to outsmart opponents and secure victory.",
         eventType: "Group (5)",
         minParticipation: "10 participants",
@@ -341,7 +351,7 @@ export const events: Event[] = [
         regLink: "https://example.com/register16",
         type: "sports",
         description: "N/A",
-        eventType: "Group (7+3)",
+        eventType: "Group (10)",
         totalParticipation: "60 (fixed)",
         registrationFee: "100/-",
         firstPrize: "2000/-",

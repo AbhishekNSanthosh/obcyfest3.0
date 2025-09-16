@@ -17,7 +17,7 @@ import {
 } from "firebase/firestore";
 import { useRouter } from "next/navigation";
 import { LuSave, LuLogOut, LuCalendarDays, LuMail, LuCalendarCheck, LuUser, LuUsers, LuCalendarX } from "react-icons/lu";
-import { semesters } from "@utils/constants";
+import { events, semesters } from "@utils/constants";
 
 type Invite = {
   id: string;
@@ -25,6 +25,9 @@ type Invite = {
   status: string;
   role: "inviter" | "invitee";
   email: string;
+  eventId?: string;
+  hasExtraData?: boolean;
+  extraData?: { name: string; type: string }[];
 };
 
 type Registration = {
@@ -32,7 +35,7 @@ type Registration = {
   eventTitle: string;
   eventDate: string | null;
   isGroup: boolean;
-  leaderUid?: string; // Add leaderUid
+  leaderUid?: string;
 };
 
 export default function ProfilePage() {
@@ -46,8 +49,10 @@ export default function ProfilePage() {
   const [invites, setInvites] = useState<Invite[]>([]);
   const [registrations, setRegistrations] = useState<Registration[]>([]);
   const [updatingInvite, setUpdatingInvite] = useState<string | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [currentInvite, setCurrentInvite] = useState<Invite | null>(null);
+  const [extraFieldData, setExtraFieldData] = useState<Record<string, string>>({});
   const router = useRouter();
-
   const isComplete = useMemo(
     () => rollNumber.trim() !== "" && semester.trim() !== "" && phone.trim() !== "",
     [rollNumber, semester, phone]
@@ -96,6 +101,7 @@ export default function ProfilePage() {
     const unsubInviter = onSnapshot(inviterQ, (snap) => {
       const inviterInvites = snap.docs.map((d) => ({
         id: d.id,
+        eventId: d.data().eventId,
         eventTitle: d.data().eventTitle,
         status: d.data().status,
         role: "inviter" as const,
@@ -112,6 +118,9 @@ export default function ProfilePage() {
       const inviteeInvites = snap.docs.map((d) => ({
         id: d.id,
         eventTitle: d.data().eventTitle,
+        eventId: d.data().eventId,
+        hasExtraData: d.data().hasExtraData,
+        extraData: d.data().extraData || null,
         status: d.data().status,
         role: "invitee" as const,
         email: d.data().inviterEmail,
@@ -194,89 +203,138 @@ export default function ProfilePage() {
     }
   };
 
-const handleInviteResponse = async (
-  inviteId: string,
-  newStatus: "accepted" | "declined"
-) => {
-  setUpdatingInvite(inviteId);
-  try {
-    const ref = doc(db, "invitations", inviteId);
+  const handleInviteResponse = async (
+    invite: Invite,
+    newStatus: "accepted" | "declined"
+  ) => {
+    if (newStatus === "accepted" && invite.hasExtraData) {
+      setCurrentInvite(invite);
+      setIsModalOpen(true);
+    } else {
+      setUpdatingInvite(invite.id);
+      try {
+        const ref = doc(db, "invitations", invite.id);
 
-    // Run transaction
-    const inviteData = await runTransaction(db, async (transaction) => {
-      const inviteDoc = await transaction.get(ref);
-      if (!inviteDoc.exists()) throw new Error("Invite does not exist!");
+        const inviteData = await runTransaction(db, async (transaction) => {
+          const inviteDoc = await transaction.get(ref);
+          if (!inviteDoc.exists()) throw new Error("Invite does not exist!");
 
-      const currentStatus = inviteDoc.data().status;
-      if (currentStatus !== "pending") {
-        throw new Error(`Invite already ${currentStatus}.`);
+          const currentStatus = inviteDoc.data().status;
+          if (currentStatus !== "pending") {
+            throw new Error(`Invite already ${currentStatus}.`);
+          }
+
+          transaction.update(ref, { status: newStatus });
+          return inviteDoc.data();
+        });
+
+        if (inviteData) {
+          await fetch("/api/invite-response", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              inviterEmail: inviteData.inviterEmail,
+              inviteeName: inviteData.inviteeEmail,
+              eventTitle: inviteData.eventTitle,
+              status: newStatus,
+            }),
+          });
+        }
+
+        toast.success(`Invite ${newStatus} successfully.`);
+      } catch (e: any) {
+        console.error("Failed to update invite status", e);
+        toast.error(e.message || "Failed to update invite status. Please try again.");
+      } finally {
+        setUpdatingInvite(null);
+      }
+    }
+  };
+
+  const handleModalSubmit = async () => {
+    if (!currentInvite) return;
+
+    setUpdatingInvite(currentInvite.id);
+    setIsModalOpen(false);
+
+    try {
+      const ref = doc(db, "invitations", currentInvite.id);
+
+      const inviteData = await runTransaction(db, async (transaction) => {
+        const inviteDoc = await transaction.get(ref);
+        if (!inviteDoc.exists()) throw new Error("Invite does not exist!");
+
+        const currentStatus = inviteDoc.data().status;
+        if (currentStatus !== "pending") {
+          throw new Error(`Invite already ${currentStatus}.`);
+        }
+
+        transaction.update(ref, {
+          status: "accepted",
+          extraData: { ...extraFieldData },
+        });
+        return inviteDoc.data();
+      });
+
+      if (inviteData) {
+        await fetch("/api/invite-response", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            inviterEmail: inviteData.inviterEmail,
+            inviteeName: inviteData.inviteeEmail,
+            eventTitle: inviteData.eventTitle,
+            status: "accepted",
+          }),
+        });
       }
 
-      transaction.update(ref, { status: newStatus });
-      return inviteDoc.data(); // return data for email
-    });
+      toast.success(`Invite accepted successfully.`);
+    } catch (e: any) {
+      console.error("Failed to update invite status", e);
+      toast.error(e.message || "Failed to update invite status. Please try again.");
+    } finally {
+      setUpdatingInvite(null);
+      setCurrentInvite(null);
+      setExtraFieldData({});
+    }
+  };
 
-    if (inviteData) {
-      await fetch("/api/invite-response", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          inviterEmail: inviteData.inviterEmail,
-          inviteeName: inviteData.inviteeEmail, // optionally displayName
-          eventTitle: inviteData.eventTitle,
-          status: newStatus,
-        }),
-      });
+  const handleCancelRegistration = async (registrationId: string) => {
+    if (!user) return;
+
+    if (!confirm("Are you sure you want to cancel this registration?")) {
+      return;
     }
 
-    toast.success(`Invite ${newStatus} successfully.`);
-  } catch (e: any) {
-    console.error("Failed to update invite status", e);
-    toast.error(e.message || "Failed to update invite status. Please try again.");
-  } finally {
-    setUpdatingInvite(null);
-  }
-};
+    try {
+      const regRef = doc(db, "registrations", registrationId);
+      await runTransaction(db, async (transaction) => {
+        const regDoc = await transaction.get(regRef);
+        if (!regDoc.exists()) {
+          throw new Error("Registration not found.");
+        }
 
+        if (regDoc.data().leaderUid !== user.uid) {
+          throw new Error("Only the leader can cancel this registration.");
+        }
 
-const handleCancelRegistration = async (registrationId: string) => {
-  if (!user) return;
+        const currentParticipants = regDoc.data().participantUids || [];
+        const updatedParticipants = currentParticipants.filter((uid: string) => uid !== user.uid);
 
-  if (!confirm("Are you sure you want to cancel this registration?")) {
-    return;
-  }
+        if (updatedParticipants.length === 0) {
+          transaction.delete(regRef);
+        } else {
+          transaction.update(regRef, { participantUids: updatedParticipants });
+        }
+      });
 
-  try {
-    const regRef = doc(db, "registrations", registrationId);
-    await runTransaction(db, async (transaction) => {
-      const regDoc = await transaction.get(regRef);
-      if (!regDoc.exists()) {
-        throw new Error("Registration not found.");
-      }
-
-      // Check if the current user is the leader of this registration
-      if (regDoc.data().leaderUid !== user.uid) {
-        throw new Error("Only the leader can cancel this registration.");
-      }
-
-      const currentParticipants = regDoc.data().participantUids || [];
-      const updatedParticipants = currentParticipants.filter((uid: string) => uid !== user.uid);
-
-      if (updatedParticipants.length === 0) {
-        transaction.delete(regRef);
-      } else {
-        transaction.update(regRef, { participantUids: updatedParticipants });
-      }
-    });
-
-    toast.success("Registration cancelled successfully.");
-  } catch (e: any) {
-    console.error("Failed to cancel registration", e);
-    toast.error(e.message || "Failed to cancel registration. Please try again.");
-  }
-};
-
-
+      toast.success("Registration cancelled successfully.");
+    } catch (e: any) {
+      console.error("Failed to cancel registration", e);
+      toast.error(e.message || "Failed to cancel registration. Please try again.");
+    }
+  };
 
   const getStatusClass = (status: string) => {
     switch (status.toLowerCase()) {
@@ -418,8 +476,9 @@ const handleCancelRegistration = async (registrationId: string) => {
             {invites.length === 0 ? (
               <p className="text-gray-400">No invitations at the moment.</p>
             ) : (
-              <div className="space-y-3">
-                {invites.map((invite) => (
+              <div className="space-y-5">
+                  {invites.map((invite) => (
+
                   <div key={invite.id} className="bg-gray-900 border border-gray-700 rounded-lg p-4 space-y-2">
                     <div className="flex items-center justify-between">
                       <p className="text-gray-200 font-medium">{invite.eventTitle}</p>
@@ -433,14 +492,14 @@ const handleCancelRegistration = async (registrationId: string) => {
                     {invite.role === "invitee" && invite.status === "pending" && (
                       <div className="flex gap-2 pt-2">
                         <button
-                          onClick={() => handleInviteResponse(invite.id, "accepted")}
+                          onClick={() => handleInviteResponse(invite, "accepted")}
                           disabled={updatingInvite === invite.id}
                           className="px-3 py-1 bg-green-500 rounded text-sm text-black font-semibold hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                           {updatingInvite === invite.id ? "..." : "Accept"}
                         </button>
                         <button
-                          onClick={() => handleInviteResponse(invite.id, "declined")}
+                          onClick={() => handleInviteResponse(invite, "declined")}
                           disabled={updatingInvite === invite.id}
                           className="px-3 py-1 bg-red-500 rounded text-sm text-black font-semibold hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
@@ -448,7 +507,7 @@ const handleCancelRegistration = async (registrationId: string) => {
                         </button>
                       </div>
                     )}
-                  </div>
+                      </div>
                 ))}
               </div>
             )}
@@ -486,6 +545,78 @@ const handleCancelRegistration = async (registrationId: string) => {
           </div>
         </div>
       </div>
+      <InviteModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSubmit={handleModalSubmit}
+        invite={currentInvite}
+        extraFieldData={extraFieldData}
+        setExtraFieldData={setExtraFieldData}
+      />
     </div>
   );
 }
+
+const InviteModal = ({
+  isOpen,
+  onClose,
+  onSubmit,
+  invite,
+  extraFieldData,
+  setExtraFieldData,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  onSubmit: () => void;
+  invite: Invite | null;
+  extraFieldData: Record<string, string>;
+  setExtraFieldData: React.Dispatch<React.SetStateAction<Record<string, string>>>;
+}) => {
+  if (!isOpen || !invite) return null;
+  
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setExtraFieldData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
+      <div className="bg-gray-900 rounded-lg p-8 max-w-md w-full border border-gray-700">
+        <h2 className="text-2xl font-bold text-yellow-400 mb-4">
+          Additional Information for {invite.eventTitle}
+        </h2>
+        <div className="space-y-4">
+          {invite.extraData?.map((field) => (
+            <div key={field.name}>
+              <label className="block text-sm font-medium text-gray-300 mb-2">
+                {field.name}
+              </label>
+              <input
+                type={field.type}
+                name={field.name}
+                value={extraFieldData[field.name] || ""}
+                onChange={handleInputChange}
+                className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent"
+                required
+              />
+            </div>
+          ))}
+        </div>
+        <div className="flex justify-end gap-4 mt-6">
+          <button
+            onClick={onClose}
+            className="px-4 py-2 rounded-lg text-gray-300 hover:bg-gray-800"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={onSubmit}
+            className="px-4 py-2 bg-yellow-400 text-black-950 font-semibold rounded-lg hover:bg-yellow-500"
+          >
+            Submit
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};

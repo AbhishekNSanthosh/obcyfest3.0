@@ -25,6 +25,13 @@ button {
   -webkit-tap-highlight-color: transparent; /* Safari and Chrome */
 }
 
+.disabled-link {
+  pointer-events: none;
+  opacity: 0.6; /* Optional: Visually indicate disabled state */
+  cursor: not-allowed; /* Optional: Change cursor */
+}
+
+
 .bg{
   background: linear-gradient(rgba(0, 0, 0, 0.849), rgba(0, 0, 0, 0.937)),
     url("/bg.png") no-repeat center center fixed;
