@@ -7,8 +7,6 @@ import { Toaster } from "react-hot-toast";
 
 // Next.js font imports
 import { Poppins, Rubik_Wet_Paint, Fugaz_One } from "next/font/google";
-import HeaderView from "@widgets/Header/view";
-import FooterView from "@widgets/Footer/view";
 import { eventName } from "@utils/constants";
 
 // Define fonts with weights you need
@@ -101,11 +99,7 @@ export default function RootLayout({
     },
   }}
 /></div>
-        <HeaderView/>
         {children}
-        <section id="contact">
-        <FooterView />
-      </section>
       </body>
     </html>
   );

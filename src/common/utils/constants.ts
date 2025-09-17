@@ -37,31 +37,12 @@ export interface Faq {
 }
 
 export const events: Event[] = [
-    {
-        id: "craft-the-screen",
-        title: "Craft The Screen",
-        image: "/posters/poster.jpeg",
-        regLink: "https://example.com/register1",
-        type: "technical",
-        date: "22-09-2025",
-        description: "The UI/UX Competition provides a platform for participants to demonstrate their design skills by creating intuitive, functional, and aesthetically appealing user interfaces. It emphasizes innovation, usability, and creativity in delivering effective digital experiences.",
-        venue: "Computer Centre",
-        eventType: "Group (2-3)",
-        maxParticipation: "25 Teams",
-        minParticipation: "10 Teams",
-        registrationFee: "150/-",
-        firstPrize: "900/-",
-        secondPrize: "600/-",
-        coordinators: [
-            { name: "Alfred Joe Devasia - S7", phone: "919876543210" },
-            { name: "Uday Krishna - S7", phone: "919876543210" }
-        ]
-    },
+
     {
         id: "just-imagine",
         title: "Just Imagine",
         image: "/posters/poster.jpeg",
-        regLink: "https://example.com/register2",
+        //regLink: "https://example.com/register2",
         type: "nonTechnical",
         date: "22-09-2025",
         description: "'Just Imagine' is an exciting and fun-filled event designed to test creativity, quick thinking, and teamwork. In this game, participants will pair up in teams of two. One member will pick a chit and act out the word or phrase without speaking or lip-syncing, while the other member guesses within a time limit of 2 minutes. The challenge lies in how creatively and accurately the actions are performed and how quickly the partner can guess.",
@@ -73,48 +54,69 @@ export const events: Event[] = [
         firstPrize: "600/-",
         secondPrize: "400/-",
         coordinators: [
-            { name: "Safna M S- S7", phone: "919876543210" },
-            { name: "Ardra S Anil- S7", phone: "919876543210" }
-        ]
-    },
-    {
-        id: "clash-of-keyboards",
-        title: "Clash of Keyboards",
-        image: "/posters/poster.jpeg",
-        regLink: "https://example.com/register3",
-        type: "technical",
-        date: "23-09-2025",
-        description: "Put your typing skills to the test in the Speed & Accuracy competition! This event is designed to challenge participants on both their typing speed and precision. Whether you're a beginner or a typing pro, this is your chance to showcase your expertise, improve your skills, and compete with others in a fast-paced, fun, and engaging environment.",
-        venue: "Computer Centre",
-        eventType: "Individual",
-        maxParticipation: "60 participants",
-        minParticipation: "20 participants",
-        registrationFee: "30/-",
-        firstPrize: "500/-",
-        secondPrize: "250/-",
-        coordinators: [
-            { name: "Nandhu Krishnan- S5", phone: "919876543210" },
-            { name: "Athul Tomy- S5", phone: "919876543210" }
+            { name: "Safna M S- S7", phone: "+919349517534" },
+            { name: "Ardra S Anil- S7", phone: "+916238393086" }
         ]
     },
     {
         id: "deadshot",
         title: "DeadShot",
         image: "/posters/poster.jpeg",
-        regLink: "https://example.com/register4",
+        //regLink: "https://example.com/register4",
         type: "technical",
         date: "23-09-2025",
         description: "'Deadshot.io', a high-stakes online arena where precision, strategy, and quick reflexes determine the ultimate sharpshooter. Players from around the world face off in a tense battle of aim and stealth, using an array of powerful weapons to outmaneuver and eliminate their opponents. Each match is a test of skill and nerve, set in dynamic environments that challenge even the most seasoned veterans. One by one, players are picked off-not by chance, but by calculated skill-until only the last marksman standing claims victory and the title of Deadshot.",
-        venue: "Department Lab 3",
+        venue: "CSE Project Lab",
         eventType: "Group (4)",
-        maxParticipation: "20 Teams",
-        minParticipation: "15 teams",
+        maxParticipation: "32 Teams",
+        minParticipation: "16 Teams",
         registrationFee: "100/-",
         firstPrize: "1000/-",
         secondPrize: "500/-",
         coordinators: [
-            { name: "Jacs J Jacob - S7 CSE", phone: "919876543210" },
-            { name: "Deepak Dayanandhan - S7 CSE", phone: "919876543210" }
+            { name: "Jacs J Jacob - S7 CSE", phone: "+918590204413" },
+            { name: "Deepak Dayanandan - S7 CSE", phone: "+917356784317" }
+        ]
+    },
+    {
+        id: "clash-of-keyboards",
+        title: "Clash of Keyboards",
+        image: "/posters/poster.jpeg",
+        //regLink: "https://example.com/register3",
+        type: "technical",
+        date: "23-09-2025",
+        description: "Put your typing skills to the test in the Speed & Accuracy competition! This event is designed to challenge participants on both their typing speed and precision. Whether you're a beginner or a typing pro, this is your chance to showcase your expertise, improve your skills, and compete with others in a fast-paced, fun, and engaging environment.",
+        venue: "Department Lab 3",
+        eventType: "Individual",
+        maxParticipation: "60 Participants",
+        minParticipation: "20 Participants",
+        registrationFee: "30/-",
+        firstPrize: "500/-",
+        secondPrize: "250/-",
+        coordinators: [
+            { name: "Nandhu Krishnan- S5", phone: "+917593985785" },
+            { name: "Athul Tomy- S5", phone: "+919567767003" }
+        ]
+    },
+    {
+        id: "craft-the-screen",
+        title: "Craft The Screen",
+        image: "/posters/poster.jpeg",
+        regLink: "https://example.com/register1",
+        type: "technical",
+        date: "23-09-2025",
+        description: "The UI/UX Competition provides a platform for participants to demonstrate their design skills by creating intuitive, functional, and aesthetically appealing user interfaces. It emphasizes innovation, usability, and creativity in delivering effective digital experiences.",
+        venue: "Computer Centre",
+        eventType: "Group (2-3)",
+        maxParticipation: "25 Teams",
+        minParticipation: "10 Teams",
+        registrationFee: "150/-",
+        firstPrize: "900/-",
+        secondPrize: "600/-",
+        requiresExtraData: false,
+        coordinators: [
+            { name: "Alfred Joe Devasia - S7", phone: "+917356728914" },
+            { name: "Uday Krishna - S7", phone: "+919567284066" }
         ]
     },
     {
@@ -128,13 +130,13 @@ export const events: Event[] = [
         venue: "S3/S4 CSE A",
         eventType: "Group (2-3)",
         maxParticipation: "20 Teams",
-        minParticipation: "15 participants",
+        minParticipation: "15 Teams",
         registrationFee: "100/-",
         firstPrize: "1000/-",
         secondPrize: "500/-",
         coordinators: [
-            { name: "Hellan Raichel Benoy - S5", phone: "919876543210" },
-            { name: "Khulood Salam - S5", phone: "919876543210" }
+            { name: "Hellan Raichel Benoy - S5", phone: "+919995251866" },
+            { name: "Khulood Salam - S5", phone: "+918590123899" }
         ]
     },
     {
@@ -147,15 +149,15 @@ export const events: Event[] = [
         description: "Prompt to Image is a creative game where players are shown an image and must write a text prompt describing it. Using this prompt, they generate a similar image, testing their observation, description, and creativity skills. The game encourages imagination, attention to detail, and artistic thinking, making it fun and engaging for participants.",
         venue: "Computer Centre",
         eventType: "Individual",
-        maxParticipation: "60 participants",
-        minParticipation: "40 participants",
+        maxParticipation: "60 Participants",
+        minParticipation: "40 Participants",
         registrationFee: "30/-",
         firstPrize: "600/-",
         secondPrize: "400/-",
         coordinators: [
-            { name: "Akshay U - S3 CSE B", phone: "919876543210" },
-            { name: "Akshay V - S3 CSE B", phone: "919876543210" },
-            { name: "Akshaya A - S3 CSE B", phone: "919876543210" }
+            { name: "Akshay U - S3 CSE B", phone: "+918129553784" },
+            { name: "Akshay V - S3 CSE B", phone: "+917736557212" },
+            { name: "Akshaya A - S3 CSE B", phone: "+919562996771" }
         ]
     },
     {
@@ -168,20 +170,20 @@ export const events: Event[] = [
         description: "'Last of Us', A thrilling campus competition where classic Kerala games decide who outsmarts, outplays, and outlasts the rest. From childhood favorites to tricky challenges, each round tests skill, teamwork, and wit. One by one, contestants are eliminated-not by violence, but by the rules of the game-until only the Last of Us remains.",
         venue: "Carmel Auditorium",
         eventType: "Individual",
-        maxParticipation: "100 participants",
-        minParticipation: "50 participants",
+        maxParticipation: "100 Participants",
+        minParticipation: "50 Participants",
         registrationFee: "30/-",
         firstPrize: "Subject to the number of participants.",
         coordinators: [
-            { name: "Amal J Anand  S3 CSE A", phone: "919876543210" },
-            { name: "Anwin Anto - S3 CSE A", phone: "919876543210" },
-            { name: "Savio Ibrahim lype - S3 CSE A", phone: "919876543210" },
-            { name: "Tessa Maria Saj - S3 CSE A", phone: "919876543210" }
+            { name: "Amal J Anand  S3 CSE A", phone: "+919496333720" },
+            { name: "Anwin Anto - S3 CSE A", phone: "+919497386729" },
+            { name: "Savio Ibrahim lype - S3 CSE A", phone: "+918089858509" },
+            { name: "Tessa Maria Saj - S3 CSE A", phone: "+918281485534" }
         ]
     },
     {
         id: "code-in-the-blanks",
-        title: "Code In The Blanks",
+        title: "Code Quest",
         image: "/posters/poster.jpeg",
         regLink: "https://example.com/register8",
         type: "technical",
@@ -189,14 +191,14 @@ export const events: Event[] = [
         description: "This event is a three-level coding challenge where participants must complete code snippets by filling in the missing operators, delimiters, or both. Each level grows more difficult, testing both speed and accuracy.",
         venue: "Computer Centre",
         eventType: "Group",
-        maxParticipation: "25 Teams",
+        maxParticipation: "20 Teams",
         minParticipation: "10 Teams",
         registrationFee: "70/-",
         firstPrize: "750/-",
         secondPrize: "500/-",
         coordinators: [
-            { name: "Shaima Yousaf - S5 CSE", phone: "919876543210" },
-            { name: "Neha Agnus P.S - S5 CSE", phone: "919876543210" }
+            { name: "Shaima Yousaf - S5 CSE", phone: "+917510251168" },
+            { name: "Neha Agnus P.S - S5 CSE", phone: "+919495619709" }
         ]
     },
     {
@@ -207,21 +209,21 @@ export const events: Event[] = [
         type: "nonTechnical",
         date: "25-09-2025",
         description: "We've all seen at events, these little stands having a stamp and you collect five of those by doing some task and then get to the end, to get a prize. The Stampede is just that. There is a play on words in the title as well. So, there will be 4 stands with tasks, increasing in difficulty of course, and should you complete the task, you will get a stamp. If you successfully collect all of the stamps, you get a prize at the end, or maybe play another game to win that prize as well.",
-        venue: "S3/S4 CSE",
+        venue: "S3/S4 CSE B",
         eventType: "Individual",
-        maxParticipation: "60 participants",
-        minParticipation: "35 participants",
+        maxParticipation: "60 Participants",
+        minParticipation: "35 Participants",
         registrationFee: "30/-",
         firstPrize: "600/-",
         secondPrize: "400/-",
         coordinators: [
-            { name: "Niharika - S1 CSE B", phone: "919876543210" },
-            { name: "Mariya - S1 CSE B", phone: "919876543210" }
+            { name: "Niharika K Gireesh- S1 CSE B", phone: "+916282351648" },
+            { name: "Mariya Sunil- S1 CSE B", phone: "+917907810449" }
         ]
     },
     {
         id: "techstorm",
-        title: "Techstorm (Technical Debate)",
+        title: "Techstorm",
         image: "/posters/poster.jpeg",
         regLink: "https://example.com/register10",
         type: "technical",
@@ -235,18 +237,18 @@ export const events: Event[] = [
         firstPrize: "600/-",
         secondPrize: "400/-",
         coordinators: [
-            { name: "Aravind B - S3 CSE A", phone: "919876543210" },
-            { name: "Unnikrishnan A - S3 CSE A", phone: "919876543210" }
+            { name: "Aravind B - S3 CSE A", phone: "+917736667814" },
+            { name: "Unnikrishnan A - S3 CSE A", phone: "+919496025951" }
         ]
     },
     {
         id: "emoji-story-decode",
-        title: "Emoji Story Decode",
+        title: "Emoji Decode",
         image: "/posters/poster.jpeg",
         regLink: "https://example.com/register11",
         type: "nonTechnical",
         date: "26-09-2025",
-        description: "Emoji Story Decode is a game where players guess the story or phrase represented by a series of emojis. Players are shown a series of emojis that represent a story, phrase, or movie. Players must decode the emojis and guess the correct answer.",
+        description: "Emoji Decode is a game where players guess the story or phrase represented by a series of emojis. Players are shown a series of emojis that represent a story, phrase, or movie. Players must decode the emojis and guess the correct answer.",
         venue: "CSE Project Lab",
         eventType: "Group (2)",
         maxParticipation: "20 Teams",
@@ -255,26 +257,27 @@ export const events: Event[] = [
         firstPrize: "600/-",
         secondPrize: "400/-",
         coordinators: [
-            { name: "Akshay A - S3 CSE B", phone: "919876543210" },
-            { name: "Pavithra Sankar - S3 CSE B", phone: "919876543210" }
+            { name: "Akshay A - S3 CSE B", phone: "+919188212217" },
+            { name: "Pavithra Sankar - S3 CSE B", phone: "+918075201808" }
         ]
     },
     {
         id: "pes",
-        title: "PES",
+        title: "E-Football",
         image: "/posters/poster.jpeg",
         regLink: "https://example.com/register12",
         type: "nonTechnical",
         date: "22-09-2025 to 26-09-2025",
-        description: "Step onto the virtual pitch and showcase your football skills in this competitive PES tournament. Test your strategy, reflexes, and precision as you go head-to-head with fellow gamers in the ultimate digital football experience.",
+        description: "Step onto the virtual pitch and showcase your football skills in this competitive E-Football tournament. Test your strategy, reflexes, and precision as you go head-to-head with fellow gamers in the ultimate digital football experience.",
         eventType: "Individual",
-        minParticipation: "16 participants",
+        minParticipation: "16 Participants",
+        isOnline: true,
         registrationFee: "30/-",
         firstPrize: "500/-",
         secondPrize: "250/-",
         coordinators: [
-            { name: "Saheed Muhammed Rafi - S7", phone: "919876543210" },
-            { name: "Ajilash - S7", phone: "919876543210" }
+            { name: "Saheed Muhammed Rafi - S7", phone: "+919539077131" },
+            { name: "Ajilash Edward - S7", phone: "+918129645672" }
         ]
     },
     {
@@ -288,11 +291,12 @@ export const events: Event[] = [
         eventType: "Individual",
         minParticipation: "25 participants",
         registrationFee: "30/-",
+        isOnline: true,
         firstPrize: "500/-",
         secondPrize: "250/-",
         coordinators: [
-            { name: "Alan Sabu - S5 CSE", phone: "919876543210" },
-            { name: "Melvin K Roy - S5 CSE", phone: "919876543210" }
+            { name: "Alan Sabu - S5 CSE", phone: "+917994326902" },
+            { name: "Melvin K Roy - S5 CSE", phone: "+918921196969" }
         ]
     },
     {
@@ -304,15 +308,21 @@ export const events: Event[] = [
         date: "22-09-2025 to 26-09-2025",
         description: "Gear up for an action-packed BGMI competition where teamwork, strategy, and quick decision-making are the keys to survival. Compete against the best and prove your dominance in this high-intensity battle royale challenge.",
         eventType: "Group (4)",
+        isOnline: true,
         minParticipation: "15 Teams",
-        registrationFee: "70/-",
+        registrationFee: "100/-",
         firstPrize: "1000/-",
         secondPrize: "500/-",
+        requiresExtraData: true,
+        extraFields: [
+            { name: "UserID", type: "text" },
+            { name: "In-GameName", type: "text" }
+        ],
         coordinators: [
-            { name: "Adithyan S- S5 CSE", phone: "919876543210" },
-            { name: "Sooraj Anil - S5 CSE", phone: "919876543210" },
-            { name: "Razal Sajeem - S5 CSE", phone: "919876543210" },
-            { name: "Abhidev Aji - S3 CSE B", phone: "919876543210" }
+            { name: "Adithyan S- S5 CSE", phone: "+917012783985" },
+            { name: "Sooraj Anil - S5 CSE", phone: "+918075044042" },
+            { name: "Abhidev Aji - S3 CSE B", phone: "+918368311643" },
+            { name: "Abhishek R Nair - S3 CSE B", phone: "+919746926815" }
         ]
     },
     {
@@ -322,16 +332,17 @@ export const events: Event[] = [
         regLink: "https://example.com/register15",
         type: "nonTechnical",
         date: "22-09-2025 to 26-09-2025",
+        isOnline: true,
         description: "Build, strategize, and conquer in the world of Clash of Clans. This event challenges participants to demonstrate tactical planning, resource management, and execution skills to outsmart opponents and secure victory.",
         eventType: "Group (5)",
-        minParticipation: "10 participants",
+        minParticipation: "5 Teams",
         registrationFee: "100/-",
         firstPrize: "600/-",
         secondPrize: "400/-",
         coordinators: [
-            { name: "Abhinav s menon - S3 CSE A", phone: "919876543210" },
-            { name: "Akhil krishnan - S3 CSE A", phone: "919876543210" },
-            { name: "Anandhu krishna - S3 CSE A", phone: "919876543210" }
+            { name: "Abhinav S Menon - S3 CSE A", phone: "+918921156681" },
+            { name: "Akhil Krishnan - S3 CSE A", phone: "+918590449575" },
+            { name: "Anandhu Krishna - S3 CSE A", phone: "+919207481774" }
         ]
     },
     {
@@ -340,14 +351,15 @@ export const events: Event[] = [
         image: "/posters/poster.jpeg",
         regLink: "https://example.com/register16",
         type: "sports",
-        description: "N/A",
-        eventType: "Group (7+3)",
+        description: "Get ready to witness the ultimate clash on the field as CSE students battle it out in an electrifying 7s Football Tournament! From Semester 1 to Semester 7, teams will showcase their skills, teamwork, and passion for the beautiful game. Who will rise as the champions of Obcyfest?",
+        eventType: "Group (10)",
         totalParticipation: "60 (fixed)",
-        registrationFee: "100/-",
-        firstPrize: "2000/-",
-        secondPrize: "1000/-",
+        registrationFee: "500/-",
+        firstPrize: "1600/-",
+        secondPrize: "900/-",
         coordinators: [
-            { name: "Aadith C Joseph - S7 CSE", phone: "919876543210" }
+            { name: "Aadith C Joseph - S7 CSE", phone: "+919495268368" },
+            { name: "Don Siby Varghese- S7 CSE", phone: "+916235365938" }
         ]
     }
 ];
