@@ -38,7 +38,7 @@ function FaqItem({ question, answer }: FaqItemProps) {
         onClick={toggleOpen}
       >
         <span className="text-lg font-light text-gray-400">{question}</span>
-        {isOpen ? (
+        {!isOpen ? (
           <IoIosArrowDown className="text-gray-400"/>
         ) : (
           <IoIosArrowUp className="text-gray-400" />

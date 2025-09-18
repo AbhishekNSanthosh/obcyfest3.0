@@ -35,7 +35,7 @@ export default function EventContent() {
   />
 
   {/* Right: Filters */}
-  <div className="flex items-center justify-end gap-3 lg:gap-5 overflow-x-auto md:overflow-visible scrollbar-hide">
+  <div className="flex items-center md:justify-end justify-start gap-3 lg:gap-5 overflow-x-auto md:overflow-visible scrollbar-hide">
     {[
       { key: "all", label: "All" },
       { key: "technical", label: "Technical" },

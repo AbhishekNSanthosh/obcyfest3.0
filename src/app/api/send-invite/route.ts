@@ -68,7 +68,7 @@ export async function POST(req: Request) {
         };
 
         await transporter.sendMail(mailOptions);
-
+console.log(`Mail Sent to ${inviterName}`)
         return NextResponse.json({ success: true, message: "Invitation sent!" });
     } catch (err: any) {
         console.error("Error sending mail:", err);

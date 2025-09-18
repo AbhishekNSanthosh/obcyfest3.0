@@ -57,11 +57,14 @@ export default function HeroText() {
       {/* Date & Call to Action */}
       <div className="text-center mt-2 mb-7 md:text-xl lg:text-xl text-sm z-10">
         <p>
-          Kickstarting Innovation on{" "}
-          <span className="text-yellow-400 font-bold">October 30, 2024</span>
+          Kickstarting innovation from{" "}
+          <span className="text-yellow-400 font-bold">
+            September 22–26, 2025
+          </span>
         </p>
         <p className="text-lg text-gray-300 mt-3">
-          Join us for a day of tech, creativity, and endless inspiration!
+          Join us for days filled with technology, creativity, and endless
+          inspiration!
         </p>
       </div>
 
@@ -82,10 +85,10 @@ export default function HeroText() {
       </div>
 
       {/* Call to Action Button */}
-       <Link className=" z-10" href={"/events"}>
+      <Link className=" z-10" href={"/events"}>
         <button className="md:mt-10 lg:mt-10 mt-2 px-8 py-3 bg-yellow-400 rounded-lg cursor-pointer font-semibold text-black-950 hover:bg-yellow-500 transition-colors">
           Register Now
-      </button>
+        </button>
       </Link>
     </div>
   );
