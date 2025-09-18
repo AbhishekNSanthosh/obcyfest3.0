@@ -942,7 +942,7 @@ const handleChange = (
                       {event?.upi1}
                     </span>
                   </div>
-                  <div className="flex lg:flex hidden flex-col gap-2 p-4 rounded-md bg-gray-900/40 border border-gray-800">
+                  <div className="lg:flex hidden flex-col gap-2 p-4 rounded-md bg-gray-900/40 border border-gray-800">
                     <label className="text-xs text-gray-300">Reg Fee</label>
                     <span className="text-sm font-medium text-white">
                       {event?.registrationFee}
@@ -957,7 +957,7 @@ const handleChange = (
                         const upiId = event?.upi1;
                         const name = event?.coordinators[0]?.name;
                         const amount = event?.registrationFee || 0; // default to 0 if not set
-                        const upiLink = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(
+                        const upiLink = `gpay://pay?pa=${upiId}&pn=${encodeURIComponent(
                           name || "Coordinator"
                         )}&am=${amount}&cu=INR&tn=${encodeURIComponent(
                           "Event Payment"
@@ -986,7 +986,7 @@ const handleChange = (
                         const upiId = event?.upi2;
                         const name = event?.coordinators[0]?.name;
                         const amount = event?.registrationFee || 0; // default to 0 if not set
-                        const upiLink = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(
+                        const upiLink = `paytmmp://pay?pa=${upiId}&pn=${encodeURIComponent(
                           name || "Coordinator"
                         )}&am=${amount}&cu=INR&tn=${encodeURIComponent(
                           "Event Payment"
@@ -1015,7 +1015,7 @@ const handleChange = (
                         const upiId = event?.upi1;
                         const name = event?.coordinators[0]?.name;
                         const amount = event?.registrationFee || 0; // default to 0 if not set
-                        const upiLink = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(
+                        const upiLink = `phonepe://pay?pa=${upiId}&pn=${encodeURIComponent(
                           name || "Coordinator"
                         )}&am=${amount}&cu=INR&tn=${encodeURIComponent(
                           "Event Payment"
