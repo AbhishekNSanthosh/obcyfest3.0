@@ -72,7 +72,7 @@ export default function EventContent() {
                     src={event.image}
                     alt={`Event ${event.id}`}
                     height={200}
-                    quality={70}
+                    quality={60}
                     width={300}
                     className="shadow-[5px] w-full h-auto"
                   />

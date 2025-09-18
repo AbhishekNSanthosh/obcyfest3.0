@@ -75,6 +75,7 @@ export default async function EventPage({ params }: EventPageProps) {
             src={event.image}
             alt={event.title}
             fill
+            quality={40}
             className="object-cover"
             priority
           />
