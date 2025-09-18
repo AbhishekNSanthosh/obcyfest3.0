@@ -1,9 +1,9 @@
 export interface Children {
-    children: React.ReactNode;
+  children: React.ReactNode;
 }
 
 export interface IconProps {
-    className: string;
+  className: string;
 }
 
 export type Event = {
@@ -16,6 +16,8 @@ export type Event = {
   description: string;
   venue?: string;
   eventType: string;
+  memberMaxCount: Number;
+  memberMinCount: Number;
   isOnline?: boolean;
   maxParticipation?: string;
   minParticipation?: string;
@@ -25,5 +27,29 @@ export type Event = {
   secondPrize?: string;
   requiresExtraData?: boolean;
   extraFields?: { name: string; type: string }[]
+  coordinators: { name: string; phone: string }[];
+};
+
+export type AppEvent = {
+  id: string;
+  title: string;
+  image: string;
+  regLink?: string;
+  type: 'technical' | 'nonTechnical' | 'sports';
+  date?: string;
+  description: string;
+  venue?: string;
+  eventType: string;
+  memberMaxCount: Number;
+  memberMinCount: Number;
+  isOnline?: boolean;
+  maxParticipation?: string;
+  minParticipation?: string;
+  totalParticipation?: string;
+  registrationFee: string;
+  firstPrize: string;
+  secondPrize?: string;
+  requiresExtraData?: boolean;
+  extraFields?: { name: string; type: string }[];
   coordinators: { name: string; phone: string }[];
 };
