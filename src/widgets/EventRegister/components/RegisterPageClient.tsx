@@ -357,7 +357,7 @@ export default function RegisterPageClient({
           for (let p of participants) {
             const regQ = query(
               collection(db, "registrations"),
-              where("participantUids", "array-contains", p.email)
+              where("participantMails", "array-contains", p.email)
             );
             const regSnap = await getDocs(regQ);
             if (
@@ -458,7 +458,7 @@ export default function RegisterPageClient({
         eventDate: normalizedEventDate || null,
         isGroup: false,
         leaderUid: profile.uid,
-        participantUids: [profile.uid],
+        participantMails: [profile.email],
         transactionId,
         amountPaid: event?.registrationFee,
         participants: [
@@ -473,7 +473,7 @@ export default function RegisterPageClient({
         createdAt: serverTimestamp(),
       });
       toast.success("Registration successful!");
-      router.push(`/events/${eventId}`);
+      router.push(`/events`);
     } catch (err) {
       console.error(err);
       toast.error("Registration failed. Please try again.");
@@ -804,12 +804,13 @@ export default function RegisterPageClient({
                           Semester
                         </label>
                         <select
-                          value={member.semester || profile?.semester || ""}
+                          value={member?.semester || ""}
                           onChange={(e) =>
                             handleChange(index, "semester", e.target.value)
                           }
                           className="w-full px-4 py-3 bg-gray-900/50 border border-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-yellow-400"
                         >
+                          <option value="">select</option>
                           {profile?.semester && (
                             <option value={profile.semester}>
                               {profile.semester}
@@ -882,7 +883,7 @@ export default function RegisterPageClient({
                   <div className="flex flex-col gap-2 p-4 rounded-md bg-gray-900/40 border border-gray-800">
                     <label className="text-xs text-gray-300">Phone</label>
                     <span className="text-sm font-medium text-white">
-                      +91 9876543210
+                      {event?.gpay}
                     </span>
                   </div>
 
@@ -890,7 +891,7 @@ export default function RegisterPageClient({
                   <div className="flex flex-col gap-2 p-4 rounded-md bg-gray-900/40 border border-gray-800">
                     <label className="text-xs text-gray-300">UPI ID</label>
                     <span className="text-sm font-medium text-white">
-                      name@upi
+                      {event?.upi1}
                     </span>
                   </div>
 
@@ -899,10 +900,10 @@ export default function RegisterPageClient({
                     {/* GPay */}
                     <button
                       onClick={() => {
-                        const upiId = "name@upi";
-                        const name = "Recipient Name";
-                        const amount = "100"; // optional
-                        const upiLink = `upi://pay?pa=${upiId}&pn=${name}&am=${amount}&cu=INR&tn=Event%20Payment`;
+                        const upiId = event?.upi1;
+                        const name = event?.coordinators[0]?.name;
+                        const amount = event?.registrationFee; // optional
+                        const upiLink = `upi://pay?pa=${upiId}&am=${amount}&cu=INR&tn=Event%20Payment`;
                         window.location.href = upiLink;
                       }}
                       className="flex flex-col items-center justify-center gap-2 px-4 py-3 rounded-lg text-gray-600 font-medium bg-black border border-gray-800 hover:opacity-90 transition"
@@ -916,17 +917,17 @@ export default function RegisterPageClient({
                       />
                       <span>Pay with GPay</span>
                       <span className="text-yellow-400 font-semibold">
-                        ₹100/-
+                        {event?.registrationFee}
                       </span>
                     </button>
 
                     {/* Paytm */}
                     <button
                       onClick={() => {
-                        const upiId = "name@upi";
+                        const upiId = event?.upi2;
                         const name = "Recipient Name";
-                        const amount = "100"; // optional
-                        const upiLink = `upi://pay?pa=${upiId}&pn=${name}&am=${amount}&cu=INR&tn=Event%20Payment`;
+                        const amount = event?.registrationFee; // optional
+                        const upiLink = `upi://pay?pa=${upiId}&am=${amount}&cu=INR&tn=Event%20Payment`;
                         window.location.href = upiLink;
                       }}
                       className="flex flex-col items-center justify-center gap-2 px-4 py-3 rounded-lg text-gray-600 font-medium bg-black border border-gray-800 hover:opacity-90 transition"
@@ -940,17 +941,17 @@ export default function RegisterPageClient({
                       />
                       <span>Pay with Paytm</span>
                       <span className="text-yellow-400 font-semibold">
-                        ₹100/-
+                        {event?.registrationFee}
                       </span>
                     </button>
 
                     {/* PhonePe */}
                     <button
                       onClick={() => {
-                        const upiId = "name@upi";
+                        const upiId = event?.upi1;
                         const name = "Recipient Name";
-                        const amount = "100"; // optional
-                        const upiLink = `upi://pay?pa=${upiId}&pn=${name}&am=${amount}&cu=INR&tn=Event%20Payment`;
+                        const amount = event?.registrationFee; // optional
+                        const upiLink = `upi://pay?pa=${upiId}&am=${amount}&cu=INR&tn=Event%20Payment`;
                         window.location.href = upiLink;
                       }}
                       className="flex flex-col items-center justify-center gap-2 px-4 py-3 rounded-lg text-gray-600 font-medium bg-black border border-gray-800 hover:opacity-90 transition"
@@ -964,7 +965,7 @@ export default function RegisterPageClient({
                       />
                       <span>Pay with PhonePe</span>
                       <span className="text-yellow-400 font-semibold">
-                        ₹100/-
+                        {event?.registrationFee}
                       </span>
                     </button>
                   </div>
@@ -1002,7 +1003,8 @@ export default function RegisterPageClient({
                   <button
                     type="button"
                     disabled={
-                      isSubmitting || members.length === event?.memberMinCount
+                      isSubmitting
+                      // || members.length === Number(event?.memberMinCount)-1
                     }
                     onClick={handleRegisterGroup}
                     className="w-full sm:w-auto bg-yellow-400 text-black-950 px-8 py-3 rounded-lg font-semibold text-lg shadow-lg hover:bg-yellow-500 disabled:opacity-50 flex items-center justify-center gap-2"

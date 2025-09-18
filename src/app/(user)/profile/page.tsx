@@ -164,7 +164,7 @@ export default function ProfilePage() {
 
     const regQ = query(
       collection(db, "registrations"),
-      where("participantUids", "array-contains", user.uid)
+      where("participantMails", "array-contains", user.email)
     );
     const unsubRegs = onSnapshot(regQ, (snap) => {
       setRegistrations(
@@ -344,7 +344,7 @@ export default function ProfilePage() {
           throw new Error("Only the leader can cancel this registration.");
         }
 
-        const currentParticipants = regDoc.data().participantUids || [];
+        const currentParticipants = regDoc.data().participantMails || [];
         const updatedParticipants = currentParticipants.filter(
           (uid: string) => uid !== user.uid
         );
@@ -352,7 +352,7 @@ export default function ProfilePage() {
         if (updatedParticipants.length === 0) {
           transaction.delete(regRef);
         } else {
-          transaction.update(regRef, { participantUids: updatedParticipants });
+          transaction.update(regRef, { participantMails: updatedParticipants });
         }
       });
 

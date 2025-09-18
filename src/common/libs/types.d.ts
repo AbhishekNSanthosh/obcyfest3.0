@@ -19,6 +19,9 @@ export type Event = {
   memberMaxCount: Number;
   memberMinCount: Number;
   isOnline?: boolean;
+  upi1?: string;
+  upi2?: string;
+  gpay?: string;
   maxParticipation?: string;
   minParticipation?: string;
   totalParticipation?: string;
@@ -44,6 +47,9 @@ export type AppEvent = {
   memberMinCount: Number;
   isOnline?: boolean;
   maxParticipation?: string;
+  upi1?: string;
+  upi2?: string;
+  gpay?: string;
   minParticipation?: string;
   totalParticipation?: string;
   registrationFee: string;
