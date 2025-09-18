@@ -24,6 +24,7 @@ import { events } from "@utils/constants";
 import toast from "react-hot-toast";
 import { AppEvent } from "@lib/types";
 import { IoClose } from "react-icons/io5";
+import Image from "next/image";
 
 type UserProfile = {
   uid: string;
@@ -89,6 +90,7 @@ export default function RegisterPageClient({
     { roll: "", name: "", email: "", semester: "", phone: "" },
   ]);
   const [participants, setParticipants] = useState<Member[]>([]);
+  const [transactionId, setTransactionId] = useState("");
 
   useEffect(() => {
     if (profile) {
@@ -297,18 +299,18 @@ export default function RegisterPageClient({
       });
 
       setInviteEmail("");
-      await fetch("/api/send-invite", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          to: email,
-          inviterName: profile.displayName,
-          eventTitle: event?.title,
-          inviteLink:
-            `${process.env.NEXT_PUBLIC_BASE_URL}/profile` ||
-            `${window.location.origin}/profile`,
-        }),
-      });
+      // await fetch("/api/send-invite", {
+      //   method: "POST",
+      //   headers: { "Content-Type": "application/json" },
+      //   body: JSON.stringify({
+      //     to: email,
+      //     inviterName: profile.displayName,
+      //     eventTitle: event?.title,
+      //     inviteLink:
+      //       `${process.env.NEXT_PUBLIC_BASE_URL}/profile` ||
+      //       `${window.location.origin}/profile`,
+      //   }),
+      // });
       toast.success("Invite sent successfully!");
     } catch (err) {
       console.error(err);
@@ -320,17 +322,22 @@ export default function RegisterPageClient({
 
   // Group registration
   const handleRegisterGroup = async () => {
-    console.log("Group registration called!!!");
-    if (!currentUser || !profile) return;
+    console.log(members);
     if (
-      members.every(
-        (m) => !m.roll && !m.name && !m.email && !m.semester && !m.phone
+      members.some(
+        (m) => !m.roll || !m.name || !m.email || !m.semester || !m.phone
       )
     ) {
-      toast.error("Please provide the team member details.");
-
-      return "";
+      toast.error("Please fill in all the team member details.");
+      return;
     }
+    if (!transactionId) {
+      toast.error("Kindly make the payment and fill the transaction");
+      return;
+    }
+    console.log("Group registration called!!!");
+    if (!currentUser || !profile) return;
+
     setIsSubmitting(true);
     try {
       await runTransaction(db, async (transaction) => {
@@ -387,6 +394,8 @@ export default function RegisterPageClient({
           eventTitle: event?.title,
           eventDate: normalizedEventDate || null,
           isGroup: true,
+          transactionId,
+          amountPaid: event?.registrationFee,
           leaderUid: profile.uid,
           participantMails: participants.map((p) => p.email),
           participants,
@@ -406,6 +415,10 @@ export default function RegisterPageClient({
 
   // Individual registration
   const handleRegisterIndividual = async () => {
+    if (!transactionId) {
+      toast.error("Kindly make the payment and fill the transaction");
+      return;
+    }
     if (!currentUser || !profile) return;
 
     setIsSubmitting(true);
@@ -446,6 +459,8 @@ export default function RegisterPageClient({
         isGroup: false,
         leaderUid: profile.uid,
         participantUids: [profile.uid],
+        transactionId,
+        amountPaid: event?.registrationFee,
         participants: [
           {
             uid: profile.uid,
@@ -605,7 +620,8 @@ export default function RegisterPageClient({
           <div className="px-6 sm:px-6 lg:px-8 py-6 border-b border-gray-800">
             <div className="max-w-4xl mx-auto">
               <h1 className="text-xl sm:text-3xl md:text-4xl font-bold text-yellow-400 mb-2">
-                Register for {event?.title}
+                Register for{" "}
+                <span className="bg-yellow-400 text-black">{event?.title}</span>
               </h1>
               <p className="text-gray-300 text-base sm:text-lg">
                 {event?.eventType} • Registration Fee: {event?.registrationFee}
@@ -619,9 +635,14 @@ export default function RegisterPageClient({
           </div>
 
           <div className="px-4 sm:px-6 lg:px-8 py-8">
-            <div className="max-w-2xl mx-auto space-y-8">
+            <div className="max-w-4xl mx-auto space-y-8">
               {/* User details */}
-              <div className="bg-black-950 bg-opacity-60 p-6 rounded-xl border border-gray-800">
+              <div className="bg-black-950 bg-opacity-60 p-6 rounded-xl border border-gray-800 relative">
+                {isGroupEvent && (
+                  <h3 className="absolute -top-3 left-3 bg-black px-2 text-yellow-400 text-sm font-semibold rounded">
+                    Member 1
+                  </h3>
+                )}
                 <h2 className="text-lg font-semibold text-yellow-400 mb-6 flex items-center gap-2">
                   <LuUser className="text-lg" />
                   Your Details
@@ -647,12 +668,32 @@ export default function RegisterPageClient({
                       className="w-full px-4 py-3 bg-gray-900/50 border border-gray-700 rounded-lg text-white"
                     />
                   </div>
-                  <div className="md:col-span-2">
+                  <div className="">
                     <label className="block text-sm font-medium text-gray-300 mb-2">
                       Email
                     </label>
                     <input
                       value={profile?.email || ""}
+                      readOnly
+                      className="w-full px-4 py-3 bg-gray-900/50 border border-gray-700 rounded-lg text-white"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                      Roll No:
+                    </label>
+                    <input
+                      value={profile?.rollNumber || ""}
+                      readOnly
+                      className="w-full px-4 py-3 bg-gray-900/50 border border-gray-700 rounded-lg text-white"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                      Mobile no:
+                    </label>
+                    <input
+                      value={profile?.phone || ""}
                       readOnly
                       className="w-full px-4 py-3 bg-gray-900/50 border border-gray-700 rounded-lg text-white"
                     />
@@ -699,79 +740,117 @@ export default function RegisterPageClient({
                   {members.map((member, index) => (
                     <div
                       key={index}
-                      className="relative grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4 p-4 border border-gray-700 rounded-lg bg-black"
+                      className="relative grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4 p-4 border border-gray-700 rounded-lg bg-black"
                     >
+                      {/* Member Title */}
                       <h3 className="absolute -top-3 left-3 bg-black px-2 text-yellow-400 text-sm font-semibold rounded">
                         Member {index + 2}
                       </h3>
 
-                      <input
-                        type="text"
-                        value={member.roll || ""}
-                        onChange={(e) =>
-                          handleChange(index, "roll", e.target.value)
-                        }
-                        placeholder="Roll Number"
-                        className="px-4 py-3 bg-gray-900/50 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-400"
-                        disabled={isInviting}
-                      />
-                      <input
-                        type="text"
-                        value={member.name || ""}
-                        onChange={(e) =>
-                          handleChange(index, "name", e.target.value)
-                        }
-                        placeholder="Full Name"
-                        className="px-4 py-3 bg-gray-900/50 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-400"
-                        disabled={isInviting}
-                      />
-                      <input
-                        type="email"
-                        value={member.email || ""}
-                        onChange={(e) =>
-                          handleChange(index, "email", e.target.value)
-                        }
-                        placeholder="member@example.com"
-                        className="px-4 py-3 bg-gray-900/50 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-400"
-                        disabled={isInviting}
-                      />
-                      <input
-                        type="text"
-                        value={member.semester || ""}
-                        onChange={(e) =>
-                          handleChange(index, "semester", e.target.value)
-                        }
-                        placeholder="Semester"
-                        className="px-4 py-3 bg-gray-900/50 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-400"
-                        disabled={isInviting}
-                      />
-                      <input
-                        type="tel"
-                        value={member.phone || ""}
-                        onChange={(e) =>
-                          handleChange(index, "phone", e.target.value)
-                        }
-                        placeholder="Phone Number (e.g. 7907247909)"
-                        className="px-4 py-3 bg-gray-900/50 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-400"
-                        disabled={isInviting}
-                      />
+                      {/* Roll No */}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-300 mb-1">
+                          Roll No.
+                        </label>
+                        <input
+                          type="number"
+                          value={member.roll || ""}
+                          onChange={(e) =>
+                            handleChange(index, "roll", e.target.value)
+                          }
+                          placeholder="Roll Number"
+                          className="w-full px-4 py-3 bg-gray-900/50 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                          disabled={isInviting}
+                        />
+                      </div>
 
-                      {/* Remove button */}
-                      {Number(event?.memberMinCount) <
-                        Number(event?.memberMaxCount) && (
-                        <>
-                          {index > 0 && (
-                            <button
-                              type="button"
-                              onClick={() => handleRemoveMember(index)}
-                              className=" text-red-400 hover:text-red-600"
-                              disabled={isInviting}
-                            >
-                              <IoClose />
-                            </button>
+                      {/* Full Name */}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-300 mb-1">
+                          Full Name
+                        </label>
+                        <input
+                          type="text"
+                          value={member.name || ""}
+                          onChange={(e) =>
+                            handleChange(index, "name", e.target.value)
+                          }
+                          placeholder="Full Name"
+                          className="w-full px-4 py-3 bg-gray-900/50 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                          disabled={isInviting}
+                        />
+                      </div>
+
+                      {/* Email */}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-300 mb-1">
+                          Email
+                        </label>
+                        <input
+                          type="email"
+                          value={member.email || ""}
+                          onChange={(e) =>
+                            handleChange(index, "email", e.target.value)
+                          }
+                          placeholder="member@example.com"
+                          className="w-full px-4 py-3 bg-gray-900/50 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                          disabled={isInviting}
+                        />
+                      </div>
+
+                      {/* Semester */}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-300 mb-1">
+                          Semester
+                        </label>
+                        <select
+                          value={member.semester || profile?.semester || ""}
+                          onChange={(e) =>
+                            handleChange(index, "semester", e.target.value)
+                          }
+                          className="w-full px-4 py-3 bg-gray-900/50 border border-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                        >
+                          {profile?.semester && (
+                            <option value={profile.semester}>
+                              {profile.semester}
+                            </option>
                           )}
-                        </>
-                      )}
+                        </select>
+                        <p className="text-[11px] text-gray-400 mt-1">
+                          Teammates must be from the same semester.
+                        </p>
+                      </div>
+
+                      {/* Mobile */}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-300 mb-1">
+                          Mobile No.
+                        </label>
+                        <input
+                          type="tel"
+                          value={member.phone || ""}
+                          onChange={(e) =>
+                            handleChange(index, "phone", e.target.value)
+                          }
+                          placeholder="7907247909"
+                          className="w-full px-4 py-3 bg-gray-900/50 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                          disabled={isInviting}
+                        />
+                      </div>
+
+                      {/* Remove button - top right */}
+                      {Number(event?.memberMinCount) <
+                        Number(event?.memberMaxCount) &&
+                        index > 0 && (
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveMember(index)}
+                            className="absolute top-2 right-2 text-red-400 hover:text-red-600"
+                            disabled={isInviting}
+                          >
+                            <IoClose />
+                          </button>
+                        )}
                     </div>
                   ))}
 
@@ -792,6 +871,120 @@ export default function RegisterPageClient({
                   )}
                 </div>
               )}
+
+              <div className="bg-black-950 bg-opacity-60 p-6 rounded-xl border border-gray-800">
+                <h2 className="text-lg font-semibold text-yellow-400 mb-6 flex items-center gap-2">
+                  Payment
+                </h2>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* Phone */}
+                  <div className="flex flex-col gap-2 p-4 rounded-md bg-gray-900/40 border border-gray-800">
+                    <label className="text-xs text-gray-300">Phone</label>
+                    <span className="text-sm font-medium text-white">
+                      +91 9876543210
+                    </span>
+                  </div>
+
+                  {/* UPI */}
+                  <div className="flex flex-col gap-2 p-4 rounded-md bg-gray-900/40 border border-gray-800">
+                    <label className="text-xs text-gray-300">UPI ID</label>
+                    <span className="text-sm font-medium text-white">
+                      name@upi
+                    </span>
+                  </div>
+
+                  {/* Pay Button */}
+                  <div className="md:col-span-2 grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    {/* GPay */}
+                    <button
+                      onClick={() => {
+                        const upiId = "name@upi";
+                        const name = "Recipient Name";
+                        const amount = "100"; // optional
+                        const upiLink = `upi://pay?pa=${upiId}&pn=${name}&am=${amount}&cu=INR&tn=Event%20Payment`;
+                        window.location.href = upiLink;
+                      }}
+                      className="flex flex-col items-center justify-center gap-2 px-4 py-3 rounded-lg text-gray-600 font-medium bg-black border border-gray-800 hover:opacity-90 transition"
+                    >
+                      <Image
+                        src={"/gpay.png"}
+                        className="w-[7rem]"
+                        width={100}
+                        height={100}
+                        alt="Google Pay"
+                      />
+                      <span>Pay with GPay</span>
+                      <span className="text-yellow-400 font-semibold">
+                        ₹100/-
+                      </span>
+                    </button>
+
+                    {/* Paytm */}
+                    <button
+                      onClick={() => {
+                        const upiId = "name@upi";
+                        const name = "Recipient Name";
+                        const amount = "100"; // optional
+                        const upiLink = `upi://pay?pa=${upiId}&pn=${name}&am=${amount}&cu=INR&tn=Event%20Payment`;
+                        window.location.href = upiLink;
+                      }}
+                      className="flex flex-col items-center justify-center gap-2 px-4 py-3 rounded-lg text-gray-600 font-medium bg-black border border-gray-800 hover:opacity-90 transition"
+                    >
+                      <Image
+                        src={"/paytm.png"}
+                        className="w-[7rem]"
+                        width={100}
+                        height={100}
+                        alt="Paytm"
+                      />
+                      <span>Pay with Paytm</span>
+                      <span className="text-yellow-400 font-semibold">
+                        ₹100/-
+                      </span>
+                    </button>
+
+                    {/* PhonePe */}
+                    <button
+                      onClick={() => {
+                        const upiId = "name@upi";
+                        const name = "Recipient Name";
+                        const amount = "100"; // optional
+                        const upiLink = `upi://pay?pa=${upiId}&pn=${name}&am=${amount}&cu=INR&tn=Event%20Payment`;
+                        window.location.href = upiLink;
+                      }}
+                      className="flex flex-col items-center justify-center gap-2 px-4 py-3 rounded-lg text-gray-600 font-medium bg-black border border-gray-800 hover:opacity-90 transition"
+                    >
+                      <Image
+                        src={"/ppay.png"}
+                        className="w-[5rem]"
+                        width={100}
+                        height={100}
+                        alt="PhonePe"
+                      />
+                      <span>Pay with PhonePe</span>
+                      <span className="text-yellow-400 font-semibold">
+                        ₹100/-
+                      </span>
+                    </button>
+                  </div>
+
+                  {/* Transaction ID Input */}
+                  <div className="md:col-span-2 flex flex-col gap-2">
+                    <label className="text-xs text-gray-300">
+                      Transaction ID
+                    </label>
+                    <input
+                      onChange={(e) => {
+                        setTransactionId(e.target.value);
+                      }}
+                      type="text"
+                      placeholder="Enter your transaction ID"
+                      className="w-full px-4 py-3 rounded-lg border border-gray-700 bg-gray-900/50 text-white placeholder-gray-500 focus:outline-none focus:border-yellow-400"
+                    />
+                  </div>
+                </div>
+              </div>
 
               {/* Actions */}
               <div className="flex flex-col sm:flex-row gap-4 justify-center">

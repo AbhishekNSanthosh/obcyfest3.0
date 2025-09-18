@@ -58,6 +58,35 @@ a {
   border-radius: 5px;
 }
 
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+/* Remove autofill background */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0px 1000px #111 inset !important; /* your bg color */
+  -webkit-text-fill-color: #fff !important; /* text color */
+  transition: background-color 5000s ease-in-out 0s;
+}
+
+@layer base {
+  input:-webkit-autofill {
+    -webkit-box-shadow: 0 0 0px 1000px rgb(17 24 39) inset !important; /* bg-gray-900 */
+    -webkit-text-fill-color: white !important;
+  }
+}
+
+
 
 @import url("https://fonts.googleapis.com/css2?family=Fugaz+One&display=swap");
 

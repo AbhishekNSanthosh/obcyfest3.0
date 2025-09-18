@@ -16,10 +16,11 @@ export default function LandingPageView() {
       <section id="about">
         <About />
       </section>
-      <section id="faqs">
-        <Info />
+      <section id="community">
+        <section id="faqs">
+          <Info />
+        </section>
       </section>
-
     </main>
   );
 }
