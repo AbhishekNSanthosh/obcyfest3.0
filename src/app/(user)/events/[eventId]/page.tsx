@@ -11,26 +11,6 @@ import {
   LuTrophy,
 } from "react-icons/lu";
 
-// Assuming the updated Event type is available in @utils/constants
-// interface Event {
-//     id: string;
-//     title: string;
-//     image: string;
-//     regLink: string;
-//     type: 'technical' | 'nonTechnical' | 'sports';
-//     date?: string;
-//     description: string;
-//     venue?: string;
-//     eventType: string;
-//     maxParticipation?: string;
-//     minParticipation?: string;
-//     totalParticipation?: string;
-//     registrationFee: string;
-//     firstPrize: string;
-//     secondPrize?: string;
-//     coordinators: string[];
-// }
-
 interface EventPageProps {
   params: {
     eventId: string;
@@ -71,34 +51,35 @@ export default async function EventPage({ params }: EventPageProps) {
     }
   };
 
-  return (
-    <div className="flex flex-col min-h-screen bg text-white">
-      {/* Hero Section with Image and Title */}
-      <div className="relative flex  lg:h-[60vh] overflow-scroll-hidden">
-        <div
-          className="absolute inset-0 bg-fixed bg-cover bg-center"
-          style={{ backgroundImage: `url(${event.image})` }}
-        >
-          <div className="absolute md:hidden flex inset-0 bg-gradient-to-t from-black via-black/70 to-black/70"></div>
-          <div className="absolute hidden lg:flex inset-0 bg-gradient-to-t from-black via-black/70 to-black/60"></div>
-        </div>
+return (
+  <div className="relative min-h-screen flex flex-col text-white">
+    {/* Full-page background image */}
+    <Image
+      src={event.image}
+      alt={event.title}
+      fill
+      priority
+      className="object-cover object-center -z-10"
+    />
 
-        {/* Hero Content */}
+    {/* Overlay for readability */}
+    <div className="absolute inset-0 bg-black/70 -z-10"></div>
+
+    {/* Page Content */}
+    <div className="flex flex-col flex-1">
+      {/* Hero */}
+      <div className="relative flex lg:h-[60vh] overflow-hidden">
         <div className="relative z-10 flex flex-1 flex-col items-center justify-end lg:pb-[6vh]">
           <div className="max-w-6xl px-[5vw] py-[5vh] mx-auto w-full">
-            {/* Event Title */}
             <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold text-justify text-yellow-400 tracking-tight leading-tight mb-4 mt-8">
               {event.title}
             </h1>
-
-            {/* Event Description */}
             <p className="text-gray-300 text-md md:text-lg max-w-6xl leading-relaxed">
               {event.description}
             </p>
           </div>
         </div>
       </div>
-
       {/* Main Content Section */}
       <div className="flex flex-1 px-[5vw] py-[5vh]">
         <div className="flex flex-col max-w-5xl mx-auto w-full">
@@ -228,7 +209,8 @@ export default async function EventPage({ params }: EventPageProps) {
         </div>
       </div>
     </div>
-  );
+  </div>
+);
 }
 
 // Generate static params for all events
