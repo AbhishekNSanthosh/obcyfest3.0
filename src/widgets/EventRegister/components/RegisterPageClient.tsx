@@ -951,7 +951,7 @@ const handleChange = (
                         const upiId = event?.upi1;
                         const name = event?.coordinators[0]?.name;
                         const amount = event?.registrationFee; // optional
-                        const upiLink = `upi://pay?pa=${upiId}&am=${amount}&cu=INR&tn=Event%20Payment`;
+                        const upiLink = `gpay://pay?pa=${upiId}&am=${amount}&cu=INR&tn=Event%20Payment`;
                         window.location.href = upiLink;
                       }}
                       className="flex flex-col items-center justify-center gap-2 px-4 py-3 rounded-lg text-gray-600 font-medium bg-black border border-gray-800 hover:opacity-90 transition"
@@ -975,7 +975,7 @@ const handleChange = (
                         const upiId = event?.upi2;
                         const name = "Recipient Name";
                         const amount = event?.registrationFee; // optional
-                        const upiLink = `upi://pay?pa=${upiId}&am=${amount}&cu=INR&tn=Event%20Payment`;
+                        const upiLink = `paytmmp://pay?pa=${upiId}&am=${amount}&cu=INR&tn=Event%20Payment`;
                         window.location.href = upiLink;
                       }}
                       className="flex flex-col items-center justify-center gap-2 px-4 py-3 rounded-lg text-gray-600 font-medium bg-black border border-gray-800 hover:opacity-90 transition"
@@ -999,7 +999,7 @@ const handleChange = (
                         const upiId = event?.upi1;
                         const name = "Recipient Name";
                         const amount = event?.registrationFee; // optional
-                        const upiLink = `upi://pay?pa=${upiId}&am=${amount}&cu=INR&tn=Event%20Payment`;
+                        const upiLink = `phonepe://pay?pa=${upiId}&am=${amount}&cu=INR&tn=Event%20Payment`;
                         window.location.href = upiLink;
                       }}
                       className="flex flex-col items-center justify-center gap-2 px-4 py-3 rounded-lg text-gray-600 font-medium bg-black border border-gray-800 hover:opacity-90 transition"
