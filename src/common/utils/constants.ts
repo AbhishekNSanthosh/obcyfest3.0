@@ -41,8 +41,7 @@ export const events: Event[] = [
     {
         id: "just-imagine",
         title: "Just Imagine",
-        image: "/posters/poster.jpeg",
-        //regLink: "https://example.com/register2",
+        image: "https://drive.google.com/uc?export=view&id=1ZM8XgBKpQfqmxwgc89rdmXytt_mgvHm5",
         type: "nonTechnical",
         date: "22-09-2025",
         description: "'Just Imagine' is an exciting and fun-filled event designed to test creativity, quick thinking, and teamwork. In this game, participants will pair up in teams of two. One member will pick a chit and act out the word or phrase without speaking or lip-syncing, while the other member guesses within a time limit of 2 minutes. The challenge lies in how creatively and accurately the actions are performed and how quickly the partner can guess.",
@@ -63,8 +62,7 @@ export const events: Event[] = [
     {
         id: "deadshot",
         title: "DeadShot",
-        image: "/posters/poster.jpeg",
-        //regLink: "https://example.com/register4",
+        image: "https://drive.google.com/uc?export=view&id=1uVahGKBypd-AwSsTP9kwN3URyI4d_4zr",
         type: "technical",
         date: "23-09-2025",
         description: "'Deadshot.io', a high-stakes online arena where precision, strategy, and quick reflexes determine the ultimate sharpshooter. Players from around the world face off in a tense battle of aim and stealth, using an array of powerful weapons to outmaneuver and eliminate their opponents. Each match is a test of skill and nerve, set in dynamic environments that challenge even the most seasoned veterans. One by one, players are picked off-not by chance, but by calculated skill-until only the last marksman standing claims victory and the title of Deadshot.",
@@ -85,8 +83,7 @@ export const events: Event[] = [
     {
         id: "clash-of-keyboards",
         title: "Clash of Keyboards",
-        image: "/posters/poster.jpeg",
-        //regLink: "https://example.com/register3",
+        image: "https://drive.google.com/uc?export=view&id=17gGLo1ggVy4qWTDuYN8YyeaAGh1NuN6R",
         type: "technical",
         date: "23-09-2025",
         description: "Put your typing skills to the test in the Speed & Accuracy competition! This event is designed to challenge participants on both their typing speed and precision. Whether you're a beginner or a typing pro, this is your chance to showcase your expertise, improve your skills, and compete with others in a fast-paced, fun, and engaging environment.",
@@ -107,8 +104,7 @@ export const events: Event[] = [
     {
         id: "craft-the-screen",
         title: "Craft The Screen",
-        image: "/posters/poster.jpeg",
-        regLink: "https://example.com/register1",
+        image: "https://drive.google.com/uc?export=view&id=1bVIZOqQwZqeq_UV7lA4AAQACdLTzAySp",
         type: "technical",
         date: "23-09-2025",
         description: "The UI/UX Competition provides a platform for participants to demonstrate their design skills by creating intuitive, functional, and aesthetically appealing user interfaces. It emphasizes innovation, usability, and creativity in delivering effective digital experiences.",
@@ -130,8 +126,7 @@ export const events: Event[] = [
     {
         id: "the-riddle-crusade",
         title: "The Riddle Crusade",
-        image: "/posters/poster.jpeg",
-        regLink: "https://example.com/register5",
+        image: "https://drive.google.com/uc?export=view&id=15_bvUnlaKnqi2jw7W8HHeo4hsfq6J_YR",
         type: "nonTechnical",
         date: "23-09-2025",
         description: "Step into a world of secrets, riddles, and hidden truths. A group of friends once shared unbreakable bonds, but betrayal tore them apart, leaving a trail of lies buried in the shadows. Now, someone new, you, has stumbled upon this tangled web and must navigate the maze of deception, solving riddles, unraveling hidden codes, and facing the final guardian. Will you uncover the truth behind the betrayal, or be lost forever in the labyrinth of lies?",
@@ -152,8 +147,7 @@ export const events: Event[] = [
     {
         id: "prompt-to-image",
         title: "Prompt To Image",
-        image: "/posters/poster.jpeg",
-        regLink: "https://example.com/register6",
+        image: "https://drive.google.com/uc?export=view&id=10fAigjyLWeTtmjFzv80kauJfU24HJ6O8",
         type: "technical",
         date: "24-09-2025",
         description: "Prompt to Image is a creative game where players are shown an image and must write a text prompt describing it. Using this prompt, they generate a similar image, testing their observation, description, and creativity skills. The game encourages imagination, attention to detail, and artistic thinking, making it fun and engaging for participants.",
@@ -175,8 +169,7 @@ export const events: Event[] = [
     {
         id: "last-of-us",
         title: "Last Of Us",
-        image: "/posters/poster.jpeg",
-        regLink: "https://example.com/register7",
+        image: "https://drive.google.com/uc?export=view&id=1_MEvLVzttCZjS0NLBFxhd8RZX_iNbfuR",
         type: "nonTechnical",
         date: "24-09-2025",
         description: "'Last of Us', A thrilling campus competition where classic Kerala games decide who outsmarts, outplays, and outlasts the rest. From childhood favorites to tricky challenges, each round tests skill, teamwork, and wit. One by one, contestants are eliminated-not by violence, but by the rules of the game-until only the Last of Us remains.",
@@ -198,8 +191,7 @@ export const events: Event[] = [
     {
         id: "code-in-the-blanks",
         title: "Code Quest",
-        image: "/posters/poster.jpeg",
-        regLink: "https://example.com/register8",
+        image: "https://drive.google.com/uc?export=view&id=1FM-yoB9Atr9gdUS5qBSX4t5UcFsAiY1G",
         type: "technical",
         date: "25-09-2025",
         description: "This event is a three-level coding challenge where participants must complete code snippets by filling in the missing operators, delimiters, or both. Each level grows more difficult, testing both speed and accuracy.",
@@ -220,8 +212,7 @@ export const events: Event[] = [
     {
         id: "the-stampede",
         title: "The Stampede",
-        image: "/posters/poster.jpeg",
-        regLink: "https://example.com/register9",
+        image: "https://drive.google.com/uc?export=view&id=1lvMcvBH6PIDKVB5jaaisN8nQULngiTme",
         type: "nonTechnical",
         date: "25-09-2025",
         description: "We've all seen at events, these little stands having a stamp and you collect five of those by doing some task and then get to the end, to get a prize. The Stampede is just that. There is a play on words in the title as well. So, there will be 4 stands with tasks, increasing in difficulty of course, and should you complete the task, you will get a stamp. If you successfully collect all of the stamps, you get a prize at the end, or maybe play another game to win that prize as well.",
@@ -242,8 +233,7 @@ export const events: Event[] = [
     {
         id: "techstorm",
         title: "Techstorm",
-        image: "/posters/poster.jpeg",
-        regLink: "https://example.com/register10",
+        image: "https://drive.google.com/uc?export=view&id=1p2K9g03v_IkJSWKOueB2yVq2-Fjyr1kU",
         type: "technical",
         date: "26-09-2025",
         description: "Techstorm is the arena where logic, teamwork, and technology shape the ultimate clash. Two teams face off on a technical topic, armed with logic, facts and quick thinking.points are scored not just for strong arguments, but for teamwork, bold first moves, and sharp, valid points. Round after Round, only the team with the sharpest wit and Strongest unity can ride the techstorm to victory.",
@@ -264,8 +254,7 @@ export const events: Event[] = [
     {
         id: "emoji-story-decode",
         title: "Emoji Decode",
-        image: "/posters/poster.jpeg",
-        regLink: "https://example.com/register11",
+        image: "https://drive.google.com/uc?export=view&id=1H0yApKiieR_Z6PNsYTkMjZZxqX7CfOr8",
         type: "nonTechnical",
         date: "26-09-2025",
         description: "Emoji Decode is a game where players guess the story or phrase represented by a series of emojis. Players are shown a series of emojis that represent a story, phrase, or movie. Players must decode the emojis and guess the correct answer.",
@@ -286,8 +275,7 @@ export const events: Event[] = [
     {
         id: "pes",
         title: "E-Football",
-        image: "/posters/poster.jpeg",
-        regLink: "https://example.com/register12",
+        image: "https://drive.google.com/uc?export=view&id=1WNjiwuof2ZIjlSJuc6CQp3j4Mh2B2mUO",
         type: "nonTechnical",
         date: "22-09-2025 to 26-09-2025",
         description: "Step onto the virtual pitch and showcase your football skills in this competitive E-Football tournament. Test your strategy, reflexes, and precision as you go head-to-head with fellow gamers in the ultimate digital football experience.",
@@ -307,8 +295,7 @@ export const events: Event[] = [
     {
         id: "photography",
         title: "Photography",
-        image: "/posters/poster.jpeg",
-        regLink: "https://example.com/register13",
+        image: "https://drive.google.com/uc?export=view&id=1fEtyfZmKio7mTr8tOqyYwyedZB7spXGh",
         type: "nonTechnical",
         date: "22-09-2025 to 26-09-2025",
         description: "Unleash your creativity behind the lens and capture moments that speak louder than words. The Photography competition encourages participants to showcase their perspective, originality, and storytelling through powerful visuals.",
@@ -328,8 +315,7 @@ export const events: Event[] = [
     {
         id: "bgmi",
         title: "BGMI",
-        image: "/posters/poster.jpeg",
-        regLink: "https://example.com/register14",
+        image: "https://drive.google.com/uc?export=view&id=1nIGRMW-XN9h77noXrTtC2YAkjGy-AdW5",
         type: "nonTechnical",
         date: "22-09-2025 to 26-09-2025",
         description: "Gear up for an action-packed BGMI competition where teamwork, strategy, and quick decision-making are the keys to survival. Compete against the best and prove your dominance in this high-intensity battle royale challenge.",
@@ -356,8 +342,7 @@ export const events: Event[] = [
     {
         id: "clash-of-clans",
         title: "Clash Of Clans",
-        image: "/posters/poster.jpeg",
-        regLink: "https://example.com/register15",
+        image: "https://drive.google.com/uc?export=view&id=1Qva-S_XIG9WOtD2olhXPGpi8B63gXPXz",
         type: "nonTechnical",
         date: "22-09-2025 to 26-09-2025",
         isOnline: true,
@@ -378,8 +363,7 @@ export const events: Event[] = [
     {
         id: "football",
         title: "Football",
-        image: "/posters/poster.jpeg",
-        regLink: "https://example.com/register16",
+        image: "https://drive.google.com/uc?export=view&id=1j0i9FQs1WZrjJF_FMMv5Tjv5nAlV7CKz",
         type: "sports",
         description: "Get ready to witness the ultimate clash on the field as CSE students battle it out in an electrifying 7s Football Tournament! From Semester 1 to Semester 7, teams will showcase their skills, teamwork, and passion for the beautiful game. Who will rise as the champions of Obcyfest?",
         eventType: "Group (10)",
