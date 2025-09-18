@@ -894,16 +894,27 @@ export default function RegisterPageClient({
                       {event?.upi1}
                     </span>
                   </div>
+                  <div className="flex lg:flex hidden flex-col gap-2 p-4 rounded-md bg-gray-900/40 border border-gray-800">
+                    <label className="text-xs text-gray-300">Reg Fee</label>
+                    <span className="text-sm font-medium text-white">
+                      {event?.registrationFee}
+                    </span>
+                  </div>
 
                   {/* Pay Button */}
-                  <div className="md:col-span-2 grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div className="md:col-span-2 grid grid-cols-1 sm:grid-cols-3 gap-4 lg:hidden">
                     {/* GPay */}
                     <button
                       onClick={() => {
                         const upiId = event?.upi1;
                         const name = event?.coordinators[0]?.name;
-                        const amount = event?.registrationFee; // optional
-                        const upiLink = `upi://pay?pa=${upiId}&am=${amount}&cu=INR&tn=Event%20Payment`;
+                        const amount = event?.registrationFee || 0; // default to 0 if not set
+                        const upiLink = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(
+                          name || "Coordinator"
+                        )}&am=${amount}&cu=INR&tn=${encodeURIComponent(
+                          "Event Payment"
+                        )}`;
+
                         window.location.href = upiLink;
                       }}
                       className="flex flex-col items-center justify-center gap-2 px-4 py-3 rounded-lg text-gray-600 font-medium bg-black border border-gray-800 hover:opacity-90 transition"
@@ -925,9 +936,14 @@ export default function RegisterPageClient({
                     <button
                       onClick={() => {
                         const upiId = event?.upi2;
-                        const name = "Recipient Name";
-                        const amount = event?.registrationFee; // optional
-                        const upiLink = `upi://pay?pa=${upiId}&am=${amount}&cu=INR&tn=Event%20Payment`;
+                        const name = event?.coordinators[0]?.name;
+                        const amount = event?.registrationFee || 0; // default to 0 if not set
+                        const upiLink = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(
+                          name || "Coordinator"
+                        )}&am=${amount}&cu=INR&tn=${encodeURIComponent(
+                          "Event Payment"
+                        )}`;
+
                         window.location.href = upiLink;
                       }}
                       className="flex flex-col items-center justify-center gap-2 px-4 py-3 rounded-lg text-gray-600 font-medium bg-black border border-gray-800 hover:opacity-90 transition"
@@ -949,9 +965,14 @@ export default function RegisterPageClient({
                     <button
                       onClick={() => {
                         const upiId = event?.upi1;
-                        const name = "Recipient Name";
-                        const amount = event?.registrationFee; // optional
-                        const upiLink = `upi://pay?pa=${upiId}&am=${amount}&cu=INR&tn=Event%20Payment`;
+                        const name = event?.coordinators[0]?.name;
+                        const amount = event?.registrationFee || 0; // default to 0 if not set
+                        const upiLink = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(
+                          name || "Coordinator"
+                        )}&am=${amount}&cu=INR&tn=${encodeURIComponent(
+                          "Event Payment"
+                        )}`;
+
                         window.location.href = upiLink;
                       }}
                       className="flex flex-col items-center justify-center gap-2 px-4 py-3 rounded-lg text-gray-600 font-medium bg-black border border-gray-800 hover:opacity-90 transition"

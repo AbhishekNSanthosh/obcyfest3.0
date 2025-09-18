@@ -102,9 +102,9 @@ export const events: Event[] = [
         registrationFee: "30/-",
         firstPrize: "500/-",
         secondPrize: "250/-",
-        upi1: "not given",
-        gpay: "--",
-        upi2: "--",
+        upi1: "athultomy2005@okaxis",
+        gpay: "9567767003",
+        upi2: "nandhunandhu77780@oksbi",
         coordinators: [
             { name: "Nandhu Krishnan- S5", phone: "+917593985785" },
             { name: "Athul Tomy- S5", phone: "+919567767003" }

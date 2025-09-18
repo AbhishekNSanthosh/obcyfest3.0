@@ -125,7 +125,7 @@ export default function HeaderContent() {
       <div className="flex flex-1 items-center justify-start">
         <Link href={"/"}>
           <Image
-            src={"/logo/obcylogomain.svg"}
+            src={"/logo/obcyLogo.svg"}
             height={500}
             width={500}
             alt=""
@@ -152,7 +152,10 @@ export default function HeaderContent() {
             href={"/profile"}
             className="flex items-center text-yellow-400 font-medium justify-center text-xl"
           >
-            Hello👋, {user?.displayName}
+            Hello👋,{" "}
+            {user?.displayName && user.displayName.length > 10
+              ? user.displayName.slice(0, 10) + "..."
+              : user?.displayName}
             <button className=" ml-2 rounded-full p-[2px] text-black-950 font-semibold">
               <div className="border-[2px] rounded-full p-1 border-yellow-400">
                 <Image
@@ -188,7 +191,10 @@ export default function HeaderContent() {
             href={"/profile"}
             className="flex items-center text-yellow-400 font-medium justify-center text-xl absolute top-9 left-6"
           >
-            Hello👋, {user?.displayName}
+            Hello👋,{" "}
+            {user?.displayName && user.displayName.length > 30
+              ? user.displayName.slice(0, 30) + "..."
+              : user?.displayName}
           </Link>
           <div className="absolute top-6 right-6">
             <button
