@@ -13,7 +13,8 @@ import {
 import type { Metadata } from "next";
 
 export async function generateMetadata({ params }: { params: { eventId: string } }): Promise<Metadata> {
-  const event = events.find((e) => e.id === params.eventId);
+    const { eventId } = await params;
+  const event = events.find((e) => e.id === eventId);
 
   if (!event) {
     return {
