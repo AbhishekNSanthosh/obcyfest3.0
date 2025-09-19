@@ -10,7 +10,7 @@ const RedirectPage = () => {
     // Redirect after 3 seconds
     const timer = setTimeout(() => {
       router.push('/admin/dashboard');
-    }, 3000);
+    }, 1000);
 
     return () => clearTimeout(timer);
   }, [router]);

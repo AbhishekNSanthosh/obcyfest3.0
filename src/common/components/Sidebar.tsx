@@ -5,14 +5,23 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import Image from 'next/image';
 
+import { FaHome } from "react-icons/fa";
 import { FaCalendar } from "react-icons/fa";
 import { MdGroups } from "react-icons/md";
 
 const Sidebar = () => {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
+  
 
   const links = [
+    {
+      href: '/admin/dashboard/',
+      label: 'Home',
+      icon: (
+        <FaHome className='h-6 w-6' />
+      )
+    },
     {
       href: '/admin/dashboard/user-management',
       label: 'User Management',
@@ -101,7 +110,7 @@ const Sidebar = () => {
                     }
                   `}
                 >
-                  <span className={pathname === link.href ? "text-black" : "text-yellow-400"}>
+                  <span className={pathname === link.href ? "text-black" : "hover:text-yellow-400 "}>
                     {link.icon}
                   </span>
                   <span>{link.label}</span>

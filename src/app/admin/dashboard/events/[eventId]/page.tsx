@@ -1,10 +1,11 @@
 import React from 'react'
 import EventDashboard from '@widgets/admin/EventDashboard'
 
-const page = ({ params }: { params: { eventId: string } }) => {
+const page = async ({ params }: { params: { eventId: string } }) => {
+  const { eventId } = await params;
   return (
     <div>
-      <EventDashboard eventId={params.eventId} />
+      <EventDashboard eventId={eventId} />
     </div>
   )
 }
