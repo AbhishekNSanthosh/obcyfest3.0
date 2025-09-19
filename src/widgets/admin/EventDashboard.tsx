@@ -182,7 +182,8 @@ const exportToCsv = () => {
                   <tr>
                     <th className="py-4 px-6 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">#</th>
                     <th className="py-4 px-6 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Participants</th>
-                    <th className="py-4 px-6 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Details</th>
+                    <th className="py-4 px-6 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Semester</th>
+                    <th className="py-4 px-6 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Email</th>
                   </tr>
                 </thead>
                 <tbody className="bg-gray-800 divide-y divide-gray-700">
@@ -200,6 +201,9 @@ const exportToCsv = () => {
                           ))}
                         </div>
                       </td>
+                      <td className="py-4 px-6 whitespace-nowrap text-sm font-medium text-yellow-400">
+                        S{reg.participants[0]?.semester}
+                      </td>
                       <td className="py-4 px-6">
                         <div className="flex flex-col gap-2">
                           {reg.participants.map((p, idx) => (
@@ -210,12 +214,6 @@ const exportToCsv = () => {
                                   <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
                                 </svg>
                                 <span>{p.email}</span>
-                              </div>
-                              <div className="flex items-center gap-2 mt-1">
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
-                                  <path fillRule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clipRule="evenodd" />
-                                </svg>
-                                <span>Semester: {p.semester || "Not specified"}</span>
                               </div>
                             </div>
                           ))}
