@@ -48,7 +48,7 @@ export default function HeroText() {
       </div>
 
       <h1
-        className="hero glitch1 layerstext-4xl font-bold md:text-8xl lg:text-8xl text-[9vw] z-10 mt-5 lg:mt-0 md:mt-0"
+        className="hero glitch1 layerstext-4xl font-bold md:text-8xl lg:text-8xl text-[8vw] z-10 mt-5 lg:mt-0 md:mt-0"
         data-text={eventName}
       >
         <span>{eventName}</span>
