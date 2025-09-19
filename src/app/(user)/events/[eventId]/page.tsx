@@ -10,6 +10,7 @@ import {
   LuIndianRupee,
   LuTrophy,
 } from "react-icons/lu";
+import { parse } from "path";
 
 interface EventPageProps {
   params: {
@@ -25,6 +26,12 @@ export default async function EventPage({ params }: EventPageProps) {
   if (!event) {
     notFound();
   }
+
+const parseDate = (str: string) => {
+  const [day, month, year] = str.split("-");
+  return new Date(Number(year), Number(month) - 1, Number(day), 23, 59, 59);
+};
+
 
   const getTypeColor = (type: string) => {
     switch (type) {
@@ -194,12 +201,14 @@ return (
 
           {/* Action Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+            {event?.regFinalDate && parseDate(event.regFinalDate) >= new Date() && (
             <Link
               href={`./${eventId}/register`}
               className="flex-shrink-0 bg-yellow-400 text-black-950 px-8 py-3 rounded-lg font-semibold text-base shadow-lg hover:bg-yellow-500 transition-all duration-300 transform hover:scale-105"
             >
               Register Now
             </Link>
+              )}
 
             <Link
               href="/events"

@@ -10,6 +10,9 @@ export default async function RegisterPage({ params }: RegisterPageProps) {
   const { eventId } = await params
   const event = events.find((e) => e.id === eventId)
 
+
+
+
   if (!event) {
     return <div>Event not found</div>
   }
