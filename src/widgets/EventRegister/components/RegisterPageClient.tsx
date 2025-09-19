@@ -41,6 +41,7 @@ type Member = {
   email?: string | null;
   semester?: string | null;
   phone?: string | null;
+  extraData?: Record<string, any>;
 };
 
 interface RegisterPageClientProps {
@@ -107,8 +108,6 @@ export default function RegisterPageClient({
     }
   }, [profile, members]);
 
-  console.log("Participants:", participants);
-  console.log("Profile:", profile);
   const router = useRouter();
 
   const handleAddMember = () => {
@@ -132,11 +131,35 @@ export default function RegisterPageClient({
     }
   }, [event]);
 
-  const handleChange = (index: number, field: keyof Member, value: string) => {
-    const updated = [...members];
-    updated[index][field] = value;
-    setMembers(updated);
-  };
+const handleChange = (
+  index: number,
+  field: string,
+  value: string,
+  isExtra = false,
+  isLeader = false
+) => {
+  if (isLeader) {
+    setProfile((prev) =>
+      prev ? {
+        ...prev,
+        extraData: {
+          ...(prev as any).extraData,
+          [field]: value,
+        },
+      } : prev
+    );
+  } else {
+    setMembers((prev) =>
+      prev.map((m, i) =>
+        i === index
+          ? isExtra
+            ? { ...m, extraData: { ...m.extraData, [field]: value } }
+            : { ...m, [field]: value }
+          : m
+      )
+    );
+  }
+};
 
   // Auth listener
   useEffect(() => {
@@ -342,18 +365,27 @@ export default function RegisterPageClient({
     try {
       await runTransaction(db, async (transaction) => {
         const participants: any[] = [
-          {
-            uid: profile.uid,
-            email: profile.email,
-            displayName: profile.displayName,
-            semester: profile.semester,
-            ...(extraData || {}),
-          },
-          ...members,
+    {
+      uid: profile.uid,
+      email: profile.email,
+      displayName: profile.displayName,
+      semester: profile.semester,
+      phone: profile.phone,
+      roll: profile.rollNumber,
+      extraData: extraData || {}, // ✅ leader’s extra fields
+    },
+    ...members.map((m) => ({
+      roll: m.roll,
+      name: m.name,
+      email: m.email,
+      semester: m.semester,
+      phone: m.phone,
+      extraData: m.extraData || {}, // ✅ member’s extra fields
+    })),
         ];
-
+        console.log("Participants:", participants);
         // ✅ Check conflicts
-        if (normalizedEventDate) {
+        if (!event?.isOnline && normalizedEventDate) {
           for (let p of participants) {
             const regQ = query(
               collection(db, "registrations"),
@@ -404,7 +436,7 @@ export default function RegisterPageClient({
       });
 
       toast.success("Group registration successful!");
-      // router.push(`/events/${eventId}`);
+      router.replace(`/events/`);
     } catch (err: any) {
       console.error(err);
       toast.error(err.message || "Registration failed. Please try again.");
@@ -429,7 +461,7 @@ export default function RegisterPageClient({
           where("participantMails", "array-contains", profile.email)
         );
         const regSnap = await getDocs(regQ);
-        if (
+        if (!event?.isOnline &&
           regSnap.docs.some((d) => d.data().eventDate === normalizedEventDate)
         ) {
           toast.error(
@@ -628,7 +660,7 @@ export default function RegisterPageClient({
               </p>
               {event.isOnline && (
                 <p className="text-green-400 text-sm mt-1">
-                  This is an online event (no schedule conflicts).
+                  This event does not have any schedule conflicts.
                 </p>
               )}
             </div>
@@ -697,12 +729,11 @@ export default function RegisterPageClient({
                       readOnly
                       className="w-full px-4 py-3 bg-gray-900/50 border border-gray-700 rounded-lg text-white"
                     />
-                  </div>
-                </div>
-              </div>
-              {/* Extra fields */}
+                      </div>
+                    </div>
+            {/* Extra fields */}
               {event.requiresExtraData && Array.isArray(event.extraFields) && (
-                <div className="bg-black-950 bg-opacity-60 p-6 rounded-xl border border-gray-800">
+                <div className="bg-black-950 bg-opacity-60 p-6 rounded-xl border mt-10 border-gray-800">
                   <h2 className="text-lg font-semibold text-yellow-400 mb-6">
                     Additional Info
                   </h2>
@@ -731,147 +762,164 @@ export default function RegisterPageClient({
                     )}
                   </div>
                 </div>
-              )}
+              )}   
+              </div>
+
 
               {/* Group Invite */}
 
-              {isGroupEvent && (
-                <div>
-                  {members.map((member, index) => (
-                    <div
-                      key={index}
-                      className="relative grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4 p-4 border border-gray-700 rounded-lg bg-black"
-                    >
-                      {/* Member Title */}
-                      <h3 className="absolute -top-3 left-3 bg-black px-2 text-yellow-400 text-sm font-semibold rounded">
-                        Member {index + 2}
-                      </h3>
+  {isGroupEvent && (
+  <div>
+    {members.map((member, index) => (
+      <div
+        key={index}
+        className="relative grid grid-cols-1 p-9 sm:grid-cols-2 gap-4 mb-4 border border-gray-700 rounded-lg bg-black"
+      >
+        {/* Member Title */}
+        <h3 className="absolute -top-3 left-3 bg-black px-2 text-yellow-400 text-sm font-semibold rounded">
+          Member {index + 2}
+        </h3>
 
-                      {/* Roll No */}
-                      <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-1">
-                          Roll No.
-                        </label>
-                        <input
-                          type="number"
-                          value={member.roll || ""}
-                          onChange={(e) =>
-                            handleChange(index, "roll", e.target.value)
-                          }
-                          placeholder="Roll Number"
-                          className="w-full px-4 py-3 bg-gray-900/50 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-400"
-                          disabled={isInviting}
-                        />
-                      </div>
+        
+        {/* Full Name */}
+        <div>
+          <label className="block text-sm font-medium text-gray-300 mb-1">
+            Full Name
+          </label>
+          <input
+            type="text"
+            value={member.name || ""}
+            onChange={(e) => handleChange(index, "name", e.target.value)}
+            placeholder="Full Name"
+            className="w-full px-4 py-3 bg-gray-900/50 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+            disabled={isInviting}
+          />
+        </div>
 
-                      {/* Full Name */}
-                      <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-1">
-                          Full Name
-                        </label>
-                        <input
-                          type="text"
-                          value={member.name || ""}
-                          onChange={(e) =>
-                            handleChange(index, "name", e.target.value)
-                          }
-                          placeholder="Full Name"
-                          className="w-full px-4 py-3 bg-gray-900/50 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-400"
-                          disabled={isInviting}
-                        />
-                      </div>
+        {/* Roll No */}
+        <div>
+          <label className="block text-sm font-medium text-gray-300 mb-1">
+            Roll No.
+          </label>
+          <input
+            type="number"
+            value={member.roll || ""}
+            onChange={(e) => handleChange(index, "roll", e.target.value)}
+            placeholder="Roll Number"
+            className="w-full px-4 py-3 bg-gray-900/50 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+            disabled={isInviting}
+          />
+        </div>
 
-                      {/* Email */}
-                      <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-1">
-                          Email
-                        </label>
-                        <input
-                          type="email"
-                          value={member.email || ""}
-                          onChange={(e) =>
-                            handleChange(index, "email", e.target.value)
-                          }
-                          placeholder="member@example.com"
-                          className="w-full px-4 py-3 bg-gray-900/50 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-400"
-                          disabled={isInviting}
-                        />
-                      </div>
+        {/* Email */}
+        <div>
+          <label className="block text-sm font-medium text-gray-300 mb-1">
+            Email
+          </label>
+          <input
+            type="email"
+            value={member.email || ""}
+            onChange={(e) => handleChange(index, "email", e.target.value)}
+            placeholder="member@example.com"
+            className="w-full px-4 py-3 bg-gray-900/50 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+            disabled={isInviting}
+          />
+        </div>
 
-                      {/* Semester */}
-                      <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-1">
-                          Semester
-                        </label>
-                        <select
-                          value={member?.semester || ""}
-                          onChange={(e) =>
-                            handleChange(index, "semester", e.target.value)
-                          }
-                          className="w-full px-4 py-3 bg-gray-900/50 border border-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-yellow-400"
-                        >
-                          <option value="">select</option>
-                          {profile?.semester && (
-                            <option value={profile.semester}>
-                              {profile.semester}
-                            </option>
-                          )}
-                        </select>
-                        <p className="text-[11px] text-gray-400 mt-1">
-                          Teammates must be from the same semester.
-                        </p>
-                      </div>
+        {/* Semester */}
+        <div>
+          <label className="block text-sm font-medium text-gray-300 mb-1">
+            Semester
+          </label>
+          <select
+            value={member?.semester || ""}
+            onChange={(e) => handleChange(index, "semester", e.target.value)}
+            className="w-full px-4 py-3 bg-gray-900/50 border border-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-yellow-400"
+          >
+            <option value="">select</option>
+            {profile?.semester && (
+              <option value={profile.semester}>{profile.semester}</option>
+            )}
+          </select>
+          <p className="text-[11px] text-gray-400 mt-1">
+            Teammates must be from the same semester.
+          </p>
+        </div>
 
-                      {/* Mobile */}
-                      <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-1">
-                          Mobile No.
-                        </label>
-                        <input
-                          type="tel"
-                          value={member.phone || ""}
-                          onChange={(e) =>
-                            handleChange(index, "phone", e.target.value)
-                          }
-                          placeholder="7907247909"
-                          className="w-full px-4 py-3 bg-gray-900/50 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-400"
-                          disabled={isInviting}
-                        />
-                      </div>
+        {/* Mobile */}
+        <div>
+          <label className="block text-sm font-medium text-gray-300 mb-1">
+            Mobile No.
+          </label>
+          <input
+            type="tel"
+            value={member.phone || ""}
+            onChange={(e) => handleChange(index, "phone", e.target.value)}
+            placeholder="7907247909"
+            className="w-full px-4 py-3 bg-gray-900/50 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+            disabled={isInviting}
+          />
+        </div>
 
-                      {/* Remove button - top right */}
-                      {Number(event?.memberMinCount) <
-                        Number(event?.memberMaxCount) &&
-                        index > 0 && (
-                          <button
-                            type="button"
-                            onClick={() => handleRemoveMember(index)}
-                            className="absolute top-2 right-2 text-red-400 hover:text-red-600"
-                            disabled={isInviting}
-                          >
-                            <IoClose />
-                          </button>
-                        )}
-                    </div>
-                  ))}
+        {/* 🔥 Extra Fields - now tied to each member */}
+        {event.requiresExtraData &&
+          Array.isArray(event.extraFields) && (
+            <div className="col-span-1 sm:col-span-2 mt-4 bg-black/60 p-4 rounded-lg border border-gray-800">
+              <h4 className="text-md font-semibold text-yellow-400 mb-3">
+                Additional Info
+              </h4>
+              <div className="space-y-3">
+                {event.extraFields.map((field: { name: string; type: string }) => (
+                  <div key={field.name}>
+                    <label className="block text-sm font-medium text-gray-300 mb-1">
+                      {field.name}
+                    </label>
+                    <input
+                      type={field.type}
+                      value={member.extraData?.[field.name] || ""}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                        handleChange(index, field.name, e.target.value, true) // mark as extra field
+                      }
+                      className="w-full px-4 py-3 bg-gray-900/50 border border-gray-700 rounded-lg text-white"
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
-                  {/* Add Member Button */}
-                  {members.length <
-                    (Number(event?.memberMaxCount) - 1 || members.length) && (
-                    <div className="flex justify-start mt-4">
-                      <button
-                        type="button"
-                        onClick={handleAddMember}
-                        className="flex items-center gap-2 px-4 py-3 bg-gray-700 text-white rounded-lg font-semibold hover:bg-gray-600 disabled:opacity-50"
-                        disabled={isInviting}
-                      >
-                        <LuPlus />
-                        Add Member
-                      </button>
-                    </div>
-                  )}
-                </div>
-              )}
+        {/* Remove button */}
+        {Number(event?.memberMinCount) < Number(event?.memberMaxCount) &&
+          index > 0 && (
+            <button
+              type="button"
+              onClick={() => handleRemoveMember(index)}
+              className="absolute top-2 right-2 text-red-400 hover:text-red-600"
+              disabled={isInviting}
+            >
+              <IoClose />
+            </button>
+          )}
+      </div>
+    ))}
+
+    {/* Add Member Button */}
+    {members.length < (Number(event?.memberMaxCount) - 1 || members.length) && (
+      <div className="flex justify-start mt-4">
+        <button
+          type="button"
+          onClick={handleAddMember}
+          className="flex items-center gap-2 px-4 py-3 bg-gray-700 text-white rounded-lg font-semibold hover:bg-gray-600 disabled:opacity-50"
+          disabled={isInviting}
+        >
+          <LuPlus />
+          Add Member
+        </button>
+      </div>
+    )}
+  </div>
+)}
+
 
               <div className="bg-black-950 bg-opacity-60 p-6 rounded-xl border border-gray-800">
                 <h2 className="text-lg font-semibold text-yellow-400 mb-6 flex items-center gap-2">
@@ -894,7 +942,7 @@ export default function RegisterPageClient({
                       {event?.upi1}
                     </span>
                   </div>
-                  <div className="flex lg:flex hidden flex-col gap-2 p-4 rounded-md bg-gray-900/40 border border-gray-800">
+                  <div className="lg:flex hidden flex-col gap-2 p-4 rounded-md bg-gray-900/40 border border-gray-800">
                     <label className="text-xs text-gray-300">Reg Fee</label>
                     <span className="text-sm font-medium text-white">
                       {event?.registrationFee}
@@ -909,7 +957,7 @@ export default function RegisterPageClient({
                         const upiId = event?.upi1;
                         const name = event?.coordinators[0]?.name;
                         const amount = event?.registrationFee || 0; // default to 0 if not set
-                        const upiLink = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(
+                        const upiLink = `gpay://pay?pa=${upiId}&pn=${encodeURIComponent(
                           name || "Coordinator"
                         )}&am=${amount}&cu=INR&tn=${encodeURIComponent(
                           "Event Payment"
@@ -938,7 +986,7 @@ export default function RegisterPageClient({
                         const upiId = event?.upi2;
                         const name = event?.coordinators[0]?.name;
                         const amount = event?.registrationFee || 0; // default to 0 if not set
-                        const upiLink = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(
+                        const upiLink = `paytmmp://pay?pa=${upiId}&pn=${encodeURIComponent(
                           name || "Coordinator"
                         )}&am=${amount}&cu=INR&tn=${encodeURIComponent(
                           "Event Payment"
@@ -967,7 +1015,7 @@ export default function RegisterPageClient({
                         const upiId = event?.upi1;
                         const name = event?.coordinators[0]?.name;
                         const amount = event?.registrationFee || 0; // default to 0 if not set
-                        const upiLink = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(
+                        const upiLink = `phonepe://pay?pa=${upiId}&pn=${encodeURIComponent(
                           name || "Coordinator"
                         )}&am=${amount}&cu=INR&tn=${encodeURIComponent(
                           "Event Payment"
