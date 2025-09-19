@@ -6,7 +6,10 @@ import { db } from "@lib/firebase";
 
 interface User {
   id: string;
+  displayName: string;
   email: string;
+  phone: string;
+  semester: string;
   role: string;
 }
 
@@ -37,7 +40,10 @@ const UserManagementPage = () => {
         <table className="min-w-full divide-y divide-yellow-400/30 bg-black-950 text-white">
           <thead className="bg-black-900 text-yellow-400">
             <tr>
+              <th className="py-3 px-6 text-left text-sm font-semibold uppercase">Name</th>
               <th className="py-3 px-6 text-left text-sm font-semibold uppercase">Email</th>
+              <th className="py-3 px-6 text-left text-sm font-semibold uppercase">Class</th>
+              <th className="py-3 px-6 text-left text-sm font-semibold uppercase">Phone</th>
               <th className="py-3 px-6 text-left text-sm font-semibold uppercase">Role</th>
               <th className="py-3 px-6 text-left text-sm font-semibold uppercase">Actions</th>
             </tr>
@@ -45,7 +51,10 @@ const UserManagementPage = () => {
           <tbody className="divide-y divide-yellow-400/20">
             {users.map(user => (
               <tr key={user.id} className="hover:bg-yellow-400/10 transition-colors">
+                <td className="py-3 px-6">{user.displayName}</td>
                 <td className="py-3 px-6">{user.email}</td>
+                <td className="py-3 px-6">S{user.semester}</td>
+                <td className="py-3 px-6">{user.phone}</td>
                 <td className="py-3 px-6 capitalize">{user.role}</td>
                 <td className="py-3 px-6">
                   <select

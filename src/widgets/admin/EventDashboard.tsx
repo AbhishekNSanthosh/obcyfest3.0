@@ -8,7 +8,7 @@ interface Registration {
   id: string;
   eventTitle: string;
   eventId: string;
-  participants: { displayName: string; email: string; semester?: string }[];
+  participants: { displayName: string; name: string; email: string; semester?: string }[];
   email: string;
   semester?: string;
 }
@@ -54,7 +54,7 @@ const EventRegistrationsPage = ({ eventId }: { eventId: string }) => {
       filtered = filtered.filter((reg) =>
         reg.participants.some(
           (p) =>
-            (p.semester || "").toLowerCase() === semesterFilter.toLowerCase()
+            (p.semester || "").toLowerCase().includes(semesterFilter.toLowerCase())
         )
       );
     }
@@ -62,28 +62,59 @@ const EventRegistrationsPage = ({ eventId }: { eventId: string }) => {
     setFilteredRegistrations(filtered);
   }, [semesterFilter, registrations]);
 
-  const exportToCsv = () => {
-    const headers = ["Sl. No", "Names", "Emails", "Semesters"];
-    const rows = filteredRegistrations.map((reg, index) => [
-      index + 1,
-      reg.participants.map((p) => p.displayName).join(" | "),
-      reg.participants.map((p) => p.email).join(" | "),
-      reg.participants.map((p) => p.semester || "-").join(" | "),
-    ]);
+const exportToCsv = () => {
+  // Find the maximum number of participants in any registration
+  const maxParticipants = Math.max(
+    ...filteredRegistrations.map((reg) => reg.participants.length)
+  );
 
-    let csvContent =
-      "data:text/csv;charset=utf-8," +
-      headers.join(",") +
-      "\n" +
-      rows.map((e) => e.join(",")).join("\n");
+  // Build headers dynamically
+  const headers = ["Sl. No"];
+  for (let i = 0; i < maxParticipants; i++) {
+    headers.push(`Name${i + 1}`, `Email${i + 1}`, `Semester${i + 1}`);
+  }
 
-    const encodedUri = encodeURI(csvContent);
-    const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", `${eventId}-registrations.csv`);
-    document.body.appendChild(link);
-    link.click();
-  };
+  // Build rows
+  const rows = filteredRegistrations.map((reg, index) => {
+    const row = ["" + (index + 1)]; // Sl. No
+
+  function formatSemester(sem: string) {
+  if (!sem) return "-";
+  const parts = sem.trim().split(/\s+/);
+  return parts.length > 1 ? `${parts[0]}-${parts[1]}` : parts[0];
+}
+
+
+    // Add participant details in correct order
+    console.log(reg.participants);
+    reg.participants.forEach((p) => {
+      row.push(p.displayName || p.name || "", p.email || "",`${formatSemester(p.semester || "")}`);
+    });
+
+    // Pad with blanks if fewer participants than max
+    while (row.length < headers.length) {
+      row.push("", "", "");
+    }
+
+    return row;
+  });
+
+  // Convert to CSV
+  let csvContent =
+    "data:text/csv;charset=utf-8," +
+    headers.join(",") +
+    "\n" +
+    rows.map((e) => e.join(",")).join("\n");
+
+  // Download file
+  const encodedUri = encodeURI(csvContent);
+  const link = document.createElement("a");
+  link.setAttribute("href", encodedUri);
+  link.setAttribute("download", `${eventId}-registrations.csv`);
+  document.body.appendChild(link);
+  link.click();
+};
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 to-black text-gray-100 p-4 md:p-8">
@@ -151,7 +182,8 @@ const EventRegistrationsPage = ({ eventId }: { eventId: string }) => {
                   <tr>
                     <th className="py-4 px-6 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">#</th>
                     <th className="py-4 px-6 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Participants</th>
-                    <th className="py-4 px-6 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Details</th>
+                    <th className="py-4 px-6 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Semester</th>
+                    <th className="py-4 px-6 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Email</th>
                   </tr>
                 </thead>
                 <tbody className="bg-gray-800 divide-y divide-gray-700">
@@ -164,10 +196,13 @@ const EventRegistrationsPage = ({ eventId }: { eventId: string }) => {
                         <div className="flex flex-col gap-1">
                           {reg.participants.map((p, idx) => (
                             <div key={idx} className="text-sm font-medium text-white">
-                              {p.displayName}
+                              {p.displayName}{p.name}
                             </div>
                           ))}
                         </div>
+                      </td>
+                      <td className="py-4 px-6 whitespace-nowrap text-sm font-medium text-yellow-400">
+                        S{reg.participants[0]?.semester}
                       </td>
                       <td className="py-4 px-6">
                         <div className="flex flex-col gap-2">
@@ -179,12 +214,6 @@ const EventRegistrationsPage = ({ eventId }: { eventId: string }) => {
                                   <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
                                 </svg>
                                 <span>{p.email}</span>
-                              </div>
-                              <div className="flex items-center gap-2 mt-1">
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
-                                  <path fillRule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clipRule="evenodd" />
-                                </svg>
-                                <span>Semester: {p.semester || "Not specified"}</span>
                               </div>
                             </div>
                           ))}

@@ -236,7 +236,6 @@ export default function RegisterPageClient({
         extraData: docSnap.data().extraData || null,
         status: docSnap.data().status,
       }));
-      console.log("Invites updated:", invites);
       setInvited(invites);
     });
 
@@ -327,7 +326,7 @@ export default function RegisterPageClient({
           return;
         }
       }
-      console.log(event?.requiresExtraData, event?.extraFields);
+
       await addDoc(collection(db, "invitations"), {
         eventId,
         eventTitle: event?.title,
@@ -365,7 +364,7 @@ export default function RegisterPageClient({
 
   // Group registration
   const handleRegisterGroup = async () => {
-    console.log(members);
+
     if (
       members.some(
         (m) => !m.roll || !m.name || !m.email || !m.semester || !m.phone
@@ -378,7 +377,6 @@ export default function RegisterPageClient({
       toast.error("Kindly make the payment and fill the transaction");
       return;
     }
-    console.log("Group registration called!!!");
     if (!currentUser || !profile) return;
 
     setIsSubmitting(true);
@@ -403,7 +401,7 @@ export default function RegisterPageClient({
             extraData: m.extraData || {}, // ✅ member’s extra fields
           })),
         ];
-        console.log("Participants:", participants);
+
         // ✅ Check conflicts
         if (!event?.isOnline && normalizedEventDate) {
           for (let p of participants) {
@@ -550,7 +548,6 @@ export default function RegisterPageClient({
   useEffect(() => {
     const selectedEvent = events.find((event) => event.id === eventId);
     setChosenEvent(selectedEvent);
-    console.log(selectedEvent);
   }, [eventId, events]);
 
   const handleRemoveMember = (index: number) => {
@@ -559,7 +556,6 @@ export default function RegisterPageClient({
     }
   };
 
-  console.log(members);
 
   if (loading) {
     return <Loader text="Loading registration details..." />;

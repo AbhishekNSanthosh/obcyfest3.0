@@ -166,11 +166,6 @@ const handleGoogleLogin = async () => {
 
       <div className="hidden md:flex flex-1 items-center justify-end gap-4">
         {user ? (
-          <Link
-            href="/profile"
-            className="flex items-center text-yellow-400 font-medium text-xl gap-2 hover:text-yellow-300 transition-colors"
-            aria-label={`Profile of ${user.displayName || "User"}`}
-          >
             <Link
               href="/profile"
               className="flex items-center text-yellow-400 font-medium text-lg"
@@ -184,12 +179,11 @@ const handleGoogleLogin = async () => {
                     <span className="marquee">{user.displayName}</span>
                   </span>
                 ) : (
-                  <span className="ml-2">{user.displayName}</span>
+                  <span className="mx-2">{user.displayName}</span>
                 )
               ) : (
                 <span className="ml-2">User</span>
               )}
-            </Link>
 
             <div className="border-[2px] rounded-full p-1 border-yellow-400">
               <Image

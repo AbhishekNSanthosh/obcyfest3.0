@@ -156,7 +156,6 @@ export default function ProfilePage() {
     };
   }, [user]);
 
-  console.log("Invites:", invites);
 
   // Real-time registrations listener
   useEffect(() => {
