@@ -67,6 +67,8 @@ export default function RegisterPageClient({
   eventId,
   event,
 }: RegisterPageClientProps) {
+
+  const router = useRouter();
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
@@ -99,6 +101,17 @@ export default function RegisterPageClient({
   const [transactionId, setTransactionId] = useState("");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
+  const parseDate = (str: string) => {
+  const [day, month, year] = str.split("-");
+  return new Date(Number(year), Number(month) - 1, Number(day), 23, 59, 59);
+};
+
+  useEffect(() => {
+    if (parseDate(event.regFinalDate) <= new Date()) {
+      router.replace("/events");
+    }
+  }, [event?.regFinalDate, router]);
+
   useEffect(() => {
     if (profile) {
       setParticipants([
@@ -113,8 +126,6 @@ export default function RegisterPageClient({
       ]);
     }
   }, [profile, members]);
-
-  const router = useRouter();
 
   const handleAddMember = () => {
     setMembers([
