@@ -12,6 +12,8 @@ import {
 } from "react-icons/lu";
 import type { Metadata } from "next";
 
+import CountdownTimer from "@widgets/Events/components/CountdownTimer";
+
 export async function generateMetadata({ params }: { params: { eventId: string } }): Promise<Metadata> {
     const { eventId } = await params;
   const event = events.find((e) => e.id === eventId);
@@ -234,6 +236,9 @@ return (
               ))}
             </div>
           </div>
+          {event?.regFinalDate && parseDate(event.regFinalDate) >= new Date() && (
+  <CountdownTimer targetDate={event.regFinalDate} />
+)}
 
           {/* Action Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
