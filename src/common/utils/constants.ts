@@ -212,7 +212,7 @@ export const events: Event[] = [
         coordinators: [
             { name: "Amal J Anand  S3 CSE A", phone: "+919496333720" },
             { name: "Anwin Anto - S3 CSE A", phone: "+919497386729" },
-            { name: "Savio Ibrahim lype - S3 CSE A", phone: "+918089858509" },
+            { name: "Savio Abraham Iype - S3 CSE A", phone: "+918089858509" },
             { name: "Tessa Maria Saj - S3 CSE A", phone: "+918281485534" }
         ]
     },

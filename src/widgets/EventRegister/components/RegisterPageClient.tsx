@@ -16,7 +16,12 @@ import {
   getDoc,
 } from "firebase/firestore";
 import { auth, db } from "@lib/firebase";
-import { onAuthStateChanged, type User } from "firebase/auth";
+import {
+  GoogleAuthProvider,
+  onAuthStateChanged,
+  signInWithPopup,
+  type User,
+} from "firebase/auth";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { LuUser, LuUsers, LuPlus, LuLoader } from "react-icons/lu";
@@ -92,6 +97,7 @@ export default function RegisterPageClient({
   ]);
   const [participants, setParticipants] = useState<Member[]>([]);
   const [transactionId, setTransactionId] = useState("");
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     if (profile) {
@@ -131,35 +137,37 @@ export default function RegisterPageClient({
     }
   }, [event]);
 
-const handleChange = (
-  index: number,
-  field: string,
-  value: string,
-  isExtra = false,
-  isLeader = false
-) => {
-  if (isLeader) {
-    setProfile((prev) =>
-      prev ? {
-        ...prev,
-        extraData: {
-          ...(prev as any).extraData,
-          [field]: value,
-        },
-      } : prev
-    );
-  } else {
-    setMembers((prev) =>
-      prev.map((m, i) =>
-        i === index
-          ? isExtra
-            ? { ...m, extraData: { ...m.extraData, [field]: value } }
-            : { ...m, [field]: value }
-          : m
-      )
-    );
-  }
-};
+  const handleChange = (
+    index: number,
+    field: string,
+    value: string,
+    isExtra = false,
+    isLeader = false
+  ) => {
+    if (isLeader) {
+      setProfile((prev) =>
+        prev
+          ? {
+              ...prev,
+              extraData: {
+                ...(prev as any).extraData,
+                [field]: value,
+              },
+            }
+          : prev
+      );
+    } else {
+      setMembers((prev) =>
+        prev.map((m, i) =>
+          i === index
+            ? isExtra
+              ? { ...m, extraData: { ...m.extraData, [field]: value } }
+              : { ...m, [field]: value }
+            : m
+        )
+      );
+    }
+  };
 
   // Auth listener
   useEffect(() => {
@@ -365,23 +373,23 @@ const handleChange = (
     try {
       await runTransaction(db, async (transaction) => {
         const participants: any[] = [
-    {
-      uid: profile.uid,
-      email: profile.email,
-      displayName: profile.displayName,
-      semester: profile.semester,
-      phone: profile.phone,
-      roll: profile.rollNumber,
-      extraData: extraData || {}, // ✅ leader’s extra fields
-    },
-    ...members.map((m) => ({
-      roll: m.roll,
-      name: m.name,
-      email: m.email,
-      semester: m.semester,
-      phone: m.phone,
-      extraData: m.extraData || {}, // ✅ member’s extra fields
-    })),
+          {
+            uid: profile.uid,
+            email: profile.email,
+            displayName: profile.displayName,
+            semester: profile.semester,
+            phone: profile.phone,
+            roll: profile.rollNumber,
+            extraData: extraData || {}, // ✅ leader’s extra fields
+          },
+          ...members.map((m) => ({
+            roll: m.roll,
+            name: m.name,
+            email: m.email,
+            semester: m.semester,
+            phone: m.phone,
+            extraData: m.extraData || {}, // ✅ member’s extra fields
+          })),
         ];
         console.log("Participants:", participants);
         // ✅ Check conflicts
@@ -461,7 +469,8 @@ const handleChange = (
           where("participantMails", "array-contains", profile.email)
         );
         const regSnap = await getDocs(regQ);
-        if (!event?.isOnline &&
+        if (
+          !event?.isOnline &&
           regSnap.docs.some((d) => d.data().eventDate === normalizedEventDate)
         ) {
           toast.error(
@@ -631,18 +640,68 @@ const handleChange = (
   //               </div>
   //             )}
 
+  const handleGoogleLogin = async () => {
+    try {
+      const provider = new GoogleAuthProvider();
+      await signInWithPopup(auth, provider);
+      // After login, send to profile to ensure completion
+      router.push("/profile");
+    } catch (error) {
+      console.error("Google sign-in failed", error);
+    }
+  };
+
+  const handleLinkClick = () => {
+    setIsMobileMenuOpen(false);
+  };
+
   return (
     <div className="min-h-screen py-16 sm:py-24 text-white">
       {!currentUser ? (
-        <div className="min-h-screen flex items-center justify-center bg-black-950 text-white">
-          <div className="text-center px-4">
-            <p className="text-gray-300 text-lg">Please sign in to register.</p>
-            <Link
-              href="/profile"
-              className="text-yellow-400 hover:underline mt-2 inline-block"
+        <div className="min-h-[80vh] flex items-center justify-center bg-black-950 text-white px-6">
+          <div className="max-w-md w-full bg-black/70 backdrop-blur-md border border-gray-800 rounded-2xl shadow-2xl p-8 text-center">
+            {/* Heading */}
+            <h1 className="text-2xl font-bold text-yellow-400 mb-3">
+              Sign In Required
+            </h1>
+            <p className="text-gray-400 text-base mb-6">
+              Please sign in to register for events and access your profile.
+            </p>
+
+            {/* Link to profile */}
+
+            {/* Google sign-in button */}
+            <button
+              onClick={() => {
+                handleGoogleLogin();
+                handleLinkClick();
+              }}
+              className="w-full flex items-center justify-center gap-3 px-6 py-3 rounded-lg bg-yellow-400 text-black-950 font-semibold text-lg shadow-md hover:bg-yellow-500 active:scale-95 transition"
             >
-              Go to Profile to Sign In
-            </Link>
+              <svg
+                className="w-6 h-6"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 48 48"
+              >
+                <path
+                  fill="#FFC107"
+                  d="M43.6 20.5H42V20H24v8h11.3c-1.7 4.6-6.1 8-11.3 8a12 12 0 010-24c3 0 5.6 1.1 7.7 2.9l5.7-5.7C34.4 6.6 29.5 4 24 4a20 20 0 100 40c11 0 20-9 20-20 0-1.3-.1-2.6-.4-3.5z"
+                />
+                <path
+                  fill="#FF3D00"
+                  d="M6.3 14.7l6.6 4.8C14.6 15.6 19 13 24 13c3 0 5.6 1.1 7.7 2.9l5.7-5.7C34.4 6.6 29.5 4 24 4c-7.3 0-13.7 3.9-17.2 9.7z"
+                />
+                <path
+                  fill="#4CAF50"
+                  d="M24 44c5.5 0 10.4-2.2 14-5.8l-6.4-5.5c-2 1.4-4.6 2.3-7.6 2.3-5.1 0-9.5-3.3-11.2-7.9l-6.5 5C10.3 40.2 16.7 44 24 44z"
+                />
+                <path
+                  fill="#1976D2"
+                  d="M43.6 20.5H42V20H24v8h11.3c-.8 2.1-2.3 4-4.3 5.2l.1.1 6.4 5.5c-.4.4.1-.1.9-1 2.5-2.6 5.1-6.8 5.1-13.3 0-1.3-.1-2.6-.4-3.5z"
+                />
+              </svg>
+              Sign in with Google
+            </button>
           </div>
         </div>
       ) : !profile?.semester ? (
@@ -742,197 +801,223 @@ const handleChange = (
                       readOnly
                       className="w-full px-4 py-3 bg-gray-900/50 border border-gray-700 rounded-lg text-white"
                     />
-                      </div>
-                    </div>
-            {/* Extra fields */}
-              {event.requiresExtraData && Array.isArray(event.extraFields) && (
-                <div className="bg-black-950 bg-opacity-60 p-6 rounded-xl border mt-10 border-gray-800">
-                  <h2 className="text-lg font-semibold text-yellow-400 mb-6">
-                    Additional Info
-                  </h2>
-                  <div className="space-y-4">
-                    {event.extraFields.map(
-                      (field: { name: string; type: string }) => (
-                        <div key={field.name}>
-                          <label className="block text-sm font-medium text-gray-300 mb-2">
-                            {field.name}
-                          </label>
-                          <input
-                            type={field.type}
-                            value={extraData[field.name] || ""}
-                            onChange={(
-                              e: React.ChangeEvent<HTMLInputElement>
-                            ) =>
-                              setExtraData((prev: Record<string, string>) => ({
-                                ...prev,
-                                [field.name]: e.target.value,
-                              }))
-                            }
-                            className="w-full px-4 py-3 bg-gray-900/50 border border-gray-700 rounded-lg text-white"
-                          />
-                        </div>
-                      )
-                    )}
                   </div>
                 </div>
-              )}   
+                {/* Extra fields */}
+                {event.requiresExtraData &&
+                  Array.isArray(event.extraFields) && (
+                    <div className="bg-black-950 bg-opacity-60 p-6 rounded-xl border mt-10 border-gray-800">
+                      <h2 className="text-lg font-semibold text-yellow-400 mb-6">
+                        Additional Info
+                      </h2>
+                      <div className="space-y-4">
+                        {event.extraFields.map(
+                          (field: { name: string; type: string }) => (
+                            <div key={field.name}>
+                              <label className="block text-sm font-medium text-gray-300 mb-2">
+                                {field.name}
+                              </label>
+                              <input
+                                type={field.type}
+                                value={extraData[field.name] || ""}
+                                onChange={(
+                                  e: React.ChangeEvent<HTMLInputElement>
+                                ) =>
+                                  setExtraData(
+                                    (prev: Record<string, string>) => ({
+                                      ...prev,
+                                      [field.name]: e.target.value,
+                                    })
+                                  )
+                                }
+                                className="w-full px-4 py-3 bg-gray-900/50 border border-gray-700 rounded-lg text-white"
+                              />
+                            </div>
+                          )
+                        )}
+                      </div>
+                    </div>
+                  )}
               </div>
-
 
               {/* Group Invite */}
 
-  {isGroupEvent && (
-  <div>
-    {members.map((member, index) => (
-      <div
-        key={index}
-        className="relative grid grid-cols-1 p-9 sm:grid-cols-2 gap-4 mb-4 border border-gray-700 rounded-lg bg-black"
-      >
-        {/* Member Title */}
-        <h3 className="absolute -top-3 left-3 bg-black px-2 text-yellow-400 text-sm font-semibold rounded">
-          Member {index + 2}
-        </h3>
+              {isGroupEvent && (
+                <div>
+                  {members.map((member, index) => (
+                    <div
+                      key={index}
+                      className="relative grid grid-cols-1 p-9 sm:grid-cols-2 gap-4 mb-4 border border-gray-700 rounded-lg bg-black"
+                    >
+                      {/* Member Title */}
+                      <h3 className="absolute -top-3 left-3 bg-black px-2 text-yellow-400 text-sm font-semibold rounded">
+                        Member {index + 2}
+                      </h3>
 
-        
-        {/* Full Name */}
-        <div>
-          <label className="block text-sm font-medium text-gray-300 mb-1">
-            Full Name
-          </label>
-          <input
-            type="text"
-            value={member.name || ""}
-            onChange={(e) => handleChange(index, "name", e.target.value)}
-            placeholder="Full Name"
-            className="w-full px-4 py-3 bg-gray-900/50 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-400"
-            disabled={isInviting}
-          />
-        </div>
+                      {/* Full Name */}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-300 mb-1">
+                          Full Name
+                        </label>
+                        <input
+                          type="text"
+                          value={member.name || ""}
+                          onChange={(e) =>
+                            handleChange(index, "name", e.target.value)
+                          }
+                          placeholder="Full Name"
+                          className="w-full px-4 py-3 bg-gray-900/50 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                          disabled={isInviting}
+                        />
+                      </div>
 
-        {/* Roll No */}
-        <div>
-          <label className="block text-sm font-medium text-gray-300 mb-1">
-            Roll No.
-          </label>
-          <input
-            type="number"
-            value={member.roll || ""}
-            onChange={(e) => handleChange(index, "roll", e.target.value)}
-            placeholder="Roll Number"
-            className="w-full px-4 py-3 bg-gray-900/50 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-400"
-            disabled={isInviting}
-          />
-        </div>
+                      {/* Roll No */}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-300 mb-1">
+                          Roll No.
+                        </label>
+                        <input
+                          type="number"
+                          value={member.roll || ""}
+                          onChange={(e) =>
+                            handleChange(index, "roll", e.target.value)
+                          }
+                          placeholder="Roll Number"
+                          className="w-full px-4 py-3 bg-gray-900/50 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                          disabled={isInviting}
+                        />
+                      </div>
 
-        {/* Email */}
-        <div>
-          <label className="block text-sm font-medium text-gray-300 mb-1">
-            Email
-          </label>
-          <input
-            type="email"
-            value={member.email || ""}
-            onChange={(e) => handleChange(index, "email", e.target.value)}
-            placeholder="member@example.com"
-            className="w-full px-4 py-3 bg-gray-900/50 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-400"
-            disabled={isInviting}
-          />
-        </div>
+                      {/* Email */}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-300 mb-1">
+                          Email
+                        </label>
+                        <input
+                          type="email"
+                          value={member.email || ""}
+                          onChange={(e) =>
+                            handleChange(index, "email", e.target.value)
+                          }
+                          placeholder="member@example.com"
+                          className="w-full px-4 py-3 bg-gray-900/50 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                          disabled={isInviting}
+                        />
+                      </div>
 
-        {/* Semester */}
-        <div>
-          <label className="block text-sm font-medium text-gray-300 mb-1">
-            Semester
-          </label>
-          <select
-            value={member?.semester || ""}
-            onChange={(e) => handleChange(index, "semester", e.target.value)}
-            className="w-full px-4 py-3 bg-gray-900/50 border border-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-yellow-400"
-          >
-            <option value="">select</option>
-            {profile?.semester && (
-              <option value={profile.semester}>{profile.semester}</option>
-            )}
-          </select>
-          <p className="text-[11px] text-gray-400 mt-1">
-            Teammates must be from the same semester.
-          </p>
-        </div>
+                      {/* Semester */}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-300 mb-1">
+                          Semester
+                        </label>
+                        <select
+                          value={member?.semester || ""}
+                          onChange={(e) =>
+                            handleChange(index, "semester", e.target.value)
+                          }
+                          className="w-full px-4 py-3 bg-gray-900/50 border border-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                        >
+                          <option value="">select</option>
+                          {profile?.semester && (
+                            <option value={profile.semester}>
+                              {profile.semester}
+                            </option>
+                          )}
+                        </select>
+                        <p className="text-[11px] text-gray-400 mt-1">
+                          Teammates must be from the same semester.
+                        </p>
+                      </div>
 
-        {/* Mobile */}
-        <div>
-          <label className="block text-sm font-medium text-gray-300 mb-1">
-            Mobile No.
-          </label>
-          <input
-            type="tel"
-            value={member.phone || ""}
-            onChange={(e) => handleChange(index, "phone", e.target.value)}
-            placeholder="7907247909"
-            className="w-full px-4 py-3 bg-gray-900/50 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-400"
-            disabled={isInviting}
-          />
-        </div>
+                      {/* Mobile */}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-300 mb-1">
+                          Mobile No.
+                        </label>
+                        <input
+                          type="tel"
+                          value={member.phone || ""}
+                          onChange={(e) =>
+                            handleChange(index, "phone", e.target.value)
+                          }
+                          placeholder="7907247909"
+                          className="w-full px-4 py-3 bg-gray-900/50 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                          disabled={isInviting}
+                        />
+                      </div>
 
-        {/* 🔥 Extra Fields - now tied to each member */}
-        {event.requiresExtraData &&
-          Array.isArray(event.extraFields) && (
-            <div className="col-span-1 sm:col-span-2 mt-4 bg-black/60 p-4 rounded-lg border border-gray-800">
-              <h4 className="text-md font-semibold text-yellow-400 mb-3">
-                Additional Info
-              </h4>
-              <div className="space-y-3">
-                {event.extraFields.map((field: { name: string; type: string }) => (
-                  <div key={field.name}>
-                    <label className="block text-sm font-medium text-gray-300 mb-1">
-                      {field.name}
-                    </label>
-                    <input
-                      type={field.type}
-                      value={member.extraData?.[field.name] || ""}
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                        handleChange(index, field.name, e.target.value, true) // mark as extra field
-                      }
-                      className="w-full px-4 py-3 bg-gray-900/50 border border-gray-700 rounded-lg text-white"
-                    />
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
+                      {/* 🔥 Extra Fields - now tied to each member */}
+                      {event.requiresExtraData &&
+                        Array.isArray(event.extraFields) && (
+                          <div className="col-span-1 sm:col-span-2 mt-4 bg-black/60 p-4 rounded-lg border border-gray-800">
+                            <h4 className="text-md font-semibold text-yellow-400 mb-3">
+                              Additional Info
+                            </h4>
+                            <div className="space-y-3">
+                              {event.extraFields.map(
+                                (field: { name: string; type: string }) => (
+                                  <div key={field.name}>
+                                    <label className="block text-sm font-medium text-gray-300 mb-1">
+                                      {field.name}
+                                    </label>
+                                    <input
+                                      type={field.type}
+                                      value={
+                                        member.extraData?.[field.name] || ""
+                                      }
+                                      onChange={
+                                        (
+                                          e: React.ChangeEvent<HTMLInputElement>
+                                        ) =>
+                                          handleChange(
+                                            index,
+                                            field.name,
+                                            e.target.value,
+                                            true
+                                          ) // mark as extra field
+                                      }
+                                      className="w-full px-4 py-3 bg-gray-900/50 border border-gray-700 rounded-lg text-white"
+                                    />
+                                  </div>
+                                )
+                              )}
+                            </div>
+                          </div>
+                        )}
 
-        {/* Remove button */}
-        {Number(event?.memberMinCount) < Number(event?.memberMaxCount) &&
-          index > 0 && (
-            <button
-              type="button"
-              onClick={() => handleRemoveMember(index)}
-              className="absolute top-2 right-2 text-red-400 hover:text-red-600"
-              disabled={isInviting}
-            >
-              <IoClose />
-            </button>
-          )}
-      </div>
-    ))}
+                      {/* Remove button */}
+                      {Number(event?.memberMinCount) <
+                        Number(event?.memberMaxCount) &&
+                        index > 0 && (
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveMember(index)}
+                            className="absolute top-2 right-2 text-red-400 hover:text-red-600"
+                            disabled={isInviting}
+                          >
+                            <IoClose />
+                          </button>
+                        )}
+                    </div>
+                  ))}
 
-    {/* Add Member Button */}
-    {members.length < (Number(event?.memberMaxCount) - 1 || members.length) && (
-      <div className="flex justify-start mt-4">
-        <button
-          type="button"
-          onClick={handleAddMember}
-          className="flex items-center gap-2 px-4 py-3 bg-gray-700 text-white rounded-lg font-semibold hover:bg-gray-600 disabled:opacity-50"
-          disabled={isInviting}
-        >
-          <LuPlus />
-          Add Member
-        </button>
-      </div>
-    )}
-  </div>
-)}
-
+                  {/* Add Member Button */}
+                  {members.length <
+                    (Number(event?.memberMaxCount) - 1 || members.length) && (
+                    <div className="flex justify-start mt-4">
+                      <button
+                        type="button"
+                        onClick={handleAddMember}
+                        className="flex items-center gap-2 px-4 py-3 bg-gray-700 text-white rounded-lg font-semibold hover:bg-gray-600 disabled:opacity-50"
+                        disabled={isInviting}
+                      >
+                        <LuPlus />
+                        Add Member
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
 
               <div className="bg-black-950 bg-opacity-60 p-6 rounded-xl border border-gray-800">
                 <h2 className="text-lg font-semibold text-yellow-400 mb-6 flex items-center gap-2">
