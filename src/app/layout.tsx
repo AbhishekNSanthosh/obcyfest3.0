@@ -44,7 +44,7 @@ export const metadata: Metadata = {
     title: eventName,
     description: `${eventName} - The mini-tech fest of CCET`,
     images: [
-      { url: "/posters/poster.jpeg", alt: eventName },
+      { url: "/posters/poster_logo.png", alt: eventName },
     ],
   },
 };
