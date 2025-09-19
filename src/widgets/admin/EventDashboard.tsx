@@ -54,7 +54,7 @@ const EventRegistrationsPage = ({ eventId }: { eventId: string }) => {
       filtered = filtered.filter((reg) =>
         reg.participants.some(
           (p) =>
-            (p.semester || "").toLowerCase() === semesterFilter.toLowerCase()
+            (p.semester || "").toLowerCase().includes(semesterFilter.toLowerCase())
         )
       );
     }
