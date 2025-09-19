@@ -215,7 +215,7 @@ export default function ProfilePage() {
       });
 
       toast.success("Profile updated successfully.");
-      router.push("/events");
+      router.back();
     } catch (e) {
       toast.error("Failed to save profile. Please try again.");
       console.error(e);

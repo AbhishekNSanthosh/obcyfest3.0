@@ -55,8 +55,9 @@ return (
   <div className="relative min-h-screen flex flex-col text-white">
     {/* Full-page background image */}
     <Image
-      src={event.image}
+      src={event.bgImage}
       alt={event.title}
+      quality = {40}
       fill
       priority
       className="object-cover object-center -z-10"
