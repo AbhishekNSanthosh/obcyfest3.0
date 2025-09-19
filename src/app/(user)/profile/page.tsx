@@ -429,7 +429,13 @@ export default function ProfilePage() {
           <p className="text-gray-300">{user.email}</p>
         </div>
         <button
-          onClick={() => signOut(auth)}
+          onClick={() => {
+            signOut(auth)
+            toast.success("Logout successful")
+            setTimeout(() => {
+              router.replace('/')
+            }, 300);
+          }}
           className="sm:ml-auto mt-4 sm:mt-0 text-red-600 hover:text-white transition-colors flex items-center gap-2 border border-red-700 px-4 py-2 rounded-lg hover:bg-gray-800"
         >
           <LuLogOut />

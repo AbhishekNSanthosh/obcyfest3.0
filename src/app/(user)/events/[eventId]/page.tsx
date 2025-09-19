@@ -18,6 +18,7 @@ interface EventPageProps {
 }
 
 export default async function EventPage({ params }: EventPageProps) {
+  
   const { eventId } = await params;
   const event = events.find((e) => e.id === eventId);
 
@@ -192,12 +193,12 @@ return (
 
           {/* Action Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <a
+            <Link
               href={`./${eventId}/register`}
               className="flex-shrink-0 bg-yellow-400 text-black-950 px-8 py-3 rounded-lg font-semibold text-base shadow-lg hover:bg-yellow-500 transition-all duration-300 transform hover:scale-105"
             >
               Register Now
-            </a>
+            </Link>
 
             <Link
               href="/events"

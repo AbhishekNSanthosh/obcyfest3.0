@@ -161,7 +161,7 @@ export default function HeaderContent() {
                 <Image
                   src={user?.photoURL || ""}
                   alt=""
-                  className="w-[2.7rem] h-[2.7rem] rounded-full"
+                  className="w-[2rem] h-[2rem] rounded-full"
                   width={300}
                   height={300}
                 />
@@ -169,12 +169,34 @@ export default function HeaderContent() {
             </button>
           </Link>
         ) : (
-          <button
+          <div
             onClick={handleGoogleLogin}
-            className="bg-yellow-400 rounded-lg px-[1rem] py-2 text-black-950 font-semibold"
+            className="bg-yellow-400 rounded-lg px-[1rem] py-2 text-black-950 font-semibold flex flex-row gap-2"
           >
+            <svg
+                className="w-6 h-6"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 48 48"
+              >
+                <path
+                  fill="#FFC107"
+                  d="M43.6 20.5H42V20H24v8h11.3c-1.7 4.6-6.1 8-11.3 8a12 12 0 010-24c3 0 5.6 1.1 7.7 2.9l5.7-5.7C34.4 6.6 29.5 4 24 4a20 20 0 100 40c11 0 20-9 20-20 0-1.3-.1-2.6-.4-3.5z"
+                />
+                <path
+                  fill="#FF3D00"
+                  d="M6.3 14.7l6.6 4.8C14.6 15.6 19 13 24 13c3 0 5.6 1.1 7.7 2.9l5.7-5.7C34.4 6.6 29.5 4 24 4c-7.3 0-13.7 3.9-17.2 9.7z"
+                />
+                <path
+                  fill="#4CAF50"
+                  d="M24 44c5.5 0 10.4-2.2 14-5.8l-6.4-5.5c-2 1.4-4.6 2.3-7.6 2.3-5.1 0-9.5-3.3-11.2-7.9l-6.5 5C10.3 40.2 16.7 44 24 44z"
+                />
+                <path
+                  fill="#1976D2"
+                  d="M43.6 20.5H42V20H24v8h11.3c-.8 2.1-2.3 4-4.3 5.2l.1.1 6.4 5.5c-.4.4.1-.1.9-1 2.5-2.6 5.1-6.8 5.1-13.3 0-1.3-.1-2.6-.4-3.5z"
+                />
+              </svg>
             Sign in with Google
-          </button>
+          </div>
         )}
       </div>
       <div className="flex md:hidden lg:hidden flex-1 items-center justify-end gap-[4vw]">
