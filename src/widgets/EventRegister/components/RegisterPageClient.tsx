@@ -513,6 +513,19 @@ export default function RegisterPageClient({
         ],
         createdAt: serverTimestamp(),
       });
+      await fetch("/api/send-invite", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          to: profile.email,
+          inviterName: "ObcyFest Team",
+          inviteType: "individual",
+          eventTitle: event?.title,
+          inviteLink:
+            `${process.env.NEXT_PUBLIC_BASE_URL}/profile` ||
+            `${window.location.origin}/profile`,
+        }),
+      });
       toast.success("Registration successful!");
       router.push(`/events`);
     } catch (err) {
