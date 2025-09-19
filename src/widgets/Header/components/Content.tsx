@@ -97,15 +97,34 @@ export default function HeaderContent() {
     return () => document.removeEventListener("mousedown", handleOutsideClick);
   }, [isMobileMenuOpen]);
 
-  const handleGoogleLogin = async () => {
-    try {
-      const provider = new GoogleAuthProvider();
-      await signInWithPopup(auth, provider);
-      router.push("/profile");
-    } catch (error) {
-      console.error("Google sign-in failed", error);
+const handleGoogleLogin = async () => {
+  try {
+    const provider = new GoogleAuthProvider();
+    const result = await signInWithPopup(auth, provider);
+
+    const user = result.user;
+
+    // Check Firestore for extra details
+    const userDocRef = doc(db, "users", user.uid);
+    const userDocSnap = await getDoc(userDocRef);
+
+    if (userDocSnap.exists()) {
+      const userData = userDocSnap.data();
+
+      // Assume "extraDetailsCompleted" flag in user document
+      if (userData.rollNumber && userData.semester && userData.phone) {
+        console.log("User already completed details ✅");
+        // Stay on current page (no redirect)
+        return;
+      }
     }
-  };
+
+    // Redirect if details not filled
+    router.push("/profile");
+  } catch (error) {
+    console.error("Google sign-in failed", error);
+  }
+};
 
   const handleLinkClick = () => {
     setIsMobileMenuOpen(false);
