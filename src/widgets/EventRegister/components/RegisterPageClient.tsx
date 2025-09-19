@@ -38,6 +38,7 @@ type UserProfile = {
   semester?: string | null;
   rollNumber: string | null;
   phone: string | null;
+  extraData?: Record<string, string>;
 };
 
 type Member = {
@@ -156,17 +157,17 @@ export default function RegisterPageClient({
     isLeader = false
   ) => {
     if (isLeader) {
-      setProfile((prev) =>
-        prev
-          ? {
-              ...prev,
-              extraData: {
-                ...(prev as any).extraData,
-                [field]: value,
-              },
-            }
-          : prev
-      );
+      setProfile((prev) => {
+        if (!prev) return prev; // do nothing if null
+
+        return {
+          ...prev,
+          extraData: {
+            ...(prev.extraData ?? {}),
+            [field]: value,
+          },
+        };
+      });
     } else {
       setMembers((prev) =>
         prev.map((m, i) =>

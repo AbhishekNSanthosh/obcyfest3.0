@@ -86,6 +86,34 @@ input:-webkit-autofill:active {
   }
 }
 
+/* globals.css (or component module if you prefer) */
+@keyframes marquee {
+  0%   { transform: translateX(100%); }
+  100% { transform: translateX(-100%); }
+}
+
+/* container that hides overflow */
+.marquee-container {
+  display: inline-block;
+  width: 12rem;          /* tweak width as needed (Tailwind: w-48) */
+  overflow: hidden;
+  vertical-align: middle;
+}
+
+/* moving text */
+.marquee {
+  display: inline-block;
+  white-space: nowrap;
+  animation: marquee 8s linear infinite;
+  will-change: transform;
+}
+
+/* pause on hover so user can read */
+.marquee-container:hover .marquee {
+  animation-play-state: paused;
+}
+
+
 
 
 @import url("https://fonts.googleapis.com/css2?family=Fugaz+One&display=swap");
