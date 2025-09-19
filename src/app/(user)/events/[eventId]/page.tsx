@@ -10,7 +10,42 @@ import {
   LuIndianRupee,
   LuTrophy,
 } from "react-icons/lu";
-import { parse } from "path";
+import type { Metadata } from "next";
+
+export async function generateMetadata({ params }: { params: { eventId: string } }): Promise<Metadata> {
+  const event = events.find((e) => e.id === params.eventId);
+
+  if (!event) {
+    return {
+      title: "Event Not Found | ObcyFest",
+      description: "The event you are looking for does not exist.",
+    };
+  }
+
+  return {
+    title: `${event.title} | ObcyFest 4.0`,
+    description: event.description,
+    openGraph: {
+      title: event.title,
+      description: event.description,
+      images: [
+        {
+          url: event.image, // make sure it's absolute URL if you want OG image
+          width: 1200,
+          height: 630,
+          alt: event.title,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: event.title,
+      description: event.description,
+      images: [event.bgImage],
+    },
+  };
+}
+
 
 interface EventPageProps {
   params: {
