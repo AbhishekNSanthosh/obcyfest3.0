@@ -30,6 +30,7 @@ import toast from "react-hot-toast";
 import { AppEvent } from "@lib/types";
 import { IoClose } from "react-icons/io5";
 import Image from "next/image";
+import { BsCopy } from "react-icons/bs";
 
 type UserProfile = {
   uid: string;
@@ -402,24 +403,30 @@ export default function RegisterPageClient({
 
         // ✅ Check conflicts
         if (!event?.isOnline && normalizedEventDate) {
-          for (let p of participants) {
+          for (const p of participants) {
             const regQ = query(
               collection(db, "registrations"),
               where("participantMails", "array-contains", p.email)
             );
             const regSnap = await getDocs(regQ);
-            if (
-              regSnap.docs.some(
-                (d) => d.data().eventDate === normalizedEventDate
-              )
-            ) {
+
+            // Find any conflicting registration
+            const conflictDoc = regSnap.docs.find(
+              (d) => d.data().eventDate === normalizedEventDate
+            );
+
+            if (conflictDoc) {
+              const conflictData = conflictDoc.data();
+              const conflictEventTitle =
+                conflictData.eventTitle || "another event";
+
               throw new Error(
                 `${
                   p.displayName || p.email
-                } is already registered for another event on the same day.`
+                } is already registered for "${conflictEventTitle}" on the ${normalizedEventDate}.`
               );
             } else {
-              console.log("No date conflicts");
+              console.log("No date conflicts for", p.email);
             }
           }
         }
@@ -1028,11 +1035,29 @@ export default function RegisterPageClient({
                 <h2 className="text-lg font-semibold text-yellow-400 mb-6 flex items-center gap-2">
                   Payment
                 </h2>
+                <p className="text-sm text-gray-300 mb-4">
+                  Please make the payment using the details provided below.
+                </p>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {/* Phone */}
                   <div className="flex flex-col gap-2 p-4 rounded-md bg-gray-900/40 border border-gray-800">
-                    <label className="text-xs text-gray-300">Phone</label>
+                    <label className="text-xs text-gray-300 flex items-center justify-between">
+                      Phone
+                      <button
+                        className="text-yellow-400 flex items-center gap-2 text-xs hover:underline"
+                        onClick={() => {
+                          if (event?.gpay) {
+                            navigator.clipboard.writeText(event.gpay);
+                            // alert("Phone number copied to clipboard!");
+                            toast.success("Phone number copied to clipboard!")
+                          }
+                        }}
+                      >
+                        <BsCopy />
+                        Copy
+                      </button>
+                    </label>
                     <span className="text-sm font-medium text-white">
                       {event?.gpay}
                     </span>
@@ -1040,13 +1065,32 @@ export default function RegisterPageClient({
 
                   {/* UPI */}
                   <div className="flex flex-col gap-2 p-4 rounded-md bg-gray-900/40 border border-gray-800">
-                    <label className="text-xs text-gray-300">UPI ID</label>
+                    <label className="text-xs text-gray-300 flex items-center justify-between">
+                      UPI ID
+                      <button
+                        className="text-yellow-400 flex items-center gap-2 text-xs hover:underline"
+                        onClick={() => {
+                          if (event?.upi1) {
+                            navigator.clipboard.writeText(event.upi1);
+                            // alert("UPI ID copied to clipboard!");
+                            toast.success("UPI ID copied to clipboard!")
+                          }
+                        }}
+                      >
+                        <BsCopy />
+                        Copy
+                      </button>
+                    </label>
                     <span className="text-sm font-medium text-white">
                       {event?.upi1}
                     </span>
                   </div>
-                  <div className="lg:flex hidden flex-col gap-2 p-4 rounded-md bg-gray-900/40 border border-gray-800">
-                    <label className="text-xs text-gray-300">Reg Fee</label>
+
+                  {/* Registration Fee */}
+                  <div className="flex flex-col gap-2 p-4 rounded-md bg-gray-900/40 border border-gray-800">
+                    <label className="text-xs text-gray-300">
+                      Registration Fee
+                    </label>
                     <span className="text-sm font-medium text-white">
                       {event?.registrationFee}
                     </span>
@@ -1126,11 +1170,10 @@ export default function RegisterPageClient({
                       Transaction ID
                     </label>
                     <input
-                      onChange={(e) => {
-                        setTransactionId(e.target.value);
-                      }}
                       type="text"
                       placeholder="Enter your transaction ID"
+                      value={transactionId}
+                      onChange={(e) => setTransactionId(e.target.value)}
                       className="w-full px-4 py-3 rounded-lg border border-gray-700 bg-gray-900/50 text-white placeholder-gray-500 focus:outline-none focus:border-yellow-400"
                     />
                   </div>
