@@ -104,7 +104,6 @@ const page = () => {
             registrationsByEvent[registration.eventId] += 1;
           }
         });
-        console.log(registrationsByEvent);
 
         setEventRegistrations(registrationsByEvent);
       } catch (error) {
@@ -124,6 +123,7 @@ const page = () => {
       </div>
     );
   }
+
 
   return (
     <div className="px-[5vw] text-white">
@@ -179,14 +179,37 @@ const page = () => {
             </span>
 
             {/* Registration Deadline */}
-            <div className="my-auto">
-              <p className="text-xs text-gray-400 mb-1">Registration closes:</p>
-              <div className="inline-flex items-center gap-2 mt-2 px-3 py-1 rounded-lg bg-gray-800 text-white">
-                <SmallTimer
-                  targetDate={parseDate(event.regFinalDate).toISOString()}
-                />
-              </div>
-            </div>
+            {event?.regFinalDate && (
+              parseDate(event.regFinalDate) >= new Date() &&
+              (typeof event.maxParticipation !== "undefined"
+                ? eventRegistrations[event.id] <
+                    Number(
+                      event.maxParticipation
+                        .replace(/Teams?/i, "")
+                        .replace(/Participants?/i, "")
+                        .trim()
+                    )
+                : true) ? (
+                // ✅ Registration OPEN
+                <div className="my-auto">
+                  <p className="text-xs text-gray-400 mb-1">Registration closes:</p>
+                  <div className="inline-flex items-center gap-2 mt-2 px-3 py-1 rounded-lg bg-gray-800 text-white">
+                    <SmallTimer
+                      targetDate={parseDate(event.regFinalDate).toISOString()}
+                    />
+                  </div>
+                </div>
+              ) : (
+                // ❌ Registration CLOSED
+                <div className="my-auto">
+                  <p className="text-xs text-gray-400 mb-1">Status:</p>
+                  <div className="inline-flex items-center gap-2 mt-2 px-3 py-1 rounded-lg bg-red-700 text-white">
+                    Registration Closed
+                  </div>
+                </div>
+              )
+            )}
+
             <span className="text-xs mt-2 mb-[-10px]">
               Share with your friends
             </span>
