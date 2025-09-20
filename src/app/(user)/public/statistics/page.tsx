@@ -191,12 +191,22 @@ const page = () => {
               Share with your friends
             </span>
             <button
-              onClick={() => {
-                const url = `https://obcyfest.carmelcet.in/events/${event.id}`;
-                navigator.clipboard.writeText(url).then(() => {
-                  toast.success("Event link copied to clipboard!");
-                });
-              }}
+                onClick={() => {
+                const eventUrl = `https://obcyfest.carmelcet.in/events/${event.id}`;
+                  const message = `*Hey there!*\n\n` +
+                  `Check out this awesome event at *ObcyFest*!\n` +
+                  `Don't miss out on the fun!\n\n` +
+                  `Event link: ${eventUrl}\n\n` +
+                  `See you there!`;
+
+                  navigator.clipboard.writeText(eventUrl).then(() => {
+                    toast.success("Event link copied to clipboard!");
+                  });
+               
+                  const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
+                  window.open(whatsappUrl, "_blank");
+                }}
+
               className="mt-4 flex items-center justify-center gap-2 bg-yellow-400 text-black-950 px-4 py-2 rounded-lg font-medium text-sm hover:bg-yellow-500 transition"
             >
               <svg
