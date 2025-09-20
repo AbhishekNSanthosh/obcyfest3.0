@@ -80,6 +80,7 @@ export default function RegisterPageClient({
   const [loading, setLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [inviteEmail, setInviteEmail] = useState("");
+  const [isClosed, setIsClosed] = useState<boolean | null>(null);
   const [inviteErrors, setInviteErrors] = useState<string>("");
   const [invited, setInvited] = useState<
     Array<{
@@ -111,47 +112,47 @@ export default function RegisterPageClient({
   };
 
   useEffect(() => {
-    const fetchData = async () => {
+  const fetchData = async () => {
+    try {
       setLoading(true);
-      try {
-        const registrationsCollection = collection(db, "registrations");
-        const registrationsSnapshot = await getDocs(registrationsCollection);
-        const registrations = registrationsSnapshot.docs.map(
-          (doc) => ({ id: doc.id, ...doc.data() } as Registration)
-        );
 
-        const registrationsByEvent: Record<string, number> = {};
-        events.forEach((event) => (registrationsByEvent[event.id] = 0));
+      const registrationsCollection = collection(db, "registrations");
+      const registrationsSnapshot = await getDocs(registrationsCollection);
+      const registrations = registrationsSnapshot.docs.map(
+        (doc) => ({ id: doc.id, ...doc.data() } as Registration)
+      );
 
-        registrations.forEach((registration) => {
-          if (registrationsByEvent[registration.eventId] !== undefined) {
-            registrationsByEvent[registration.eventId] += 1;
-          }
-        });
-        if (
-  event?.regFinalDate &&
-  (
-    parseDate(event.regFinalDate) < new Date() || // registration expired
-    (typeof event.maxParticipation !== "undefined" &&
-      registrationsByEvent[event.id] >=
-        Number(
-          event.maxParticipation
-            .replace(/Teams?/i, "")
-            .replace(/Participants?/i, "")
-            .trim()
-        ))
-  )
-) {
-  router.replace("/events");
-}
-      } catch (error) {
-        console.error("Error fetching dashboard data:", error);
-      }finally {
-        setLoading(false);
+      const registrationsByEvent: Record<string, number> = {};
+      events.forEach((event) => (registrationsByEvent[event.id] = 0));
+
+      registrations.forEach((registration) => {
+        if (registrationsByEvent[registration.eventId] !== undefined) {
+          registrationsByEvent[registration.eventId] += 1;
+        }
+      });
+
+      const closed =
+        event?.regFinalDate &&
+        (parseDate(event.regFinalDate) < new Date() ||
+          (typeof event.maxParticipation !== "undefined" &&
+            registrationsByEvent[event.id] >=
+              Number(
+                event.maxParticipation
+                  .replace(/Teams?/i, "")
+                  .replace(/Participants?/i, "")
+                  .trim()
+              )));
+
+     setIsClosed(!!closed);
+      if (closed) {
+        router.replace("/events");
       }
-    };
-    fetchData();
-  }, []);
+    } catch (error) {
+      console.error("Error fetching dashboard data:", error);
+    }
+  };
+  fetchData();
+}, []);
 
 
   useEffect(() => {
@@ -260,6 +261,7 @@ export default function RegisterPageClient({
       }
     });
     return () => unsubscribe();
+
   }, []);
 
 
@@ -484,7 +486,7 @@ export default function RegisterPageClient({
     }
   };
 
-  if (loading) {
+  if (loading && isClosed === null || isClosed === true) {
     return <Loader text="Loading registration details..." />;
   }
 
