@@ -80,6 +80,7 @@ export default function RegisterPageClient({
   const [loading, setLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [inviteEmail, setInviteEmail] = useState("");
+  const[isGreen,setIsGreen]=useState(false);
   const [isClosed, setIsClosed] = useState<boolean | null>(null);
   const [inviteErrors, setInviteErrors] = useState<string>("");
   const [invited, setInvited] = useState<
@@ -297,10 +298,6 @@ export default function RegisterPageClient({
       toast.error("Please fill in all the team member details.");
       return;
     }
-    if (!transactionId) {
-      toast.error("Kindly make the payment and fill the transaction");
-      return;
-    }
     if (!currentUser || !profile) return;
 
     setIsSubmitting(true);
@@ -367,6 +364,16 @@ export default function RegisterPageClient({
           throw new Error("Oops! You're already registered for this event.");
         }
 
+        
+      if (!isGreen) {
+        setIsGreen(true);
+        return
+        }
+      if (!transactionId) {
+        toast.error("Kindly make the payment and fill the transaction");
+        return;
+      }
+
         // ✅ Save registration
         const regRef = doc(collection(db, "registrations"));
         transaction.set(regRef, {
@@ -395,10 +402,6 @@ export default function RegisterPageClient({
 
   // Individual registration
   const handleRegisterIndividual = async () => {
-    if (!transactionId) {
-      toast.error("Kindly make the payment and fill the transaction");
-      return;
-    }
     if (!currentUser || !profile) return;
 
     setIsSubmitting(true);
@@ -431,6 +434,16 @@ export default function RegisterPageClient({
 
       if (!sameEventSnap.empty) {
         throw new Error("Oops! You're already registered for this event.");
+      }
+      
+      if (!isGreen) {
+        setIsGreen(true);
+        return
+      }
+
+      if (!transactionId) {
+      toast.error("Kindly make the payment and fill the transaction");
+      return;
       }
 
       await addDoc(collection(db, "registrations"), {
@@ -955,7 +968,8 @@ export default function RegisterPageClient({
                   )}
                 </div>
               )}
-
+{isGreen && (
+                
               <div className="bg-black-950 bg-opacity-60 p-6 rounded-xl border border-gray-800">
                 <h2 className="text-lg font-semibold text-yellow-400 mb-6 flex items-center gap-2">
                   Payment
@@ -1103,7 +1117,8 @@ export default function RegisterPageClient({
                     />
                   </div>
                 </div>
-              </div>
+                    </div>
+                    )}
 
               {/* Actions */}
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -1115,7 +1130,7 @@ export default function RegisterPageClient({
                     className="w-full sm:w-auto bg-yellow-400 text-black-950 px-8 py-3 rounded-lg font-semibold text-lg shadow-lg hover:bg-yellow-500 disabled:opacity-50 flex items-center justify-center gap-2"
                   >
                     {isSubmitting && <LuLoader className="animate-spin" />}
-                    {isSubmitting ? "Registering..." : "Submit"}
+                    {isSubmitting ? "Registering..." : !isGreen ? "Check" : "Submit"}
                   </button>
                 ) : (
                   <button
@@ -1128,7 +1143,7 @@ export default function RegisterPageClient({
                     className="w-full sm:w-auto bg-yellow-400 text-black-950 px-8 py-3 rounded-lg font-semibold text-lg shadow-lg hover:bg-yellow-500 disabled:opacity-50 flex items-center justify-center gap-2"
                   >
                     {isSubmitting && <LuLoader className="animate-spin" />}
-                    {isSubmitting ? "Registering..." : "Submit"}
+                     {isSubmitting ? "Registering..." : !isGreen ? "Check" : "Submit"}
                   </button>
                 )}
                 <Link
