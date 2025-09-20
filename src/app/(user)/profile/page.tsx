@@ -338,21 +338,10 @@ export default function ProfilePage() {
         if (!regDoc.exists()) {
           throw new Error("Registration not found.");
         }
-
         if (regDoc.data().leaderUid !== user.uid) {
           throw new Error("Only the leader can cancel this registration.");
         }
-
-        const currentParticipants = regDoc.data().participantMails || [];
-        const updatedParticipants = currentParticipants.filter(
-          (uid: string) => uid !== user.uid
-        );
-
-        if (updatedParticipants.length === 0) {
-          transaction.delete(regRef);
-        } else {
-          transaction.update(regRef, { participantMails: updatedParticipants });
-        }
+         transaction.delete(regRef);
       });
 
       toast.success("Registration cancelled successfully.");
