@@ -184,8 +184,8 @@ const exportToCsv = () => {
                     <th className="py-4 px-6 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">#</th>
                     <th className="py-4 px-6 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Participants</th>
                     <th className="py-4 px-6 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Semester</th>
-                      <th className="py-4 px-6 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Email</th>
-                      <th className="py-4 px-6 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Transaction ID</th>
+                    <th className="py-4 px-6 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Email</th>
+                    <th className="py-4 px-6 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Transaction ID</th>
                   </tr>
                 </thead>
                 <tbody className="bg-gray-800 divide-y divide-gray-700">
@@ -221,7 +221,7 @@ const exportToCsv = () => {
                           ))}
                         </div>
                       </td>
-                        <td className="py-4 px-6 whitespace-nowrap text-sm font-medium text-yellow-400">
+                      <td className="py-4 px-6 whitespace-nowrap text-sm font-medium text-yellow-400">
                         {reg.transactionId}
                       </td>
                     </tr>
