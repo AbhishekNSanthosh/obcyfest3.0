@@ -100,10 +100,10 @@ const page = () => {
 
         registrations.forEach((registration) => {
           if (registrationsByEvent[registration.eventId] !== undefined) {
-            registrationsByEvent[registration.eventId] +=
-              registration.participants.length;
+            registrationsByEvent[registration.eventId] += 1;
           }
         });
+        console.log(registrationsByEvent);
 
         setEventRegistrations(registrationsByEvent);
       } catch (error) {
