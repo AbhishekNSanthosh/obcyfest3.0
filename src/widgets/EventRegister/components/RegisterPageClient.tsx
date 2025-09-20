@@ -340,7 +340,7 @@ export default function RegisterPageClient({
               (d) => d.data().eventDate === normalizedEventDate
             );
 
-            if (conflictDoc) {
+            if (!event.isOnline && conflictDoc) {
               const conflictData = conflictDoc.data();
               const conflictEventTitle =
                 conflictData.eventTitle || "another event";

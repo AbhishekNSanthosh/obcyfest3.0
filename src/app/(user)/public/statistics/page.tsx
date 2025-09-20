@@ -194,9 +194,23 @@ const page = () => {
                 <div className="my-auto">
                   <p className="text-xs text-gray-400 mb-1">Registration closes:</p>
                   <div className="inline-flex items-center gap-2 mt-2 px-3 py-1 rounded-lg bg-gray-800 text-white">
-                    <SmallTimer
-                      targetDate={parseDate(event.regFinalDate).toISOString()}
-                    />
+                    <SmallTimer targetDate={parseDate(event.regFinalDate).toISOString()} />
+                  </div>
+                </div>
+              ) : parseDate(event.regFinalDate) < new Date() &&
+                typeof event.minParticipation !== "undefined" &&
+                eventRegistrations[event.id] <
+                  Number(
+                    event.minParticipation
+                      .replace(/Teams?/i, "")
+                      .replace(/Participants?/i, "")
+                      .trim()
+                  ) ? (
+                // ⚠️ Requirement Not Met
+                <div className="my-auto">
+                  <p className="text-xs text-gray-400 mb-1">Status:</p>
+                  <div className="inline-flex items-center gap-2 mt-2 px-3 py-1 rounded-lg bg-yellow-600 text-white">
+                    Requirement Not Met
                   </div>
                 </div>
               ) : (
@@ -209,6 +223,7 @@ const page = () => {
                 </div>
               )
             )}
+
 
             <span className="text-xs mt-2 mb-[-10px]">
               Share with your friends
