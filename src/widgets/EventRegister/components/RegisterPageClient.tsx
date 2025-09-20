@@ -1,5 +1,5 @@
-// File: app/events/[eventId]/register/RegisterPageClient.tsx
 "use client";
+
 import React, { useEffect, useMemo, useState } from "react";
 import {
   doc,
@@ -29,6 +29,7 @@ import { AppEvent } from "@lib/types";
 import { IoClose } from "react-icons/io5";
 import Image from "next/image";
 import { BsCopy } from "react-icons/bs";
+import parseDate from "@utils/parseDate";
 
 type UserProfile = {
   uid: string;
@@ -106,11 +107,6 @@ export default function RegisterPageClient({
   const [participants, setParticipants] = useState<Member[]>([]);
   const [transactionId, setTransactionId] = useState("");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-
-  const parseDate = (str: string) => {
-    const [day, month, year] = str.split("-");
-    return new Date(Number(year), Number(month) - 1, Number(day), 23, 59, 59);
-  };
 
   useEffect(() => {
   const fetchData = async () => {
@@ -502,93 +498,6 @@ export default function RegisterPageClient({
   if (loading && isClosed === null || isClosed === true) {
     return <Loader text="Loading registration details..." />;
   }
-
-  // {isGroupEvent && (
-  //               <div className="bg-black-950 bg-opacity-60 p-6 rounded-xl border border-gray-800">
-  //                 <div className="flex items-center justify-between mb-6">
-  //                   <h2 className="text-base sm:text-lg md:text-xl font-semibold text-yellow-400 flex items-center gap-2">
-  //                     <LuUsers className="text-lg" />
-  //                     Invite Members by Email (
-  //                     {1 +
-  //                       invited.filter((i) => i.status === "accepted").length}
-  //                     /{maxGroupSize})
-  //                   </h2>
-  //                 </div>
-  //                 <p className="text-gray-400 text-sm mb-6">
-  //                   Invite {minGroupSize - 1} to {maxGroupSize - 1} members.
-  //                   Invites require same semester and no same-day conflict.
-  //                 </p>
-
-  //                 <div className="flex flex-col sm:flex-row gap-3">
-  //                   <input
-  //                     type="email"
-  //                     value={inviteEmail}
-  //                     onChange={(e) => setInviteEmail(e.target.value)}
-  //                     placeholder="member@example.com"
-  //                     className="flex-1 px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent"
-  //                     disabled={isInviting}
-  //                   />
-  //                   <button
-  //                     type="button"
-  //                     onClick={handleInvite}
-  //                     className="flex items-center justify-center gap-2 px-4 py-3 bg-yellow-400 text-black-950 rounded-lg font-semibold hover:bg-yellow-500 disabled:opacity-50"
-  //                     disabled={isInviting}
-  //                   >
-  //                     {isInviting ? (
-  //                       <LuLoader className="animate-spin" />
-  //                     ) : (
-  //                       <LuPlus />
-  //                     )}
-  //                     {isInviting ? "Sending..." : "Send Invite"}
-  //                   </button>
-  //                 </div>
-  //                 {inviteErrors && (
-  //                   <p className="text-red-400 text-sm mt-2">{inviteErrors}</p>
-  //                 )}
-
-  //                 {invited.length > 0 && (
-  //                   <div className="mt-6 space-y-2">
-  //                     {invited.map((m) => (
-  //                       <div
-  //                         key={m.id}
-  //                         className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 bg-gray-900 border border-gray-700 rounded-lg px-4 py-3 w-full"
-  //                       >
-  //                         {/* Email and Status */}
-  //                         <div className="flex items-center max-w-full bg-gray-900 rounded-lg px-3 py-2">
-  //                           <span
-  //                             className="text-gray-200 truncate max-w-[80%]" // only email is truncated
-  //                             title={m.inviteeEmail || "Unknown Email"}
-  //                           >
-  //                             {m.inviteeEmail || "Unknown Email"}
-  //                           </span>
-  //                           <span className="text-gray-400 ml-1">
-  //                             {m.status && `(${m.status})`}
-  //                           </span>
-  //                         </div>
-
-  //                         {/* Buttons */}
-  //                         <div className="flex flex-wrap sm:flex-nowrap gap-2 items-start sm:items-center mt-2 sm:mt-0">
-  //                           {profile?.uid === currentUser?.uid && (
-  //                             <button
-  //                               onClick={() => handleCancelInvite(m.id)}
-  //                               className="px-3 py-1 text-sm rounded-md bg-red-500 text-white hover:bg-red-600 disabled:opacity-50"
-  //                               disabled={cancellingInvite === m.id}
-  //                             >
-  //                               {cancellingInvite === m.id
-  //                                 ? "Removing..."
-  //                                 : "Remove"}
-  //                             </button>
-  //                           )}
-  //                         </div>
-  //                       </div>
-  //                     ))}
-  //                   </div>
-  //                 )}
-  //                 <p className="text-gray-400 text-xs mt-4">
-  //                   Note: Members will need to accept the invite separately.
-  //                 </p>
-  //               </div>
-  //             )}
 
   const handleGoogleLogin = async () => {
     try {

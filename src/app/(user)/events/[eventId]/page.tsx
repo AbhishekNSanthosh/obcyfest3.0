@@ -12,7 +12,7 @@ import {
   LuTrophy,
 } from "react-icons/lu";
 import type { Metadata } from "next";
-
+import parseDate from "@utils/parseDate";
 import { collection, getDocs } from "firebase/firestore";
 import CountdownTimer from "@widgets/Events/components/CountdownTimer";
 
@@ -93,10 +93,6 @@ export default async function EventPage({ params }: EventPageProps) {
             }
           });
 
-  const parseDate = (str: string) => {
-    const [day, month, year] = str.split("-");
-    return new Date(Number(year), Number(month) - 1, Number(day), 23, 59, 59);
-  };
 
   const isOpenForRegistration = event?.regFinalDate &&
   parseDate(event.regFinalDate) >= new Date() &&

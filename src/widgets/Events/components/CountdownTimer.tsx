@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-
+import parseDate from "@utils/parseDate";
 interface CountdownTimerProps {
   targetDate: string; // expects "DD-MM-YYYY" format
 }
@@ -13,10 +13,6 @@ export default function CountdownTimer({ targetDate }: CountdownTimerProps) {
     seconds: number;
   } | null>(null);
 
-  const parseDate = (str: string) => {
-    const [day, month, year] = str.split("-");
-    return new Date(Number(year), Number(month) - 1, Number(day), 23, 59, 59);
-  };
 
   useEffect(() => {
     if (!targetDate) return;
