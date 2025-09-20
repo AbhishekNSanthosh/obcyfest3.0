@@ -1063,11 +1063,7 @@ export default function RegisterPageClient({
                           name: string,
                           amount: number
                         ) =>
-                          `https://pay.google.com/gp/p/u/upi/pay?pa=${upiId}&pn=${encodeURIComponent(
-                            name
-                          )}&am=${amount}&cu=INR&tn=${encodeURIComponent(
-                            "Event Payment"
-                          )}`,
+                          `upi://pay?pa=${upiId}&pn=${encodeURIComponent(profile?.displayName||"")}&am=${amount}&cu=INR&tn=${encodeURIComponent(`${event?.title} Event Payment`)}`,
                       },
                       {
                         name: "Paytm",
@@ -1077,11 +1073,7 @@ export default function RegisterPageClient({
                           name: string,
                           amount: number
                         ) =>
-                          `https://paytm.me/upi/pay?pa=${upiId}&pn=${encodeURIComponent(
-                            name
-                          )}&am=${amount}&cu=INR&tn=${encodeURIComponent(
-                            "Event Payment"
-                          )}`,
+                          `upi://pay?pa=${upiId}&pn=${encodeURIComponent(profile?.displayName||"")}&am=${amount}&cu=INR&tn=${encodeURIComponent(`${event?.title} Event Payment`)}`,
                       },
                       {
                         name: "PhonePe",
@@ -1091,11 +1083,7 @@ export default function RegisterPageClient({
                           name: string,
                           amount: number
                         ) =>
-                          `https://phonepe.com/upi/pay?pa=${upiId}&pn=${encodeURIComponent(
-                            name
-                          )}&am=${amount}&cu=INR&tn=${encodeURIComponent(
-                            "Event Payment"
-                          )}`,
+                         `upi://pay?pa=${upiId}&pn=${encodeURIComponent(profile?.displayName||"")}&am=${amount}&cu=INR&tn=${encodeURIComponent(`${event?.title} Event Payment`)}`,
                       },
                     ].map((item, idx) => {
                       const upiId = idx === 1 ? event?.upi2 : event?.upi1; // Paytm uses upi2
