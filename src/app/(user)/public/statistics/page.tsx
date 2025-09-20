@@ -7,6 +7,7 @@ import { app, db } from "@lib/firebase";
 import { collection, getDocs } from "firebase/firestore";
 import { events } from "@utils/constants";
 import Loader from "@components/Loader";
+import toast from "react-hot-toast";
 
 type Registration = {
   id: string;
@@ -166,9 +167,16 @@ const page = () => {
             <div className="flex items-center justify-between mb-4">
               <span className="text-gray-300 text-sm">Registrations</span>
               <span className="text-3xl font-bold text-yellow-400">
-                {eventRegistrations[event.id] || 0}
+                {eventRegistrations[event.id] || 0}{" "}
+                <span className="text-xs truncate font-normal">
+                  {event?.eveType === "team" ? "Teams" : "Participants"}
+                </span>
               </span>
             </div>
+            <span className="text-[11px] font-extralight mb-2">
+              Note: If the minimum number of registrations is not achieved, the
+              event will be disqualified.
+            </span>
 
             {/* Registration Deadline */}
             <div className="my-auto">
@@ -179,6 +187,35 @@ const page = () => {
                 />
               </div>
             </div>
+            <span className="text-xs mt-2 mb-[-10px]">
+              Share with your friends
+            </span>
+            <button
+              onClick={() => {
+                const url = `https://obcyfest.carmelcet.in/events/${event.id}`;
+                navigator.clipboard.writeText(url).then(() => {
+                  toast.success("Event link copied to clipboard!");
+                });
+              }}
+              className="mt-4 flex items-center justify-center gap-2 bg-yellow-400 text-black-950 px-4 py-2 rounded-lg font-medium text-sm hover:bg-yellow-500 transition"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="lucide lucide-copy-icon lucide-copy"
+              >
+                <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
+                <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
+              </svg>
+              Copy Link
+            </button>
           </div>
         ))}
       </div>
