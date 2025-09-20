@@ -10,6 +10,7 @@ interface Registration {
   eventId: string;
   participants: { displayName: string; name: string; email: string; semester?: string }[];
   email: string;
+  transactionId: string;
   semester?: string;
 }
 
@@ -183,7 +184,8 @@ const exportToCsv = () => {
                     <th className="py-4 px-6 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">#</th>
                     <th className="py-4 px-6 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Participants</th>
                     <th className="py-4 px-6 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Semester</th>
-                    <th className="py-4 px-6 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Email</th>
+                      <th className="py-4 px-6 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Email</th>
+                      <th className="py-4 px-6 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Transaction ID</th>
                   </tr>
                 </thead>
                 <tbody className="bg-gray-800 divide-y divide-gray-700">
@@ -218,6 +220,9 @@ const exportToCsv = () => {
                             </div>
                           ))}
                         </div>
+                      </td>
+                        <td className="py-4 px-6 whitespace-nowrap text-sm font-medium text-yellow-400">
+                        S{reg.transactionId}
                       </td>
                     </tr>
                   ))}
