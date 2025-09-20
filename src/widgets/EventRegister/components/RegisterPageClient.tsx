@@ -1096,6 +1096,74 @@ export default function RegisterPageClient({
                     </span>
                   </div>
 
+                  {/* Pay Button */}
+                  <div className="md:col-span-2 grid grid-cols-1 sm:grid-cols-3 gap-4 lg:hidden">
+                    {[
+                      {
+                        name: "GPay",
+                        img: "/gpay.png",
+                        getLink: (
+                          upiId: string,
+                          name: string,
+                          amount: number
+                        ) =>
+                          `upi://pay?pa=${upiId}&pn=${encodeURIComponent(profile?.displayName||"")}&am=${amount}&cu=INR&tn=${encodeURIComponent(`${event?.title} Event Payment`)}`,
+                      },
+                      {
+                        name: "Paytm",
+                        img: "/paytm.png",
+                        getLink: (
+                          upiId: string,
+                          name: string,
+                          amount: number
+                        ) =>
+                          `upi://pay?pa=${upiId}&pn=${encodeURIComponent(profile?.displayName||"")}&am=${amount}&cu=INR&tn=${encodeURIComponent(`${event?.title} Event Payment`)}`,
+                      },
+                      {
+                        name: "PhonePe",
+                        img: "/ppay.png",
+                        getLink: (
+                          upiId: string,
+                          name: string,
+                          amount: number
+                        ) =>
+                         `upi://pay?pa=${upiId}&pn=${encodeURIComponent(profile?.displayName||"")}&am=${amount}&cu=INR&tn=${encodeURIComponent(`${event?.title} Event Payment`)}`,
+                      },
+                    ].map((item, idx) => {
+                      const upiId = idx === 1 ? event?.upi2 : event?.upi1; // Paytm uses upi2
+                      const amount = Number(event?.registrationFee) || 0;
+                      const coordinatorName =
+                        event?.coordinators[0]?.name || "Coordinator";
+                      const upiLink = item.getLink(
+                        upiId!,
+                        coordinatorName,
+                        amount
+                      );
+
+                      return (
+                        <button
+                          key={item.name}
+                          onClick={() => {
+                            window.open(upiLink, "_blank"); // open link in new tab
+                          }}
+                          className="flex flex-col items-center justify-center gap-2 px-4 py-3 rounded-lg text-gray-600 font-medium bg-black border border-gray-800 hover:opacity-90 transition"
+                        >
+                          <Image
+                            src={item.img}
+                            className="w-[7rem]"
+                            width={100}
+                            height={100}
+                            alt={item.name}
+                          />
+                          <span>Pay with {item.name}</span>
+                          <span className="text-yellow-400 font-semibold">
+                            {amount}
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+
                   {/* Transaction ID Input */}
                   <div className="md:col-span-2 flex flex-col gap-2">
                     <label className="text-xs text-gray-300">
