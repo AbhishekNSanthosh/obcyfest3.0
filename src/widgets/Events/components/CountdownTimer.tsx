@@ -47,20 +47,22 @@ export default function CountdownTimer({ targetDate }: CountdownTimerProps) {
   if (!timeLeft) return null;
 
   return (
-    <div className="mb-6 flex flex-col items-center">
-      <h3 className="text-xl font-bold text-yellow-400 mb-3">
+    <div className="mb-6 flex flex-col items-center px-[2vw]">
+      <h3 className="text-lg sm:text-xl font-bold text-yellow-400 mb-3 text-center">
         Registration closes in
       </h3>
-      <div className="flex gap-4 text-center">
+      <div className="flex gap-2 sm:gap-4 text-center flex-wrap justify-center">
         {["days", "hours", "minutes", "seconds"].map((unit) => (
           <div
             key={unit}
-            className="bg-black-950 bg-opacity-80 px-4 py-3 rounded-lg border border-yellow-400/30 shadow-md min-w-[70px]"
+            className="bg-black-950 bg-opacity-80 px-2 py-2 sm:px-4 sm:py-3 rounded-lg border border-yellow-400/30 shadow-md min-w-[70px] sm:min-w-[70px]"
           >
-            <p className="text-2xl font-bold text-yellow-400">
+            <p className="text-lg sm:text-2xl font-bold text-yellow-400">
               {timeLeft[unit as keyof typeof timeLeft]}
             </p>
-            <p className="text-sm text-gray-400 capitalize">{unit}</p>
+            <p className="text-xs sm:text-sm text-gray-400 capitalize">
+              {unit}
+            </p>
           </div>
         ))}
       </div>
