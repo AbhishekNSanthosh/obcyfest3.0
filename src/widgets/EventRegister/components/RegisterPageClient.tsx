@@ -1054,53 +1054,65 @@ export default function RegisterPageClient({
 
                   {/* Pay Button */}
                   <div className="md:col-span-2 grid grid-cols-1 sm:grid-cols-3 gap-4 lg:hidden">
-                    {/* UPI Button Template */}
                     {[
                       {
                         name: "GPay",
-                        upiScheme: "gpay://pay",
                         img: "/gpay.png",
+                        getLink: (
+                          upiId: string,
+                          name: string,
+                          amount: number
+                        ) =>
+                          `https://pay.google.com/gp/p/u/upi/pay?pa=${upiId}&pn=${encodeURIComponent(
+                            name
+                          )}&am=${amount}&cu=INR&tn=${encodeURIComponent(
+                            "Event Payment"
+                          )}`,
                       },
                       {
                         name: "Paytm",
-                        upiScheme: "paytmmp://pay",
                         img: "/paytm.png",
+                        getLink: (
+                          upiId: string,
+                          name: string,
+                          amount: number
+                        ) =>
+                          `https://paytm.me/upi/pay?pa=${upiId}&pn=${encodeURIComponent(
+                            name
+                          )}&am=${amount}&cu=INR&tn=${encodeURIComponent(
+                            "Event Payment"
+                          )}`,
                       },
                       {
                         name: "PhonePe",
-                        upiScheme: "phonepe://pay",
                         img: "/ppay.png",
+                        getLink: (
+                          upiId: string,
+                          name: string,
+                          amount: number
+                        ) =>
+                          `https://phonepe.com/upi/pay?pa=${upiId}&pn=${encodeURIComponent(
+                            name
+                          )}&am=${amount}&cu=INR&tn=${encodeURIComponent(
+                            "Event Payment"
+                          )}`,
                       },
                     ].map((item, idx) => {
                       const upiId = idx === 1 ? event?.upi2 : event?.upi1; // Paytm uses upi2
-                      const amount = event?.registrationFee || 0;
+                      const amount = Number(event?.registrationFee) || 0;
                       const coordinatorName =
                         event?.coordinators[0]?.name || "Coordinator";
-                      const upiLink = `${
-                        item.upiScheme
-                      }?pa=${upiId}&pn=${encodeURIComponent(
-                        coordinatorName
-                      )}&am=${amount}&cu=INR&tn=${encodeURIComponent(
-                        "Event Payment"
-                      )}`;
+                      const upiLink = item.getLink(
+                        upiId!,
+                        coordinatorName,
+                        amount
+                      );
 
                       return (
                         <button
                           key={item.name}
                           onClick={() => {
-                            // Try opening the app
-                            window.open(upiLink, "_self");
-
-                            // Optional: alert user to open on mobile if not working
-                            if (
-                              !/Android|iPhone|iPad|iPod/i.test(
-                                navigator.userAgent
-                              )
-                            ) {
-                              alert(
-                                `${item.name} UPI payment works only on mobile devices with the app installed.`
-                              );
-                            }
+                            window.open(upiLink, "_blank"); // open link in new tab
                           }}
                           className="flex flex-col items-center justify-center gap-2 px-4 py-3 rounded-lg text-gray-600 font-medium bg-black border border-gray-800 hover:opacity-90 transition"
                         >
