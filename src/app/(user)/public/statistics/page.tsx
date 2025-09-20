@@ -9,6 +9,7 @@ import { events } from "@utils/constants";
 import Loader from "@components/Loader";
 import toast from "react-hot-toast";
 import parseDate from "@utils/parseDate";
+import Link from "next/link";
 
 type Registration = {
   id: string;
@@ -16,8 +17,6 @@ type Registration = {
   eventTitle: string;
   participants: any[];
 };
-
-
 
 function SmallTimer({ targetDate }: { targetDate: string }) {
   const [timeLeft, setTimeLeft] = React.useState(getTimeRemaining(targetDate));
@@ -122,7 +121,6 @@ const page = () => {
     );
   }
 
-
   return (
     <div className="px-[5vw] text-white">
       <h2 className="text-2xl sm:text-2xl font-bold text-yellow-400 mb-6 mt-[100px]">
@@ -177,22 +175,26 @@ const page = () => {
             </span>
 
             {/* Registration Deadline */}
-            {event?.regFinalDate && (
-              parseDate(event.regFinalDate) >= new Date() &&
+            {event?.regFinalDate &&
+              (parseDate(event.regFinalDate) >= new Date() &&
               (typeof event.maxParticipation !== "undefined"
                 ? eventRegistrations[event.id] <
-                    Number(
-                      event.maxParticipation
-                        .replace(/Teams?/i, "")
-                        .replace(/Participants?/i, "")
-                        .trim()
-                    )
+                  Number(
+                    event.maxParticipation
+                      .replace(/Teams?/i, "")
+                      .replace(/Participants?/i, "")
+                      .trim()
+                  )
                 : true) ? (
                 // ✅ Registration OPEN
                 <div className="my-auto">
-                  <p className="text-xs text-gray-400 mb-1">Registration closes:</p>
+                  <p className="text-xs text-gray-400 mb-1">
+                    Registration closes:
+                  </p>
                   <div className="inline-flex items-center gap-2 mt-2 px-3 py-1 rounded-lg bg-gray-800 text-white">
-                    <SmallTimer targetDate={parseDate(event.regFinalDate).toISOString()} />
+                    <SmallTimer
+                      targetDate={parseDate(event.regFinalDate).toISOString()}
+                    />
                   </div>
                 </div>
               ) : parseDate(event.regFinalDate) < new Date() &&
@@ -219,49 +221,84 @@ const page = () => {
                     Registration Closed
                   </div>
                 </div>
-              )
-            )}
-
+              ))}
 
             <span className="text-xs mt-2 mb-[-10px]">
               Share with your friends
             </span>
-            <button
+            <div className="flex flex-col gap-3 mt-4">
+              {/* Copy Link Button */}
+              <button
                 onClick={() => {
-                const eventUrl = `https://obcyfest.carmelcet.in/events/${event.id}`;
-                  const message = `*Hey there!*\n\n` +
-                  `Check out this awesome event at *ObcyFest*!\n` +
-                  `Don't miss out on the fun!\n\n` +
-                  `Event link: ${eventUrl}\n\n` +
-                  `See you there!`;
-
+                  const eventUrl = `https://obcyfest.carmelcet.in/events/${event.id}`;
                   navigator.clipboard.writeText(eventUrl).then(() => {
-                    toast.success("Event link copied to clipboard!");
+                    toast.success("✅ Event link copied to clipboard!");
                   });
-               
-                  const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
+                }}
+                className="flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-medium text-sm
+               bg-gray-800 text-white hover:bg-gray-700 transition"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="lucide lucide-copy"
+                >
+                  <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
+                  <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
+                </svg>
+                Copy Link
+              </button>
+
+              {/* Share on WhatsApp */}
+              <button
+                onClick={() => {
+                  const eventUrl = `https://obcyfest.carmelcet.in/events/${event.id}`;
+                  const message =
+                    `*Hey there!*\n\n` +
+                    `Check out this awesome event at *ObcyFest*!\n` +
+                    `Don't miss out on the fun!\n\n` +
+                    `Event link: ${eventUrl}\n\n` +
+                    `See you there!`;
+
+                  const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(
+                    message
+                  )}`;
                   window.open(whatsappUrl, "_blank");
                 }}
-
-              className="mt-4 flex items-center justify-center gap-2 bg-yellow-400 text-black-950 px-4 py-2 rounded-lg font-medium text-sm hover:bg-yellow-500 transition"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="18"
-                height="18"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="lucide lucide-copy-icon lucide-copy"
+                className="flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-medium text-sm
+               bg-green-500 text-white hover:bg-green-600 transition"
               >
-                <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
-                <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
-              </svg>
-              Copy Link
-            </button>
+                {/* <div className="border border-white rounded-full flex items-center justify-center">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                    className="lucide"
+                  >
+                    <path d="M16.7 13.4c-.3-.1-1.7-.9-2-1-.3-.1-.5-.1-.7.1-.2.3-.8 1-.9 1.1-.2.2-.3.2-.6.1-.3-.1-1.1-.4-2.1-1.4-.8-.7-1.4-1.6-1.5-1.9-.2-.3 0-.5.1-.6.1-.1.3-.3.4-.5.1-.2.2-.3.3-.5.1-.2 0-.4 0-.5s-.7-1.7-1-2.3c-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1.1 1-1.1 2.5 0 1.5 1.1 3 1.3 3.2.2.2 2.1 3.2 5 4.5.7.3 1.2.5 1.6.6.7.2 1.4.2 1.9.1.6-.1 1.7-.7 1.9-1.3.2-.6.2-1.1.2-1.2-.1-.2-.3-.2-.6-.3z" />
+                  </svg>
+                </div> */}
+                Share on WhatsApp
+              </button>
+
+              {/* View Registrations Link */}
+              <Link
+                href={`/public/statistics/${event?.id}`}
+                className="flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-medium text-sm
+               bg-yellow-400 text-black hover:bg-yellow-500 transition"
+              >
+                View Registrations
+              </Link>
+            </div>
           </div>
         ))}
       </div>
