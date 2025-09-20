@@ -1049,7 +1049,8 @@ export default function RegisterPageClient({
                         onClick={() => {
                           if (event?.gpay) {
                             navigator.clipboard.writeText(event.gpay);
-                            alert("Phone number copied to clipboard!");
+                            // alert("Phone number copied to clipboard!");
+                            toast.success("Phone number copied to clipboard!")
                           }
                         }}
                       >
@@ -1071,7 +1072,8 @@ export default function RegisterPageClient({
                         onClick={() => {
                           if (event?.upi1) {
                             navigator.clipboard.writeText(event.upi1);
-                            alert("UPI ID copied to clipboard!");
+                            // alert("UPI ID copied to clipboard!");
+                            toast.success("UPI ID copied to clipboard!")
                           }
                         }}
                       >
