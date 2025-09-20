@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import React from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { app, db } from "@lib/firebase";
 import {
   LuMapPin,
   LuCalendar,
@@ -12,8 +13,8 @@ import {
 } from "react-icons/lu";
 import type { Metadata } from "next";
 
+import { collection, getDocs } from "firebase/firestore";
 import CountdownTimer from "@widgets/Events/components/CountdownTimer";
-import ShareButton from "@components/ShareButton";
 
 export async function generateMetadata({
   params,
@@ -22,6 +23,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { eventId } = await params;
   const event = events.find((e) => e.id === eventId);
+
 
   if (!event) {
     return {
@@ -60,13 +62,36 @@ interface EventPageProps {
   };
 }
 
+type Registration = {
+  id: string;
+  eventId: string;
+  eventTitle: string;
+  participants: any[];
+};
+
 export default async function EventPage({ params }: EventPageProps) {
   const { eventId } = await params;
   const event = events.find((e) => e.id === eventId);
 
+
   if (!event) {
     notFound();
   }
+
+  const registrationsCollection = collection(db, "registrations");
+          const registrationsSnapshot = await getDocs(registrationsCollection);
+          const registrations = registrationsSnapshot.docs.map(
+            (doc) => ({ id: doc.id, ...doc.data() } as Registration)
+          );
+  
+          const registrationsByEvent: Record<string, number> = {};
+          events.forEach((event) => (registrationsByEvent[event.id] = 0));
+  
+          registrations.forEach((registration) => {
+            if (registrationsByEvent[registration.eventId] !== undefined) {
+              registrationsByEvent[registration.eventId] += 1;
+            }
+          });
 
   const parseDate = (str: string) => {
     const [day, month, year] = str.split("-");
@@ -98,6 +123,16 @@ export default async function EventPage({ params }: EventPageProps) {
         return "Event";
     }
   };
+
+  const isOpenForRegistration = event?.regFinalDate &&
+  parseDate(event.regFinalDate) >= new Date() &&
+  (typeof event.maxParticipation !== "undefined"
+    ? registrationsByEvent[event.id] <=
+        Number(
+          event.maxParticipation
+            .replace(/Teams?/i, "")
+            .replace(/Participants?/i, "")
+            .trim()): true)
 
   return (
     <div className="relative min-h-screen flex flex-col text-white">
@@ -240,15 +275,13 @@ export default async function EventPage({ params }: EventPageProps) {
                 ))}
               </div>
             </div>
-            {event?.regFinalDate &&
-              parseDate(event.regFinalDate) >= new Date() && (
+            {isOpenForRegistration && (
                 <CountdownTimer targetDate={event.regFinalDate} />
               )}
 
             {/* Action Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              {event?.regFinalDate &&
-                parseDate(event.regFinalDate) >= new Date() && (
+              {isOpenForRegistration && (
                   <Link
                     href={`./${eventId}/register`}
                     className="flex-shrink-0 bg-yellow-400 text-black-950 px-8 py-3 rounded-lg font-semibold text-base shadow-lg hover:bg-yellow-500 transition-all duration-300 transform hover:scale-105"
