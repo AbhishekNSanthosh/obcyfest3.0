@@ -1063,7 +1063,7 @@ export default function RegisterPageClient({
                         const upiId = event?.upi1;
                         const name = event?.coordinators[0]?.name;
                         const amount = event?.registrationFee || 0; // default to 0 if not set
-                        const upiLink = `gpay://pay?pa=${upiId}&pn=${encodeURIComponent(
+                        const upiLink = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(
                           name || "Coordinator"
                         )}&am=${amount}&cu=INR&tn=${encodeURIComponent(
                           "Event Payment"
@@ -1092,7 +1092,7 @@ export default function RegisterPageClient({
                         const upiId = event?.upi2;
                         const name = event?.coordinators[0]?.name;
                         const amount = event?.registrationFee || 0; // default to 0 if not set
-                        const upiLink = `paytmmp://pay?pa=${upiId}&pn=${encodeURIComponent(
+                        const upiLink = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(
                           name || "Coordinator"
                         )}&am=${amount}&cu=INR&tn=${encodeURIComponent(
                           "Event Payment"
@@ -1121,7 +1121,7 @@ export default function RegisterPageClient({
                         const upiId = event?.upi1;
                         const name = event?.coordinators[0]?.name;
                         const amount = event?.registrationFee || 0; // default to 0 if not set
-                        const upiLink = `phonepe://pay?pa=${upiId}&pn=${encodeURIComponent(
+                        const upiLink = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(
                           name || "Coordinator"
                         )}&am=${amount}&cu=INR&tn=${encodeURIComponent(
                           "Event Payment"
