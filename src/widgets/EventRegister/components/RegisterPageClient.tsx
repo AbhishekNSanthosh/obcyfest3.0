@@ -1107,7 +1107,7 @@ export default function RegisterPageClient({
                           name: string,
                           amount: number
                         ) =>
-                          `upi://pay?pa=${upiId}&pn=${encodeURIComponent(profile?.displayName||"")}&am=${amount}&cu=INR&tn=${encodeURIComponent(`${event?.title} Event Payment`)}`,
+                          `upi://pay?pa=${upiId}&pn=${encodeURIComponent(name||"")}&am=${amount}&cu=INR&tn=${encodeURIComponent(`${event?.title} Event Payment`)}`,
                       },
                       {
                         name: "Paytm",
@@ -1117,7 +1117,7 @@ export default function RegisterPageClient({
                           name: string,
                           amount: number
                         ) =>
-                          `upi://pay?pa=${upiId}&pn=${encodeURIComponent(profile?.displayName||"")}&am=${amount}&cu=INR&tn=${encodeURIComponent(`${event?.title} Event Payment`)}`,
+                          `upi://pay?pa=${upiId}&pn=${encodeURIComponent(name||"")}&am=${amount}&cu=INR&tn=${encodeURIComponent(`${event?.title} Event Payment`)}`,
                       },
                       {
                         name: "PhonePe",
@@ -1127,11 +1127,11 @@ export default function RegisterPageClient({
                           name: string,
                           amount: number
                         ) =>
-                         `upi://pay?pa=${upiId}&pn=${encodeURIComponent(profile?.displayName||"")}&am=${amount}&cu=INR&tn=${encodeURIComponent(`${event?.title} Event Payment`)}`,
+                         `upi://pay?pa=${upiId}&pn=${encodeURIComponent(name||"")}&am=${amount}&cu=INR&tn=${encodeURIComponent(`${event?.title} Event Payment`)}`,
                       },
                     ].map((item, idx) => {
                       const upiId = idx === 1 ? event?.upi2 : event?.upi1; // Paytm uses upi2
-                      const amount = Number(event?.registrationFee) || 0;
+                      const amount = Number(event.registrationFee.replace("/-", "")) || 0;
                       const coordinatorName =
                         event?.coordinators[0]?.name || "Coordinator";
                       const upiLink = item.getLink(
@@ -1157,7 +1157,7 @@ export default function RegisterPageClient({
                           />
                           <span>Pay with {item.name}</span>
                           <span className="text-yellow-400 font-semibold">
-                            {amount}
+                            &#x20B9;{amount}/-
                           </span>
                         </button>
                       );
