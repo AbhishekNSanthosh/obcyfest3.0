@@ -222,7 +222,7 @@ const exportToCsv = () => {
                         </div>
                       </td>
                         <td className="py-4 px-6 whitespace-nowrap text-sm font-medium text-yellow-400">
-                        S{reg.transactionId}
+                        {reg.transactionId}
                       </td>
                     </tr>
                   ))}
