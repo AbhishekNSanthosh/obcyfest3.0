@@ -248,12 +248,14 @@ export default async function EventPage({ params }: EventPageProps) {
             {isOpenForRegistration ? (
               // ✅ Registration OPEN
               <>
-              <CountdownTimer targetDate={event.regFinalDate} />
+                <CountdownTimer targetDate={event.regFinalDate} />
+                {event.maxParticipation && ( 
               <div className="mb-5 mx-auto">
                 <p className="text-white bg-red-600 font-semibold text-lg px-3 py-1 rounded-lg inline-block shadow-md animate-pulse">
-                  Slots Left: {event.maxParticipation ? Number(event.maxParticipation.replace(/Teams?/i, "").replace(/Participants?/i, "").trim()) - registrationsByEvent[event.id] : 0}
+                  Slots Left: {event.maxParticipation ? Number(event.maxParticipation.replace(/Teams?/i, "").replace(/Participants?/i, "").trim()) - registrationsByEvent[event.id] :  0}
                 </p>
-              </div>
+                  </div>
+                  )}
                 </>
             ) : (
               // ❌ Registration CLOSED
