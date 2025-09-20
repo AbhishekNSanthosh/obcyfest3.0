@@ -30,6 +30,7 @@ import { IoClose } from "react-icons/io5";
 import Image from "next/image";
 import { BsCopy } from "react-icons/bs";
 import parseDate from "@utils/parseDate";
+import { error } from "console";
 
 type UserProfile = {
   uid: string;
@@ -363,11 +364,10 @@ export default function RegisterPageClient({
         
       if (!isGreen) {
         setIsGreen(true);
-        return
+        throw new Error("Kindly make the payment and fill the transaction")
         }
       if (!transactionId) {
-        toast.error("Kindly make the payment and fill the transaction");
-        return;
+        throw new Error("Kindly make the payment and fill the transaction")
       }
 
         // ✅ Save registration
