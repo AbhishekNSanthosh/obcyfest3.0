@@ -27,6 +27,7 @@ export type Event = {
   maxParticipation?: string;
   minParticipation?: string;
   totalParticipation?: string;
+  eveType?: "ind" | "team"
   registrationFee: string;
   firstPrize: string;
   secondPrize?: string;
@@ -41,6 +42,7 @@ export type AppEvent = {
   image: string;
   regLink?: string;
   type: 'technical' | 'nonTechnical' | 'sports';
+  eveType?: "ind" | "team"
   date?: string;
   description: string;
   venue?: string;
