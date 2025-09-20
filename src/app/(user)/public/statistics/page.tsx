@@ -8,6 +8,7 @@ import { collection, getDocs } from "firebase/firestore";
 import { events } from "@utils/constants";
 import Loader from "@components/Loader";
 import toast from "react-hot-toast";
+import parseDate from "@utils/parseDate";
 
 type Registration = {
   id: string;
@@ -16,10 +17,7 @@ type Registration = {
   participants: any[];
 };
 
-const parseDate = (str: string) => {
-  const [day, month, year] = str.split("-");
-  return new Date(Number(year), Number(month) - 1, Number(day), 23, 59, 59);
-};
+
 
 function SmallTimer({ targetDate }: { targetDate: string }) {
   const [timeLeft, setTimeLeft] = React.useState(getTimeRemaining(targetDate));
