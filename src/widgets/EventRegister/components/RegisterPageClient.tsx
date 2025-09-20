@@ -10,8 +10,6 @@ import {
   query,
   where,
   serverTimestamp,
-  onSnapshot,
-  updateDoc,
   runTransaction,
   getDoc,
 } from "firebase/firestore";
@@ -24,7 +22,7 @@ import {
 } from "firebase/auth";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { LuUser, LuUsers, LuPlus, LuLoader } from "react-icons/lu";
+import { LuUser, LuPlus, LuLoader } from "react-icons/lu";
 import { events } from "@utils/constants";
 import toast from "react-hot-toast";
 import { AppEvent } from "@lib/types";
@@ -49,6 +47,13 @@ type Member = {
   semester?: string | null;
   phone?: string | null;
   extraData?: Record<string, any>;
+};
+
+type Registration = {
+  id: string;
+  eventId: string;
+  eventTitle: string;
+  participants: any[];
 };
 
 interface RegisterPageClientProps {
@@ -89,12 +94,10 @@ export default function RegisterPageClient({
   >([]);
   const [isInviting, setIsInviting] = useState(false);
   const [cancellingInvite, setCancellingInvite] = useState<string | null>(null);
-  const [respondingInvite, setRespondingInvite] = useState<string | null>(null);
   const [extraData, setExtraData] = useState<Record<string, string>>({});
 
   //New changes by Abhishek..
   const [chosenEvent, setChosenEvent] = useState<AppEvent | undefined>();
-  const [teamMates, setTeamMates] = useState([]);
   const [members, setMembers] = useState<Member[]>([
     { roll: "", name: "", email: "", semester: "", phone: "" },
   ]);
@@ -108,8 +111,52 @@ export default function RegisterPageClient({
   };
 
   useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        const registrationsCollection = collection(db, "registrations");
+        const registrationsSnapshot = await getDocs(registrationsCollection);
+        const registrations = registrationsSnapshot.docs.map(
+          (doc) => ({ id: doc.id, ...doc.data() } as Registration)
+        );
+
+        const registrationsByEvent: Record<string, number> = {};
+        events.forEach((event) => (registrationsByEvent[event.id] = 0));
+
+        registrations.forEach((registration) => {
+          if (registrationsByEvent[registration.eventId] !== undefined) {
+            registrationsByEvent[registration.eventId] += 1;
+          }
+        });
+        if (
+  event?.regFinalDate &&
+  (
+    parseDate(event.regFinalDate) < new Date() || // registration expired
+    (typeof event.maxParticipation !== "undefined" &&
+      registrationsByEvent[event.id] >=
+        Number(
+          event.maxParticipation
+            .replace(/Teams?/i, "")
+            .replace(/Participants?/i, "")
+            .trim()
+        ))
+  )
+) {
+  router.replace("/events");
+}
+      } catch (error) {
+        console.error("Error fetching dashboard data:", error);
+      }finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
+
+
+  useEffect(() => {
     if (parseDate(event.regFinalDate) <= new Date()) {
-      router.replace("/events");
+     return router.replace("/events");
     }
   }, [event?.regFinalDate, router]);
 
@@ -211,36 +258,10 @@ export default function RegisterPageClient({
       } else {
         setProfile(null);
       }
-      setLoading(false);
     });
     return () => unsubscribe();
   }, []);
 
-  // Real-time invites listener (leader view)
-  useEffect(() => {
-    if (!profile) return;
-
-    const q = query(
-      collection(db, "invitations"),
-      where("inviterUid", "==", profile.uid),
-      where("eventId", "==", eventId)
-    );
-
-    const unsubscribe = onSnapshot(q, (snap) => {
-      const invites = snap.docs.map((docSnap) => ({
-        id: docSnap.id,
-        inviteeEmail: docSnap.data().inviteeEmail,
-        inviteeUid: docSnap.data().inviteeUid,
-        inviterUid: docSnap.data().inviterUid,
-        inviterEmail: docSnap.data().inviterEmail,
-        extraData: docSnap.data().extraData || null,
-        status: docSnap.data().status,
-      }));
-      setInvited(invites);
-    });
-
-    return () => unsubscribe();
-  }, [profile, eventId]);
 
   const normalizedEventDate = useMemo(() => {
     if (!event?.date) return null;
@@ -263,104 +284,6 @@ export default function RegisterPageClient({
 
   const { min: minGroupSize, max: maxGroupSize } = getGroupSize();
 
-  // Invite handling
-  const handleCancelInvite = async (inviteId: string) => {
-    setCancellingInvite(inviteId);
-    try {
-      await deleteDoc(doc(db, "invitations", inviteId));
-      toast.success("Invite cancelled.");
-    } catch (err) {
-      console.error("Failed to cancel invite:", err);
-      toast.error("Failed to cancel invite. Please try again.");
-    } finally {
-      setCancellingInvite(null);
-    }
-  };
-
-  const handleInvite = async () => {
-    setInviteErrors("");
-    const email = inviteEmail.trim().toLowerCase();
-    if (!email) return setInviteErrors("Please enter an email.");
-    if (!profile || !profile.semester)
-      return setInviteErrors(
-        "Complete your profile first (semester required)."
-      );
-    if (email === profile.email)
-      return setInviteErrors("You cannot invite yourself.");
-
-    setIsInviting(true);
-    try {
-      if (invited.find((i) => i.inviteeEmail === email)) {
-        setInviteErrors("You already invited this user.");
-        return;
-      }
-
-      const q = query(collection(db, "users"), where("email", "==", email));
-      const snap = await getDocs(q);
-      if (snap.empty) {
-        setInviteErrors("No user found with that email in obcyFest.");
-        return;
-      }
-
-      const invitee = snap.docs[0].data();
-      const inviteeUid = invitee.uid;
-
-      if ((invitee.semester || "") !== (profile.semester || "")) {
-        setInviteErrors("Invitee must be in the same semester.");
-        return;
-      }
-
-      if (!event?.isOnline && normalizedEventDate) {
-        const regQ = query(
-          collection(db, "registrations"),
-          where("participantUids", "array-contains", inviteeUid)
-        );
-        const regSnap = await getDocs(regQ);
-        const conflict = regSnap.docs.some(
-          (d) => d.data().eventDate === normalizedEventDate
-        );
-        if (conflict) {
-          setInviteErrors(
-            "Invitee is already registered for another event on the same day."
-          );
-          return;
-        }
-      }
-
-      await addDoc(collection(db, "invitations"), {
-        eventId,
-        eventTitle: event?.title,
-        inviterUid: profile.uid,
-        inviterEmail: profile.email,
-        inviteeUid,
-        inviteeEmail: email,
-        hasExtraData: event?.requiresExtraData ?? false, // ✅ fallback to false
-        extraData: event?.requiresExtraData ? event?.extraFields ?? null : null,
-        status: "pending",
-        createdAt: serverTimestamp(),
-      });
-
-      setInviteEmail("");
-      // await fetch("/api/send-invite", {
-      //   method: "POST",
-      //   headers: { "Content-Type": "application/json" },
-      //   body: JSON.stringify({
-      //     to: email,
-      //     inviterName: profile.displayName,
-      //     eventTitle: event?.title,
-      //     inviteLink:
-      //       `${process.env.NEXT_PUBLIC_BASE_URL}/profile` ||
-      //       `${window.location.origin}/profile`,
-      //   }),
-      // });
-      toast.success("Invite sent successfully!");
-    } catch (err) {
-      console.error(err);
-      setInviteErrors("Failed to send invite. Please try again." + err);
-    } finally {
-      setIsInviting(false);
-    }
-  };
 
   // Group registration
   const handleRegisterGroup = async () => {

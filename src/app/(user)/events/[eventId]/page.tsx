@@ -98,32 +98,6 @@ export default async function EventPage({ params }: EventPageProps) {
     return new Date(Number(year), Number(month) - 1, Number(day), 23, 59, 59);
   };
 
-  const getTypeColor = (type: string) => {
-    switch (type) {
-      case "technical":
-        return "bg-yellow-400 text-black-950";
-      case "nonTechnical":
-        return "bg-yellow-400 text-black-950";
-      case "sports":
-        return "bg-yellow-400 text-black-950";
-      default:
-        return "bg-yellow-400 text-black-950";
-    }
-  };
-
-  const getTypeName = (type: string) => {
-    switch (type) {
-      case "technical":
-        return "Technical Event";
-      case "nonTechnical":
-        return "Non-Technical Event";
-      case "sports":
-        return "Sports Event";
-      default:
-        return "Event";
-    }
-  };
-
   const isOpenForRegistration = event?.regFinalDate &&
   parseDate(event.regFinalDate) >= new Date() &&
   (typeof event.maxParticipation !== "undefined"
@@ -275,9 +249,17 @@ export default async function EventPage({ params }: EventPageProps) {
                 ))}
               </div>
             </div>
-            {isOpenForRegistration && (
-                <CountdownTimer targetDate={event.regFinalDate} />
-              )}
+            {isOpenForRegistration ? (
+              // ✅ Registration OPEN
+              <CountdownTimer targetDate={event.regFinalDate} />
+            ) : (
+              // ❌ Registration CLOSED
+              <div className="flex justify-center my-3">
+                <div className="flex bg-red-600 text-white px-8 py-3 rounded-lg font-semibold text-base shadow-lg transition-all duration-300">
+                  Registration Closed
+                </div>
+              </div>
+            )}
 
             {/* Action Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
