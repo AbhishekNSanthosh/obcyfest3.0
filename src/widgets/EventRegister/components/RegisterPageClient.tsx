@@ -909,7 +909,7 @@ export default function RegisterPageClient({
                   )}
                 </div>
               )}
-{isGreen && (
+            {isGreen && (
                 
               <div className="bg-black-950 bg-opacity-60 p-6 rounded-xl border border-gray-800">
                 <h2 className="text-lg font-semibold text-yellow-400 mb-6 flex items-center gap-2">
@@ -1058,8 +1058,8 @@ export default function RegisterPageClient({
                     />
                   </div>
                 </div>
-                    </div>
-                    )}
+              </div>
+               )}
 
               {/* Actions */}
               <div className="flex flex-col sm:flex-row gap-4 justify-center">

@@ -95,7 +95,7 @@ export default async function EventPage({ params }: EventPageProps) {
     event?.regFinalDate &&
     parseDate(event.regFinalDate) >= new Date() &&
     (typeof event.maxParticipation !== "undefined"
-      ? registrationsByEvent[event.id] <=
+      ? registrationsByEvent[event.id] <
         Number(
           event.maxParticipation
             .replace(/Teams?/i, "")
