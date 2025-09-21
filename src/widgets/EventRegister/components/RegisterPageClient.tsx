@@ -977,7 +977,7 @@ export default function RegisterPageClient({
                   </div>
 
                   {/* Pay Button */}
-                  <div className="md:col-span-2 grid grid-cols-1 sm:grid-cols-3 gap-4 lg:hidden">
+                  {/* <div className="md:col-span-2 grid grid-cols-1 sm:grid-cols-3 gap-4 lg:hidden">
                     {[
                       {
                         name: "GPay",
@@ -1042,7 +1042,7 @@ export default function RegisterPageClient({
                         </button>
                       );
                     })}
-                  </div>
+                  </div> */}
 
                   {/* Transaction ID Input */}
                   <div className="md:col-span-2 flex flex-col gap-2">
