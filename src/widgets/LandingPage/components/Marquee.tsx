@@ -1,7 +1,7 @@
 import { eventName } from '@utils/constants';
 import React from 'react';
 
-export default function Marquee({ speed = 7 }) {  // pass speed in seconds
+export default function Marquee({ speed = 10 }) {  // pass speed in seconds
   return (
     <div className="bg-yellow-400 text-black-950 mt-[10vh] py-[3vh] mb-[5vh] overflow-hidden">
       <div >

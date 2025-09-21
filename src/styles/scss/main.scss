@@ -89,28 +89,29 @@ input:-webkit-autofill:active {
 /* globals.css or module.css */
 
 @keyframes marquee {
-  0% {
-    transform: translateX(0);
-  }
-  100% {
-    transform: translateX(-50%);
-  }
+  0%   { transform: translateX(10%); }
+  100% { transform: translateX(-50%); } /* move by half because of two copies */
+}
+
+.marquee-container {
+  display: block;
+  width: 12rem;           /* or w-48 in Tailwind */
+  overflow: hidden;
+  position: relative;
+  white-space: nowrap;
 }
 
 .marquee {
-  display: block;
+  display: inline-block;
+  min-width: 200%;        /* two copies side by side */
+  animation: marquee 5s linear infinite;
   will-change: transform;
-  animation: marquee 8s linear infinite;
 }
 
-.marquee-content {
-  display: inline-flex;
+.marquee span {
+  display: inline-block;
+  padding-right: 2rem;    /* spacing between loops */
 }
-
-.marquee:hover {
-  animation-play-state: paused;
-}
-
 
 @import url("https://fonts.googleapis.com/css2?family=Fugaz+One&display=swap");
 
