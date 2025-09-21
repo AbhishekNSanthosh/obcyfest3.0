@@ -13,12 +13,12 @@ export default function CountdownTimer({ targetDate }: CountdownTimerProps) {
     seconds: number;
   } | null>(null);
 
-
   useEffect(() => {
     if (!targetDate) return;
 
     const endDate = parseDate(targetDate);
-
+    // ⏰ Set target time to 9:00 AM
+    endDate.setHours(9, 0, 0, 0);
     const interval = setInterval(() => {
       const now = new Date().getTime();
       const distance = endDate.getTime() - now;
