@@ -322,33 +322,53 @@ export default function RegisterPageClient({
 
         // ✅ Check conflicts
         if (!event?.isOnline && normalizedEventDate) {
+
+            const emails = participants.map((p) => p.email.trim().toLowerCase());
+            const uniqueEmails = new Set(emails);
+
+            if (emails.length !== uniqueEmails.size) {
+              throw new Error("Duplicate participant emails found in the group.");
+          }
+          
+           const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            for (const email of emails) {
+              if (!emailRegex.test(email)) {
+                throw new Error(`Invalid email detected: ${email}`);
+              }
+            }
+
           for (const p of participants) {
+            // 1. Find all registrations of this participant
             const regQ = query(
               collection(db, "registrations"),
               where("participantMails", "array-contains", p.email)
             );
             const regSnap = await getDocs(regQ);
 
-            // Find any conflicting registration
-            const conflictDoc = regSnap.docs.find(
-              (d) => d.data().eventDate === normalizedEventDate
-            );
+            // 2. Check each registration
+            for (const d of regSnap.docs) {
+              const regData = d.data();
 
-            if (!event.isOnline && conflictDoc) {
-              const conflictData = conflictDoc.data();
-              const conflictEventTitle =
-                conflictData.eventTitle || "another event";
+              // Same date?
+              if (regData.eventDate === normalizedEventDate && regData.eventId) {
+                // 3. Find event in your constants
+                const conflictEvent = events.find((e) => e.id === regData.eventId);
 
-              throw new Error(
-                `${
-                  p.displayName || p.email
-                } is already registered for "${conflictEventTitle}" on the ${normalizedEventDate}.`
-              );
-            } else {
-              console.log("No date conflicts for", p.email);
+                // 4. Conflict only if BOTH are offline
+                if (conflictEvent && !conflictEvent.isOnline && !event.isOnline) {
+                  throw new Error(
+                    `${p.displayName || p.email} is already registered for "${
+                      conflictEvent.title || "another event"
+                    }" on ${normalizedEventDate}.`
+                  );
+                }
+              }
             }
+
+            console.log("No date conflicts for", p.email);
           }
         }
+
 
         const qSameEvent = query(
           collection(db, "registrations"),
@@ -400,26 +420,38 @@ export default function RegisterPageClient({
   const handleRegisterIndividual = async () => {
     if (!currentUser || !profile) return;
 
-    setIsSubmitting(true);
-    try {
-      if (normalizedEventDate) {
-        const regQ = query(
-          collection(db, "registrations"),
-          where("participantMails", "array-contains", profile.email)
-        );
-        const regSnap = await getDocs(regQ);
-        if (
-          !event?.isOnline &&
-          regSnap.docs.some((d) => d.data().eventDate === normalizedEventDate)
-        ) {
-          toast.error(
-            "You have already registered for another event on the same day."
+      setIsSubmitting(true);
+      try {
+        if (normalizedEventDate) {
+          const regQ = query(
+            collection(db, "registrations"),
+            where("participantMails", "array-contains", profile.email)
           );
+          const regSnap = await getDocs(regQ);
 
-          setIsSubmitting(false);
-          return;
+          // check if conflict exists
+          const hasConflict = regSnap.docs.some((d) => {
+            const regData = d.data();
+
+            if (regData.eventDate === normalizedEventDate && regData.eventId) {
+              // find the event from your constants
+              const conflictEvent = events.find((e) => e.id === regData.eventId);
+
+              // conflict only if both are offline
+              return conflictEvent && !conflictEvent.isOnline && !event?.isOnline;
+            }
+
+            return false;
+          });
+
+          if (hasConflict) {
+            toast.error(
+              "You have already registered for another offline event on the same day."
+            );
+            setIsSubmitting(false);
+            return;
+          }
         }
-      }
 
       const qSameEvent = query(
         collection(db, "registrations"),
