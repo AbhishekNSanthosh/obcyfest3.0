@@ -86,34 +86,30 @@ input:-webkit-autofill:active {
   }
 }
 
-/* globals.css (or component module if you prefer) */
+/* globals.css or module.css */
+
 @keyframes marquee {
-  0%   { transform: translateX(100%); }
-  100% { transform: translateX(-100%); }
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
 }
 
-/* container that hides overflow */
-.marquee-container {
-  display: inline-block;
-  width: 12rem;          /* tweak width as needed (Tailwind: w-48) */
-  overflow: hidden;
-  vertical-align: middle;
-}
-
-/* moving text */
 .marquee {
-  display: inline-block;
-  white-space: nowrap;
-  animation: marquee 8s linear infinite;
+  display: block;
   will-change: transform;
+  animation: marquee 8s linear infinite;
 }
 
-/* pause on hover so user can read */
-.marquee-container:hover .marquee {
+.marquee-content {
+  display: inline-flex;
+}
+
+.marquee:hover {
   animation-play-state: paused;
 }
-
-
 
 
 @import url("https://fonts.googleapis.com/css2?family=Fugaz+One&display=swap");

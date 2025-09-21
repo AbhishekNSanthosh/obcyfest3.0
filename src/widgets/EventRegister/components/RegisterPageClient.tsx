@@ -1058,8 +1058,8 @@ export default function RegisterPageClient({
                     />
                   </div>
                 </div>
-                    </div>
-                    )}
+              </div>
+               )}
 
               {/* Actions */}
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
