@@ -107,7 +107,7 @@ export const events: Event[] = [
         memberMinCount: 0,
         eventType: "Individual",
         maxParticipation: "60 Participants",
-        minParticipation: "20 Participants",
+        minParticipation: "25 Participants",
         registrationFee: "30/-",
         firstPrize: "500/-",
         secondPrize: "250/-",

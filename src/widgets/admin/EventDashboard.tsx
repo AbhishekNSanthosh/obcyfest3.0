@@ -1,14 +1,24 @@
-'use client';
+"use client";
 
-import React, { useEffect, useState } from 'react';
-import { collection, getDocs } from 'firebase/firestore';
+import React, { useEffect, useState } from "react";
+import { collection, getDocs } from "firebase/firestore";
 import { db } from "@lib/firebase";
+
+interface ExtraData {
+  inGameName?: string;
+  userId?: string;
+  name?: string;
+  phone?: string;
+  [key: string]: any; // ✅ allows new fields automatically
+}
 
 interface Participant {
   displayName: string;
   name: string;
+  phone:string;
   email: string;
   semester?: string;
+  extraData?: ExtraData;
 }
 
 interface Registration {
@@ -23,15 +33,18 @@ interface Registration {
 
 const EventRegistrationsPage = ({ eventId }: { eventId: string }) => {
   const [registrations, setRegistrations] = useState<Registration[]>([]);
-  const [filteredRegistrations, setFilteredRegistrations] = useState<Registration[]>([]);
+  const [filteredRegistrations, setFilteredRegistrations] = useState<
+    Registration[]
+  >([]);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [isLoading, setIsLoading] = useState(true);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
 
   // Normalize semester string for search
-  const normalizeSemester = (sem: string) => sem.replace(/\s+/g, "").toLowerCase();
+  const normalizeSemester = (sem: string) =>
+    sem.replace(/\s+/g, "").toLowerCase();
 
-  // Highlight matching text in search
+  // Highlight matching text
   const highlightText = (text: string, query: string) => {
     if (!query) return text;
     const regex = new RegExp(`(${query})`, "gi");
@@ -51,7 +64,7 @@ const EventRegistrationsPage = ({ eventId }: { eventId: string }) => {
     );
   };
 
-  // Fetch registrations from Firestore
+  // Fetch registrations
   useEffect(() => {
     const fetchRegistrations = async () => {
       setIsLoading(true);
@@ -79,7 +92,7 @@ const EventRegistrationsPage = ({ eventId }: { eventId: string }) => {
     fetchRegistrations();
   }, [eventId]);
 
-  // Apply search filter
+  // Apply search
   useEffect(() => {
     let filtered = [...registrations];
     if (searchQuery.trim()) {
@@ -93,7 +106,11 @@ const EventRegistrationsPage = ({ eventId }: { eventId: string }) => {
               p.displayName?.toLowerCase().includes(query) ||
               p.name?.toLowerCase().includes(query) ||
               p.email?.toLowerCase().includes(query) ||
-              normalizeSemester(p.semester || "").includes(query)
+              normalizeSemester(p.semester || "").includes(query) ||
+              (p.extraData &&
+                Object.values(p.extraData).some((val) =>
+                  String(val).toLowerCase().includes(query)
+                ))
           )
       );
     }
@@ -109,36 +126,42 @@ const EventRegistrationsPage = ({ eventId }: { eventId: string }) => {
 
     const headers = ["Sl. No", "Transaction ID"];
     for (let i = 0; i < maxParticipants; i++) {
-      headers.push(`Name${i + 1}`, `Email${i + 1}`, `Semester${i + 1}`);
+      headers.push(
+        `Name${i + 1}`,
+        `Email${i + 1}`,
+        `Semester${i + 1}`,
+        `ExtraData${i + 1}`,
+        `PhoneNumber${i + 1}`
+      );
     }
 
     const rows = filteredRegistrations.map((reg, index) => {
-      const row = ["" + (index + 1), reg.transactionId];
-      const formatSemester = (sem: string) => {
-        if (!sem) return "-";
-        const parts = sem.trim().split(/\s+/);
-        return parts.length > 1 ? `${parts[0]}-${parts[1]}` : parts[0];
-      };
-
+      const row = [`"${index + 1}"`, `"${reg.transactionId}"`]; // wrap in quotes
       reg.participants.forEach((p) => {
+        const extraString = p.extraData
+          ? Object.entries(p.extraData)
+              .map(([k, v]) => `${k}: ${v}`)
+              .join(" | ")
+          : "-";
         row.push(
-          p.displayName || p.name || "",
-          p.email || "",
-          `${formatSemester(p.semester || "")}`
+          `"${p.displayName || p.name || ""}"`,
+          `"${p.email || ""}"`,
+          `"${p.semester || ""}"`,
+          `"${extraString}"`,
+          `"${p.phone}"`
         );
       });
-
       while (row.length < headers.length) {
-        row.push("", "", "");
+        row.push('""', '""', '""', '""'); // fill empty cells
       }
       return row;
     });
 
-    let csvContent =
+    const csvContent =
       "data:text/csv;charset=utf-8," +
       headers.join(",") +
       "\n" +
-      rows.map((e) => e.join(",")).join("\n");
+      rows.map((e) => e.map((v) => `"${v}"`).join(",")).join("\n"); // ✅ quote values
 
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");
@@ -149,18 +172,17 @@ const EventRegistrationsPage = ({ eventId }: { eventId: string }) => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br  text-gray-100 px-[5vw] mt-[100px]">
+    <div className="min-h-screen bg-gradient-to-br text-gray-100 px-[5vw] mt-[100px]">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
           <div>
             <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">
               Event Registrations
-                          <p className="bg-yellow-400 text-black font-medium">
-              {registrations[0]?.eventTitle}
-            </p>
+              <p className="bg-yellow-400 text-black font-medium">
+                {registrations[0]?.eventTitle}
+              </p>
             </h1>
-
             <p className="text-gray-400 mt-1">
               {filteredRegistrations.length} registration(s) found
             </p>
@@ -175,9 +197,6 @@ const EventRegistrationsPage = ({ eventId }: { eventId: string }) => {
             disabled={filteredRegistrations.length === 0}
             className="px-6 py-3 bg-gradient-to-r from-yellow-500 to-yellow-600 text-black font-semibold rounded-lg shadow-lg hover:from-yellow-400 hover:to-yellow-500 transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-              <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" />
-            </svg>
             Export to CSV
           </button>
         </div>
@@ -185,8 +204,12 @@ const EventRegistrationsPage = ({ eventId }: { eventId: string }) => {
         {/* Search Bar */}
         <div className="bg-gray-800/20 rounded-xl p-4 mb-6 shadow-lg flex flex-col md:flex-row gap-4">
           <div className="flex-1">
-            <label htmlFor="searchQuery" className="block text-sm font-medium text-gray-300 mb-1">
-              Search (Name, Email, Semester, Transaction ID, Event Title)
+            <label
+              htmlFor="searchQuery"
+              className="block text-sm font-medium text-gray-300 mb-1"
+            >
+              Search (Name, Email, Semester, Transaction ID, Event Title, Extra
+              Data)
             </label>
             <input
               id="searchQuery"
@@ -219,58 +242,117 @@ const EventRegistrationsPage = ({ eventId }: { eventId: string }) => {
               <table className="min-w-full divide-y divide-gray-700">
                 <thead className="bg-gray-750 sticky top-0 z-10">
                   <tr>
-                    <th className="py-4 px-6 text-left text-xs font-medium text-gray-300 uppercase">#</th>
-                    <th className="py-4 px-6 text-left text-xs font-medium text-gray-300 uppercase">Participants</th>
-                    <th className="py-4 px-6 text-left text-xs font-medium text-gray-300 uppercase">Semester</th>
-                    <th className="py-4 px-6 text-left text-xs font-medium text-gray-300 uppercase">Email</th>
-                    <th className="py-4 px-6 text-left text-xs font-medium text-gray-300 uppercase">Transaction ID</th>
+                    <th className="py-4 px-6 text-left text-xs font-medium text-gray-300 uppercase">
+                      #
+                    </th>
+                    <th className="py-4 px-6 text-left text-xs font-medium text-gray-300 uppercase">
+                      Participants
+                    </th>
+                    <th className="py-4 px-6 text-left text-xs font-medium text-gray-300 uppercase">
+                      Semester
+                    </th>
+                    <th className="py-4 px-6 text-left text-xs font-medium text-gray-300 uppercase">
+                      Email
+                    </th>
+                    <th className="py-4 px-6 text-left text-xs font-medium text-gray-300 uppercase">
+                      Transaction ID
+                    </th>
+                    {/* <th className="py-4 px-6 text-left text-xs font-medium text-gray-300 uppercase">Extra Data</th> */}
                   </tr>
                 </thead>
                 <tbody className="bg-gray-900/10 divide-y divide-gray-700">
                   {filteredRegistrations.map((reg, index) => (
-                    <tr key={reg.id} className="hover:bg-gray-750 transition-colors">
-                      <td className="py-4 px-6 whitespace-nowrap text-sm font-medium text-yellow-400">{index + 1}</td>
+                    <tr
+                      key={reg.id}
+                      className="hover:bg-gray-750 transition-colors"
+                    >
+                      <td className="py-4 px-6 text-sm font-medium text-yellow-400">
+                        {index + 1}
+                      </td>
 
+                      {/* Participants with inline extra data */}
                       <td className="py-4 px-6">
                         <div className="flex flex-col gap-1">
-                          {reg.participants.map((p, idx) => (
-                            <div key={idx} className="text-sm font-medium text-white">
-                              {highlightText(p.displayName || p.name || "", searchQuery)}
-                            </div>
-                          ))}
+                          {reg.participants.map((p, idx) => {
+                            const extraShort = p.extraData
+                              ? Object.entries(p.extraData)
+                                  .map(([k, v]) => `${k}: ${v}`)
+                                  .join(" | ")
+                              : "";
+                            return (
+                              <div
+                                key={idx}
+                                className="text-sm font-medium text-white"
+                              >
+                                {highlightText(
+                                  p.displayName || p.name || "",
+                                  searchQuery
+                                )}
+                                {extraShort && (
+                                  <span className="text-xs text-yellow-400 ml-1">
+                                    ({highlightText(extraShort, searchQuery)})
+                                  </span>
+                                )}
+                              </div>
+                            );
+                          })}
                         </div>
                       </td>
 
-                      <td className="py-4 px-6 whitespace-nowrap text-sm font-medium text-yellow-400">
+                      <td className="py-4 px-6 text-sm font-medium text-yellow-400">
                         {reg.participants[0]?.semester
-                          ? highlightText(`S${reg.participants[0].semester}`, searchQuery)
+                          ? highlightText(
+                              `S${reg.participants[0].semester}`,
+                              searchQuery
+                            )
                           : "-"}
                       </td>
 
                       <td className="py-4 px-6">
                         <div className="flex flex-col gap-2">
                           {reg.participants.map((p, idx) => (
-                            <div key={idx} className="text-sm text-gray-300 flex items-center gap-2">
-                              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
-                                <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
-                                <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
-                              </svg>
+                            <div key={idx} className="text-sm text-gray-300">
                               {highlightText(p.email, searchQuery)}
                             </div>
                           ))}
                         </div>
                       </td>
 
-                      <td className="py-4 px-6 whitespace-nowrap text-sm font-medium text-yellow-400 flex items-center gap-2">
+                      <td className="py-4 px-6 text-sm font-medium text-yellow-400 flex items-center gap-2">
                         {highlightText(reg.transactionId, searchQuery)}
                         <button
-                          onClick={() => navigator.clipboard.writeText(reg.transactionId)}
+                          onClick={() =>
+                            navigator.clipboard.writeText(reg.transactionId)
+                          }
                           className="text-gray-400 hover:text-yellow-400 transition"
                           title="Copy Transaction ID"
                         >
                           📋
                         </button>
                       </td>
+
+                      {/* Extra Data */}
+                      {/* <td className="py-4 px-6 text-sm text-gray-300">
+                        {reg.participants.some((p) => p.extraData) ? (
+                          <div className="flex flex-col gap-2">
+                            {reg.participants.map(
+                              (p, idx) =>
+                                p.extraData && (
+                                  <div key={idx}>
+                                    {Object.entries(p.extraData).map(([key, value]) => (
+                                      <div key={key} className="flex items-center gap-2">
+                                        <span className="font-medium text-yellow-400">{key}:</span>
+                                        <span>{highlightText(String(value), searchQuery)}</span>
+                                      </div>
+                                    ))}
+                                  </div>
+                                )
+                            )}
+                          </div>
+                        ) : (
+                          <span className="text-gray-500 italic">-</span>
+                        )}
+                      </td> */}
                     </tr>
                   ))}
                 </tbody>
@@ -279,12 +361,13 @@ const EventRegistrationsPage = ({ eventId }: { eventId: string }) => {
           </div>
         ) : (
           <div className="bg-gray-800 rounded-xl shadow-lg p-8 text-center">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 mx-auto text-gray-500 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <h3 className="text-xl font-medium text-gray-300 mb-2">No registrations found</h3>
+            <h3 className="text-xl font-medium text-gray-300 mb-2">
+              No registrations found
+            </h3>
             <p className="text-gray-500">
-              {searchQuery ? `No results match your search` : "There are no registrations for this event yet."}
+              {searchQuery
+                ? `No results match your search`
+                : "There are no registrations for this event yet."}
             </p>
           </div>
         )}

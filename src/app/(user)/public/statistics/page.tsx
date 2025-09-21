@@ -158,6 +158,12 @@ const page = () => {
                 {event.minParticipation}
               </span>{" "}
             </p>
+            <p className="text-gray-400 text-sm mb-4">
+              Reg Fee:{" "}
+              <span className=" font-bold">
+                {event?.registrationFee}
+              </span>{" "}
+            </p>
 
             {/* Registrations */}
             <div className="flex items-center justify-between mb-4">
