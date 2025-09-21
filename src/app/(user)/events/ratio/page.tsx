@@ -108,10 +108,6 @@ for (const p of allParticipants) {
   }
 }
 
-  
-  console.log(uniqueCounts);
-
-
   // Prepare ratios
   const ratios: Record<string, string> = {};
   semesters.forEach((sem) => {
