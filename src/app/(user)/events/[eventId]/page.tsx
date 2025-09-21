@@ -1,9 +1,11 @@
+"use client";
+
 import { events } from "@utils/constants";
 import { notFound } from "next/navigation";
 import React from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { app, db } from "@lib/firebase";
+import { db } from "@lib/firebase";
 import {
   LuMapPin,
   LuCalendar,
@@ -16,12 +18,16 @@ import parseDate from "@utils/parseDate";
 import { collection, getDocs } from "firebase/firestore";
 import CountdownTimer from "@widgets/Events/components/CountdownTimer";
 
+// Force dynamic rendering (no cache)
+export const revalidate = 0;
+export const dynamic = "force-dynamic";
+
 export async function generateMetadata({
   params,
 }: {
   params: { eventId: string };
 }): Promise<Metadata> {
-  const { eventId } = await params;
+  const { eventId } = params;
   const event = events.find((e) => e.id === eventId);
 
   if (!event) {
@@ -39,7 +45,7 @@ export async function generateMetadata({
       description: event.description,
       images: [
         {
-          url: event.image, // make sure it's absolute URL if you want OG image
+          url: event.image,
           width: 1200,
           height: 630,
           alt: event.title,
@@ -69,13 +75,14 @@ type Registration = {
 };
 
 export default async function EventPage({ params }: EventPageProps) {
-  const { eventId } = await params;
+  const { eventId } = params;
   const event = events.find((e) => e.id === eventId);
 
   if (!event) {
     notFound();
   }
 
+  // Fetch fresh registrations from Firestore
   const registrationsCollection = collection(db, "registrations");
   const registrationsSnapshot = await getDocs(registrationsCollection);
   const registrations = registrationsSnapshot.docs.map(
@@ -95,7 +102,7 @@ export default async function EventPage({ params }: EventPageProps) {
     event?.regFinalDate &&
     parseDate(event.regFinalDate) >= new Date() &&
     (typeof event.maxParticipation !== "undefined"
-      ? registrationsByEvent[event.id] <=
+      ? registrationsByEvent[event.id] <
         Number(
           event.maxParticipation
             .replace(/Teams?/i, "")
@@ -134,6 +141,7 @@ export default async function EventPage({ params }: EventPageProps) {
             </div>
           </div>
         </div>
+
         {/* Main Content Section */}
         <div className="flex flex-1 px-[5vw] py-[5vh]">
           <div className="flex flex-col max-w-5xl mx-auto w-full">
@@ -148,9 +156,7 @@ export default async function EventPage({ params }: EventPageProps) {
                     <h3 className="font-semibold text-gray-400 text-sm mb-1">
                       Date
                     </h3>
-                    <p className="text-lg text-white font-medium">
-                      {event.date}
-                    </p>
+                    <p className="text-lg text-white font-medium">{event.date}</p>
                   </div>
                 </div>
               )}
@@ -164,9 +170,7 @@ export default async function EventPage({ params }: EventPageProps) {
                     <h3 className="font-semibold text-gray-400 text-sm mb-1">
                       Venue
                     </h3>
-                    <p className="text-lg text-white font-medium">
-                      {event.venue}
-                    </p>
+                    <p className="text-lg text-white font-medium">{event.venue}</p>
                   </div>
                 </div>
               )}
@@ -179,9 +183,7 @@ export default async function EventPage({ params }: EventPageProps) {
                   <h3 className="font-semibold text-gray-400 text-sm mb-1">
                     Participation
                   </h3>
-                  <p className="text-lg text-white font-medium">
-                    {event.eventType}
-                  </p>
+                  <p className="text-lg text-white font-medium">{event.eventType}</p>
                 </div>
               </div>
 
@@ -193,9 +195,7 @@ export default async function EventPage({ params }: EventPageProps) {
                   <h3 className="font-semibold text-gray-400 text-sm mb-1">
                     Registration Fee
                   </h3>
-                  <p className="text-lg text-white font-medium">
-                    {event.registrationFee}
-                  </p>
+                  <p className="text-lg text-white font-medium">{event.registrationFee}</p>
                 </div>
               </div>
 
@@ -224,16 +224,14 @@ export default async function EventPage({ params }: EventPageProps) {
                 {event.coordinators.map((coordinator, index) => (
                   <Link
                     key={index}
-                    href={`https://wa.me/${
-                      coordinator.phone
-                    }?text=${encodeURIComponent(
+                    href={`https://wa.me/${coordinator.phone}?text=${encodeURIComponent(
                       `Hi, I have a question regarding the event "**${event.title}**". Could you help me with it?`
                     )}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex-shrink-0 flex items-center justify-center gap-2 bg-yellow-400/10 text-gray-300 text-base px-4 py-2 rounded-lg shadow-lg border border-yellow-400/30 hover:bg-yellow-400/20 transition-all duration-300"
                   >
-                    {coordinator.name}{" "}
+                    {coordinator.name}
                     <Image
                       src={"/wp.png"}
                       alt=""
@@ -245,8 +243,9 @@ export default async function EventPage({ params }: EventPageProps) {
                 ))}
               </div>
             </div>
+
+            {/* Registration Section */}
             {isOpenForRegistration ? (
-              // ✅ Registration OPEN
               <>
                 <CountdownTimer targetDate={event.regFinalDate} />
 
@@ -263,7 +262,7 @@ export default async function EventPage({ params }: EventPageProps) {
                       const current = registrationsByEvent[event.id] || 0;
                       const remaining = required - current;
 
-                      if (remaining <= 0) return null; // hide if achieved
+                      if (remaining <= 0) return null;
 
                       return (
                         <>
@@ -299,7 +298,6 @@ export default async function EventPage({ params }: EventPageProps) {
                 </div>
               </>
             ) : (
-              // ❌ Registration CLOSED
               <div className="flex justify-center my-3">
                 <div className="flex bg-red-600 text-white px-8 py-3 rounded-lg font-semibold text-base shadow-lg transition-all duration-300">
                   Registration Closed
@@ -330,11 +328,4 @@ export default async function EventPage({ params }: EventPageProps) {
       </div>
     </div>
   );
-}
-
-// Generate static params for all events
-export async function generateStaticParams() {
-  return events.map((event) => ({
-    id: event.id,
-  }));
 }
