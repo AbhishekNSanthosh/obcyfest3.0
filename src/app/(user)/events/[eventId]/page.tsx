@@ -249,55 +249,54 @@ export default async function EventPage({ params }: EventPageProps) {
               // ✅ Registration OPEN
               <>
                 <CountdownTimer targetDate={event.regFinalDate} />
-                {event.maxParticipation && (
-                  <div className="flex flex-col items-center space-y-3 mb-5">
-                    {/* Minimum Participation */}
-                    {event.minParticipation &&
-                      (() => {
-                        const required = Number(
-                          event.minParticipation
-                            .replace(/Teams?/i, "")
-                            .replace(/Participants?/i, "")
-                            .trim()
-                        );
-                        const current = registrationsByEvent[event.id] || 0;
-                        const remaining = required - current;
 
-                        if (remaining <= 0) return null; // hide if achieved
+                <div className="flex flex-col items-center space-y-3 mb-5">
+                  {/* Minimum Participation */}
+                  {event.minParticipation &&
+                    (() => {
+                      const required = Number(
+                        event.minParticipation
+                          .replace(/Teams?/i, "")
+                          .replace(/Participants?/i, "")
+                          .trim()
+                      );
+                      const current = registrationsByEvent[event.id] || 0;
+                      const remaining = required - current;
 
-                        return (
-                          <>
-                            <p className="text-white bg-red-600 font-semibold text-lg px-3 py-1 rounded-lg shadow-md animate-pulse text-center">
-                              {event?.eveType?.toLowerCase() === "team"
-                                ? `${remaining} more team${
-                                    remaining > 1 ? "s" : ""
-                                  } required`
-                                : `${remaining} more participant${
-                                    remaining > 1 ? "s" : ""
-                                  } required`}
-                            </p>
-                            <p className="text-gray-300 text-sm italic text-center">
-                              ⚠️ Note: If the minimum number of registrations is
-                              not achieved, the event will be cancelled.
-                            </p>
-                          </>
-                        );
-                      })()}
+                      if (remaining <= 0) return null; // hide if achieved
 
-                    {/* Slots Left */}
+                      return (
+                        <>
+                          <p className="text-white bg-red-600 font-semibold text-lg px-3 py-1 rounded-lg shadow-md animate-pulse text-center">
+                            {event?.eveType?.toLowerCase() === "team"
+                              ? `${remaining} more team${
+                                  remaining > 1 ? "s" : ""
+                                } required`
+                              : `${remaining} more participant${
+                                  remaining > 1 ? "s" : ""
+                                } required`}
+                          </p>
+                          <p className="text-gray-300 text-sm italic text-center">
+                            ⚠️ Note: If the minimum number of registrations is
+                            not achieved, the event will be cancelled.
+                          </p>
+                        </>
+                      );
+                    })()}
+
+                  {/* Slots Left */}
+                  {event.maxParticipation && (
                     <p className="text-white bg-red-600 font-semibold text-lg px-3 py-1 rounded-lg shadow-md animate-pulse text-center">
                       Slots Left:{" "}
-                      {event.maxParticipation
-                        ? Number(
-                            event.maxParticipation
-                              .replace(/Teams?/i, "")
-                              .replace(/Participants?/i, "")
-                              .trim()
-                          ) - (registrationsByEvent[event.id] || 0)
-                        : 0}
+                      {Number(
+                        event.maxParticipation
+                          .replace(/Teams?/i, "")
+                          .replace(/Participants?/i, "")
+                          .trim()
+                      ) - (registrationsByEvent[event.id] || 0)}
                     </p>
-                  </div>
-                )}
+                  )}
+                </div>
               </>
             ) : (
               // ❌ Registration CLOSED
