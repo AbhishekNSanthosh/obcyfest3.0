@@ -1,4 +1,3 @@
-"use client"
 import EventView from '@widgets/Events'
 import React from 'react'
 

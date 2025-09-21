@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import React from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { app, db } from "@lib/firebase";
+import { db } from "@lib/firebase";
 import {
   LuMapPin,
   LuCalendar,
@@ -15,6 +15,8 @@ import type { Metadata } from "next";
 import parseDate from "@utils/parseDate";
 import { collection, getDocs } from "firebase/firestore";
 import CountdownTimer from "@widgets/Events/components/CountdownTimer";
+
+export const revalidate = 60;
 
 export async function generateMetadata({
   params,
