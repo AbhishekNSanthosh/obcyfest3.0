@@ -73,7 +73,7 @@ type Registration = {
 };
 
 export default async function EventPage({ params }: EventPageProps) {
-  const { eventId } = params;
+  const { eventId } = await params;
   const event = events.find((e) => e.id === eventId);
 
   if (!event) {
