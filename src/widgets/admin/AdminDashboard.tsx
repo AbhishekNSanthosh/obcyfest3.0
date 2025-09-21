@@ -57,7 +57,7 @@ const AdminDashboard = () => {
         events.forEach(event => registrationsByEvent[event.id] = 0);
 
         registrations.forEach((registration) => {
-          totalRegs += registration.participants.length;
+          totalRegs += 1
           if (registrationsByEvent[registration.eventId] !== undefined) {
             registrationsByEvent[registration.eventId] += 1;
           }

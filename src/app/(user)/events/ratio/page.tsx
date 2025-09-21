@@ -7,8 +7,7 @@ export const dynamic = "force-dynamic"; // always fresh
 interface Participant {
   name?: string;
   email?: string;
-  semester?: string; // might be "1 A", "1A", "S1A", "5", etc.
-  // sometimes semester might be under extraData in some DB shapes
+  semester?: string;
   extraData?: { semester?: string } | any;
 }
 
@@ -19,18 +18,11 @@ interface Registration {
   participants?: Participant[];
 }
 
-// Semesters you want to track (canonical form)
 const semesters = ["S1 A", "S1 B", "S3 A", "S3 B", "S5", "S7"];
 
-/** Normalize many possible inputs into canonical "S{num}" or "S{num} {LETTER}".
- * Examples:
- *  "1 A" -> "S1 A"
- *  "1A"  -> "S1 A"
- *  "S1A" -> "S1 A"
- *  "5"   -> "S5"
- *  "s3 b"-> "S3 B"
- */
+
 function normalizeSemester(raw?: string | number | null): string | null {
+
   if (raw === null || raw === undefined) return null;
   let s = String(raw).trim();
 
@@ -62,34 +54,63 @@ export default async function Page() {
 
   // Initialize counts for the target semesters
   const counts: Record<string, number> = Object.fromEntries(semesters.map((s) => [s, 0]));
+  const uniqueCounts: Record<string, number> = Object.fromEntries(semesters.map((s) => [s, 0]));
 
   // Keep track of normalized-but-not-target semesters (e.g. S2, S4, S8) and raw unknowns for debugging
   const otherNormalized: Record<string, number> = {};
   const unknownRaw: Record<string, number> = {};
 
-  let total = 0;
-  for (const p of allParticipants) {
-    total++;
-    // read semester from possible locations
-    const raw =
-      (p as any).semester ??
-      (p as any).sem ??
-      (p as any).extraData?.semester ??
-      (p as any).extra?.semester ??
-      null;
+  const emails = [] as string[];
 
-    const normalized = normalizeSemester(raw);
-    if (normalized && counts[normalized] !== undefined) {
-      counts[normalized] += 1;
-    } else if (normalized) {
-      // Normalized but not in target semesters list (e.g. "S2" or "S4 B")
-      otherNormalized[normalized] = (otherNormalized[normalized] || 0) + 1;
-    } else {
-      // Could not normalize - record the raw string for debugging
-      const key = raw === null || raw === undefined ? "null/empty" : String(raw);
-      unknownRaw[key] = (unknownRaw[key] || 0) + 1;
-    }
+  let total = 0;
+  let uniqueTotal = 0;
+
+for (const p of allParticipants) {
+  const email = p.email;
+
+  // Count total participants regardless of duplication
+  total++;
+
+  // Check if this email is unique
+  const isUnique = email && !emails.includes(email);
+  if (isUnique) {
+    emails.push(email);
+    uniqueTotal++;
   }
+
+  // Extract semester from all possible fields
+  const raw =
+    (p as any).semester ??
+    (p as any).sem ??
+    (p as any).extraData?.semester ??
+    (p as any).extra?.semester ??
+    null;
+
+  const normalized = normalizeSemester(raw);
+
+  if (normalized) {
+    if (counts[normalized] !== undefined) {
+      // Increment total count
+      counts[normalized] += 1;
+
+      // Increment unique count only if this participant is unique
+      if (isUnique) {
+        uniqueCounts[normalized] += 1;
+      }
+    } else {
+      // Normalized but not in target semesters list
+      otherNormalized[normalized] = (otherNormalized[normalized] || 0) + 1;
+    }
+  } else {
+    // Could not normalize
+    const key = raw == null ? "null/empty" : String(raw);
+    unknownRaw[key] = (unknownRaw[key] || 0) + 1;
+  }
+}
+
+  
+  console.log(uniqueCounts);
+
 
   // Prepare ratios
   const ratios: Record<string, string> = {};
@@ -103,9 +124,10 @@ export default async function Page() {
 
       <table className="table-auto border-collapse border border-gray-300 w-full mb-6">
         <thead>
-          <tr className="bg-gray-100">
+          <tr className="bg-gray-900">
             <th className="border px-4 py-2 text-left">Semester</th>
-            <th className="border px-4 py-2 text-right">Count</th>
+            <th className="border px-4 py-2 text-left">User Count</th>
+            <th className="border px-4 py-2 text-right">Register Count</th>
             <th className="border px-4 py-2 text-right">Ratio</th>
           </tr>
         </thead>
@@ -113,15 +135,18 @@ export default async function Page() {
           {semesters.map((sem) => (
             <tr key={sem}>
               <td className="border px-4 py-2">{sem}</td>
+              <td className="border px-4 py-2 text-right">{uniqueCounts[sem]}</td>
               <td className="border px-4 py-2 text-right">{counts[sem]}</td>
               <td className="border px-4 py-2 text-right">{ratios[sem]}</td>
             </tr>
           ))}
-          <tr className="font-bold bg-gray-50">
+          <tr className="font-bold bg-gray-900">
             <td className="border px-4 py-2">Total</td>
+            <td className="border px-4 py-2 text-right">{uniqueTotal}</td>
             <td className="border px-4 py-2 text-right">{total}</td>
             <td className="border px-4 py-2 text-right">100%</td>
           </tr>
+          
         </tbody>
       </table>
 
