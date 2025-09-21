@@ -18,6 +18,10 @@ import parseDate from "@utils/parseDate";
 import { collection, getDocs } from "firebase/firestore";
 import CountdownTimer from "@widgets/Events/components/CountdownTimer";
 
+// Force dynamic rendering (no cache)
+export const revalidate = 0;
+export const dynamic = "force-dynamic";
+
 export async function generateMetadata({
   params,
 }: {
