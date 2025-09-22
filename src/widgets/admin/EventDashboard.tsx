@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { collection, getDocs } from "firebase/firestore";
+import {  collection, query, where, getDocs } from "firebase/firestore";
 import { db } from "@lib/firebase";
 
 interface ExtraData {
@@ -20,6 +20,11 @@ interface Participant {
   semester?: string;
   extraData?: ExtraData;
 }
+
+type UserDoc = {
+  email: string;
+  phone?: string;
+};
 
 interface Registration {
   id: string;
@@ -108,6 +113,38 @@ const normalizePhone = (raw:string) => {
   return `+91${str.replace(/^91/, "")}`;
 };
 
+const getUserPhones = async (
+  registrations: Array<{
+    participants: Array<{ email?: string }>;
+  }>
+): Promise<Record<string, string>> => {
+  const allEmails = Array.from(
+  new Set(
+    registrations.flatMap((reg) =>
+      reg.participants.map((p) => p.email).filter(Boolean) as string[]
+    )
+  )
+);
+
+  const phoneMap: Record<string, string> = {};
+
+  // Firestore "in" queries support up to 30 items
+  for (let i = 0; i < allEmails.length; i += 30) {
+    const chunk = allEmails.slice(i, i + 30);
+    const q = query(collection(db, "users"), where("email", "in", chunk));
+    const snap = await getDocs(q);
+
+    snap.forEach((doc) => {
+      const data = doc.data() as UserDoc; // ✅ tell TS what shape this is
+      if (data.email) {
+        phoneMap[data.email] = data.phone ?? "";
+      }
+    });
+  }
+
+  return phoneMap;
+};
+  
   // Apply search
   useEffect(() => {
     let filtered = [...registrations];
@@ -134,59 +171,63 @@ const normalizePhone = (raw:string) => {
   }, [searchQuery, registrations]);
 
   // Export CSV
-  const exportToCsv = () => {
-    const maxParticipants = Math.max(
-      ...filteredRegistrations.map((reg) => reg.participants.length),
-      0
+const exportToCsv = async () => {
+  const phoneMap = await getUserPhones(filteredRegistrations);
+
+  const maxParticipants = Math.max(
+    ...filteredRegistrations.map((reg) => reg.participants.length),
+    0
+  );
+
+  const headers = ["Sl. No", "Transaction ID"];
+  for (let i = 0; i < maxParticipants; i++) {
+    headers.push(
+      `Name${i + 1}`,
+      `Email${i + 1}`,
+      `Semester${i + 1}`,
+      `ExtraData${i + 1}`,
+      `PhoneNumber${i + 1}`
     );
+  }
 
-    const headers = ["Sl. No", "Transaction ID"];
-    for (let i = 0; i < maxParticipants; i++) {
-      headers.push(
-        `Name${i + 1}`,
-        `Email${i + 1}`,
-        `Semester${i + 1}`,
-        `ExtraData${i + 1}`,
-        `PhoneNumber${i + 1}`
+  const rows = filteredRegistrations.map((reg, index) => {
+    const row = [`${index + 1}`, `"${reg.transactionId}"`];
+    reg.participants.forEach((p) => {
+      const extraString = p.extraData
+        ? Object.entries(p.extraData)
+            .map(([k, v]) => `${k}: ${v}`)
+            .join(" | ")
+        : "-";
+
+      const phone = normalizePhone(phoneMap[p.email] || "");
+
+      row.push(
+        `${p.displayName || p.name || ""}`,
+        `${p.email || ""}`,
+        `S${p.semester || ""}`,
+        `${extraString}`,
+        phone
       );
-    }
-
-    const rows = filteredRegistrations.map((reg, index) => {
-      const row = [`${index + 1}`, `"${reg.transactionId}"`]; // wrap in quotes
-      reg.participants.forEach((p) => {
-        const extraString = p.extraData
-          ? Object.entries(p.extraData)
-              .map(([k, v]) => `${k}: ${v}`)
-              .join(" | ")
-          : "-";
-        row.push(
-          `${p.displayName || p.name || ""}`,
-          `${p.email || ""}`,
-          `S${p.semester || ""}`,
-          `${extraString}`,
-          normalizePhone(p.phone)
-        );
-      });
-      while (row.length < headers.length) {
-        row.push('', '', '', ''); // fill empty cells
-      }
-      return row;
     });
+    while (row.length < headers.length) {
+      row.push("", "", "", "");
+    }
+    return row;
+  });
 
-    const csvContent =
-      "data:text/csv;charset=utf-8," +
-      headers.join(",") +
-      "\n" +
-      rows.map((e) => e.map((v) => `${v}`).join(",")).join("\n"); // ✅ quote values
+  const csvContent =
+    "data:text/csv;charset=utf-8," +
+    headers.join(",") +
+    "\n" +
+    rows.map((e) => e.join(",")).join("\n");
 
-    const encodedUri = encodeURI(csvContent);
-    const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", `${eventId}-registrations.csv`);
-    document.body.appendChild(link);
-    link.click();
-  };
-
+  const encodedUri = encodeURI(csvContent);
+  const link = document.createElement("a");
+  link.setAttribute("href", encodedUri);
+  link.setAttribute("download", `${eventId}-registrations.csv`);
+  document.body.appendChild(link);
+  link.click();
+};
   return (
     <div className="min-h-screen bg-gradient-to-br text-gray-100 px-[5vw] mt-[100px]">
       <div className="max-w-7xl mx-auto">
