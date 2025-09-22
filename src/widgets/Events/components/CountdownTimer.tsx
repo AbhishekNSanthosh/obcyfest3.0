@@ -17,7 +17,6 @@ export default function CountdownTimer({ targetDate,RegCloseTime }: CountdownTim
     seconds: number;
   } | null>(null);
 
-
   useEffect(() => {
     if (!targetDate) return;
 
