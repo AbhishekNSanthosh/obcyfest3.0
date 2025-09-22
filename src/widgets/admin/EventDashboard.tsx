@@ -92,6 +92,22 @@ const EventRegistrationsPage = ({ eventId }: { eventId: string }) => {
     fetchRegistrations();
   }, [eventId]);
 
+const normalizePhone = (raw:string) => {
+  // Convert to string safely
+  let str = String(raw);
+
+  // If it came in as scientific notation (e.g., "9.19657E+11")
+  if (/e\+/i.test(str)) {
+    str = Number(str).toFixed(0); // expand scientific to full number
+  }
+
+  // Keep only digits
+  str = str.replace(/\D/g, "");
+
+  // Make sure it always has +91 prefix
+  return `+91${str.replace(/^91/, "")}`;
+};
+
   // Apply search
   useEffect(() => {
     let filtered = [...registrations];
@@ -136,7 +152,7 @@ const EventRegistrationsPage = ({ eventId }: { eventId: string }) => {
     }
 
     const rows = filteredRegistrations.map((reg, index) => {
-      const row = [`"${index + 1}"`, `"${reg.transactionId}"`]; // wrap in quotes
+      const row = [`${index + 1}`, `"${reg.transactionId}"`]; // wrap in quotes
       reg.participants.forEach((p) => {
         const extraString = p.extraData
           ? Object.entries(p.extraData)
@@ -144,15 +160,15 @@ const EventRegistrationsPage = ({ eventId }: { eventId: string }) => {
               .join(" | ")
           : "-";
         row.push(
-          `"${p.displayName || p.name || ""}"`,
-          `"${p.email || ""}"`,
-          `"${p.semester || ""}"`,
-          `"${extraString}"`,
-          `"${p.phone}"`
+          `${p.displayName || p.name || ""}`,
+          `${p.email || ""}`,
+          `S${p.semester || ""}`,
+          `${extraString}`,
+          normalizePhone(p.phone)
         );
       });
       while (row.length < headers.length) {
-        row.push('""', '""', '""', '""'); // fill empty cells
+        row.push('', '', '', ''); // fill empty cells
       }
       return row;
     });
@@ -161,7 +177,7 @@ const EventRegistrationsPage = ({ eventId }: { eventId: string }) => {
       "data:text/csv;charset=utf-8," +
       headers.join(",") +
       "\n" +
-      rows.map((e) => e.map((v) => `"${v}"`).join(",")).join("\n"); // ✅ quote values
+      rows.map((e) => e.map((v) => `${v}`).join(",")).join("\n"); // ✅ quote values
 
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");
