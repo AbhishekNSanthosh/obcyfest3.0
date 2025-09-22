@@ -12,6 +12,10 @@ export type Event = {
   image: string;
   regFinalDate: string;
   bgImage: string;
+  RegCloseTime?: {
+    hours: number;
+    minutes: number;
+  }
   regLink?: string;
   type: 'technical' | 'nonTechnical' | 'sports';
   date?: string;
