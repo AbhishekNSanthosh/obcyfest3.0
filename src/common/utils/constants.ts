@@ -207,7 +207,7 @@ export const events: Event[] = [
         title: "Last Of Us",
         image: "https://res.cloudinary.com/day9g145m/image/upload/v1758256738/LAST_OF_US_bzhlml.png",
         type: "nonTechnical",
-        regFinalDate: "24-09-2025",
+        regFinalDate: "22-09-2025",
         date: "24-09-2025",
         bgImage: "https://res.cloudinary.com/day9g145m/image/upload/v1758256858/LAST_OF_US_BG_bp3fbv.png",
         description: "'Last of Us', A thrilling campus competition where classic Kerala games decide who outsmarts, outplays, and outlasts the rest. From childhood favorites to tricky challenges, each round tests skill, teamwork, and wit. One by one, contestants are eliminated-not by violence, but by the rules of the game-until only the Last of Us remains.",
