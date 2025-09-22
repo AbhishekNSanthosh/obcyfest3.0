@@ -12,8 +12,6 @@ import {
   LuTrophy,
 } from "react-icons/lu";
 import type { Metadata } from "next";
-import parseDate from "@utils/parseDate";
-import { collection, getDocs } from "firebase/firestore";
 import RegisterButtonSection from "@widgets/Events/components/RegisterButtonSection";
 
 // Force dynamic rendering (no cache)
@@ -25,7 +23,7 @@ export async function generateMetadata({
 }: {
   params: { eventId: string };
 }): Promise<Metadata> {
-  const { eventId } = params;
+  const { eventId } = await params;
   const event = events.find((e) => e.id === eventId);
 
   if (!event) {
@@ -65,12 +63,6 @@ interface EventPageProps {
   };
 }
 
-type Registration = {
-  id: string;
-  eventId: string;
-  eventTitle: string;
-  participants: any[];
-};
 
 export default async function EventPage({ params }: EventPageProps) {
   const { eventId } = await params;

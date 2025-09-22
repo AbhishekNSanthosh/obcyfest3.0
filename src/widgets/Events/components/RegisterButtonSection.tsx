@@ -79,7 +79,7 @@ const RegisterButtonSection: React.FC<Props> = ({ eventId }) => {
 
   const isOpenForRegistration =
     event?.regFinalDate &&
-    parseDate(event.regFinalDate) >= new Date() &&
+    parseDate(event.regFinalDate,event.RegCloseTime?.hours,event.RegCloseTime?.minutes) >= new Date() &&
     (typeof event.maxParticipation !== "undefined"
       ? registrationsByEvent[event.id] <
         Number(
@@ -94,7 +94,7 @@ const RegisterButtonSection: React.FC<Props> = ({ eventId }) => {
     <div>
       {isOpenForRegistration ? (
         <>
-          <CountdownTimer targetDate={event.regFinalDate} />
+          <CountdownTimer targetDate={event.regFinalDate} RegCloseTime={event.RegCloseTime} />
 
           <div className="flex flex-col items-center space-y-3 mb-5">
             {/* Minimum Participation */}

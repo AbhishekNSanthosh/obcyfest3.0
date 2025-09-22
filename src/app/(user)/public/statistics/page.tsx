@@ -182,7 +182,7 @@ const page = () => {
 
             {/* Registration Deadline */}
             {event?.regFinalDate &&
-              (parseDate(event.regFinalDate) >= new Date() &&
+              (parseDate(event.regFinalDate,event.RegCloseTime?.hours,event.RegCloseTime?.minutes) >= new Date() &&
               (typeof event.maxParticipation !== "undefined"
                 ? eventRegistrations[event.id] <
                   Number(
@@ -199,11 +199,11 @@ const page = () => {
                   </p>
                   <div className="inline-flex items-center gap-2 mt-2 px-3 py-1 rounded-lg bg-gray-800 text-white">
                     <SmallTimer
-                      targetDate={parseDate(event.regFinalDate).toISOString()}
+                      targetDate={parseDate(event.regFinalDate,event.RegCloseTime?.hours,event.RegCloseTime?.minutes).toISOString()}
                     />
                   </div>
                 </div>
-              ) : parseDate(event.regFinalDate) < new Date() &&
+              ) : parseDate(event.regFinalDate,event.RegCloseTime?.hours,event.RegCloseTime?.minutes) < new Date() &&
                 typeof event.minParticipation !== "undefined" &&
                 eventRegistrations[event.id] <
                   Number(

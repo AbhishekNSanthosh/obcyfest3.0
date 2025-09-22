@@ -3,9 +3,13 @@ import { useEffect, useState } from "react";
 import parseDate from "@utils/parseDate";
 interface CountdownTimerProps {
   targetDate: string; // expects "DD-MM-YYYY" format
+  RegCloseTime: {
+    hours: number;
+    minutes: number;
+  } | undefined;
 }
 
-export default function CountdownTimer({ targetDate }: CountdownTimerProps) {
+export default function CountdownTimer({ targetDate,RegCloseTime }: CountdownTimerProps) {
   const [timeLeft, setTimeLeft] = useState<{
     days: number;
     hours: number;
@@ -17,7 +21,7 @@ export default function CountdownTimer({ targetDate }: CountdownTimerProps) {
   useEffect(() => {
     if (!targetDate) return;
 
-    const endDate = parseDate(targetDate);
+    const endDate = parseDate(targetDate,RegCloseTime?.hours,RegCloseTime?.minutes);
 
     const interval = setInterval(() => {
       const now = new Date().getTime();

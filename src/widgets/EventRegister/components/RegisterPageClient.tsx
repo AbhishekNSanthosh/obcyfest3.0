@@ -27,10 +27,9 @@ import { events } from "@utils/constants";
 import toast from "react-hot-toast";
 import { AppEvent } from "@lib/types";
 import { IoClose } from "react-icons/io5";
-import Image from "next/image";
+
 import { BsCopy } from "react-icons/bs";
 import parseDate from "@utils/parseDate";
-import { error } from "console";
 
 type UserProfile = {
   uid: string;
@@ -131,7 +130,7 @@ export default function RegisterPageClient({
 
       const closed =
         event?.regFinalDate &&
-        (parseDate(event.regFinalDate) < new Date() ||
+        (parseDate(event.regFinalDate,event.RegCloseTime?.hours,event.RegCloseTime?.minutes) < new Date() ||
           (typeof event.maxParticipation !== "undefined" &&
             registrationsByEvent[event.id] >=
               Number(
@@ -154,7 +153,7 @@ export default function RegisterPageClient({
 
 
   useEffect(() => {
-    if (parseDate(event.regFinalDate) <= new Date()) {
+    if (parseDate(event.regFinalDate,event.RegCloseTime?.hours,event.RegCloseTime?.minutes) <= new Date()) {
      return router.replace("/events");
     }
   }, [event?.regFinalDate, router]);
