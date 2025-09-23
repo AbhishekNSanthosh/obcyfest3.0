@@ -6,12 +6,14 @@ import Marquee from "./components/Marquee";
 import About from "./components/About";
 import Info from "./components/Info";
 import FeaturedEvents from "./components/FeaturedEvents";
+import ScoreBoard from "./components/ScoreBoard";
 
 export default function LandingPageView() {
   return (
     <main>
       <HeroText />
       <Marquee />
+      <ScoreBoard/>
       <FeaturedEvents />
       <section id="about">
         <About />
