@@ -388,7 +388,7 @@ export default function ProfilePage() {
             href="/"
             className="bg-yellow-400 rounded-lg px-[5vw] py-3 text-black-950 font-semibold"
           >
-            Go to Home
+            Go to Home 
           </Link>
         </div>
       </div>
