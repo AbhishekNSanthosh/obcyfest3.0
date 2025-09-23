@@ -41,6 +41,7 @@ type Invite = {
 
 type Registration = {
   id: string;
+  eventId: string;
   eventTitle: string;
   eventDate: string | null;
   isGroup: boolean;
@@ -169,6 +170,7 @@ export default function ProfilePage() {
       setRegistrations(
         snap.docs.map((d) => ({
           id: d.id,
+          eventId: d.data().eventId,
           eventTitle: d.data().eventTitle,
           eventDate: d.data().eventDate,
           isGroup: d.data().isGroup,
@@ -541,7 +543,22 @@ export default function ProfilePage() {
               )}
             </div>
           </div>
-          {user.uid === reg.leaderUid && (
+          {(() => {
+            const event = events.find((e) => e.id === reg.eventId);
+            if (!event || !reg.leaderUid || user.uid !== reg.leaderUid) return false;
+
+            const now = new Date();
+            const finalDate = new Date(event.regFinalDate);
+
+            // If RegCloseTime is defined, adjust the final date
+            if (event.RegCloseTime) {
+              finalDate.setHours(event.RegCloseTime.hours);
+              finalDate.setMinutes(event.RegCloseTime.minutes);
+            }
+
+            // Only show Cancel button if current time is before the final registration date/time
+            return now < finalDate;
+          })() && (
             <button
               onClick={() => handleCancelRegistration(reg.id)}
               className="px-3 py-1 bg-red-500 rounded text-sm text-white font-semibold hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed"
@@ -549,6 +566,8 @@ export default function ProfilePage() {
               Cancel
             </button>
           )}
+
+
         </div>
       ))}
     </div>
