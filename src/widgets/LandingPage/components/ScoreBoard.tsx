@@ -100,7 +100,6 @@ export default function ScoreBoard() {
         // Fetch user profiles
         const profileMap: Record<string, UserProfile> = {};
         for (const p of finalParticipants) {
-  
           if (!p.email || profileMap[p.email]) continue;
           const q = query(
             collection(db, "users"),
@@ -246,7 +245,7 @@ export default function ScoreBoard() {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {scores.map((score, index) => {
-                // Example: scores is an array of objects like { email: string, score: number | string }
+                // Calculate total of all scores
                 const totalAllScores = scores.reduce(
                   (acc, s) => acc + (Number(s.score) || 0),
                   0
@@ -256,18 +255,42 @@ export default function ScoreBoard() {
                 const totalScore = Number(score.score) || 0;
 
                 // Calculate percentage relative to total of all scores
-                const percent =
-                  totalAllScores > 0 ? (totalScore / totalAllScores) * 100 : 0;
+                const percent = totalAllScores > 0 ? (totalScore / totalAllScores) * 100 : 0;
+
+                // Find highest score
+                const highestScore = Math.max(...scores.map(s => Number(s.score) || 0));
+    
+                // Check if this score is the highest (or tied for highest)
+                const isTopScorer = totalScore === highestScore && totalScore > 0;
+    
+                // Count how many have the highest score (for badge positioning)
+                const topScorersCount = scores.filter(s => Number(s.score) || 0 === highestScore).length;
+                const isSingleTopScorer = topScorersCount === 1;
 
                 // Profile remains the same
                 const profile = profiles[score.email];
-              
 
                 return (
                   <div
                     key={`${score.email}-${score.sem}`}
                     className="group relative bg-gray-800/30 backdrop-blur-lg rounded-2xl p-6 border border-gray-600/30 hover:border-yellow-400/50 transition-all duration-500 hover:scale-[1.02] hover:shadow-xl hover:shadow-yellow-400/5"
                   >
+                    {/* Top Scorer Badge */}
+                    {isTopScorer && (
+                      <div className={`absolute -top-2 -right-2 z-10 ${isSingleTopScorer ? 'animate-bounce' : 'animate-pulse'
+                        }`}>
+                        <div className="relative">
+                          <div className="w-10 h-10 bg-gradient-to-r from-yellow-400 to-yellow-600 rounded-full flex items-center justify-center shadow-lg">
+                            <span className="text-white font-bold text-lg">🏆</span>
+                          </div>
+                          {isSingleTopScorer && (
+                            <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-ping"></div>
+                          )}
+                        </div>
+
+                      </div>
+                    )}
+
                     {/* Profile Section */}
                     <div className="flex items-center space-x-4 mb-4">
                       <div className="relative">
@@ -275,18 +298,25 @@ export default function ScoreBoard() {
                           <img
                             src={profile.photoURL}
                             alt={profile.displayName}
-                            className="w-12 h-12 rounded-full border-2 border-yellow-400/50"
+                            className={`w-12 h-12 rounded-full border-2 ${isTopScorer ? 'border-yellow-400 shadow-lg shadow-yellow-400/30' : 'border-yellow-400/50'
+                              }`}
                           />
                         ) : (
-                          <div className="w-12 h-12 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full flex items-center justify-center">
+                          <div className={`w-12 h-12 rounded-full flex items-center justify-center ${isTopScorer
+                              ? 'bg-gradient-to-br from-yellow-400 to-yellow-600 shadow-lg shadow-yellow-400/30'
+                              : 'bg-gradient-to-br from-yellow-400 to-yellow-600'
+                            }`}>
                             <span className="text-lg">👤</span>
                           </div>
                         )}
-                        <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-green-400 rounded-full border-2 border-gray-800"></div>
+                       
                       </div>
                       <div className="flex-1 min-w-0">
                         <h3 className="text-lg font-semibold text-white truncate">
                           {profile?.displayName || score.name}
+                          {isTopScorer && (
+                            <span className="ml-2 text-yellow-400 text-sm">⭐</span>
+                          )}
                         </h3>
                         <p className="text-sm text-gray-400 truncate">
                           {score.sem}
@@ -295,8 +325,14 @@ export default function ScoreBoard() {
                     </div>
 
                     {/* Score Display */}
-                    <div className="text-center py-4">
-                      <span className="text-4xl font-bold bg-gradient-to-r from-yellow-400 to-yellow-600 bg-clip-text text-transparent">
+                    <div className="text-center py-4 relative">
+                      {isTopScorer && (
+                        <div className="absolute -top-2 left-1/2 transform -translate-x-1/2 bg-yellow-500 text-black text-xs font-bold px-2 py-1 rounded-full">
+                          🏆 Highest Score!
+                        </div>
+                      )}
+                      <span className={`text-4xl font-bold bg-gradient-to-r from-yellow-400 to-yellow-600 bg-clip-text text-transparent ${isTopScorer ? 'drop-shadow-lg' : ''
+                        }`}>
                         {score.score}
                       </span>
                       <div className="text-sm text-gray-400 mt-1">Achieved</div>
@@ -304,9 +340,15 @@ export default function ScoreBoard() {
 
                     {/* Progress Bar */}
                     <div className="mt-4">
+                      <div className="flex justify-between items-center mb-1">
+                        <span className="text-xs text-gray-400">Progress</span>
+                      </div>
                       <div className="h-2 bg-gray-700 rounded-full overflow-hidden">
                         <div
-                          className="h-2 rounded-full bg-gradient-to-r from-yellow-400 to-yellow-600 transition-all duration-1000 ease-out"
+                          className={`h-2 rounded-full transition-all duration-1000 ease-out ${isTopScorer
+                              ? 'bg-gradient-to-r from-yellow-400 to-yellow-600 shadow shadow-yellow-400/50'
+                              : 'bg-gradient-to-r from-yellow-400 to-yellow-600'
+                            }`}
                           style={{ width: `${percent}%` }}
                         ></div>
                       </div>
@@ -314,8 +356,7 @@ export default function ScoreBoard() {
                   </div>
                 );
               })}
-            </div>
-          )}
+            </div>)}
 
           {/* Statistics */}
           {scores.length > 0 && (
