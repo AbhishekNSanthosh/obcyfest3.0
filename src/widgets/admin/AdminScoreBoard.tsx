@@ -184,7 +184,7 @@ export default function AdminScoreBoard() {
                 {entries.map((entry) => (
                   <div
                     key={entry.id}
-                    className="group relative bg-gray-800/30 backdrop-blur-lg rounded-2xl p-6 border border-gray-600/30 hover:border-yellow-400/50 transition-all duration-500 hover:scale-[1.02] hover:shadow-xl hover:shadow-yellow-400/5"
+                    className="group relative bg-gray-800/30 backdrop-blur-lg rounded-2xl p-6 mt-2 mx-2 border border-gray-600/30 hover:border-yellow-400/50 transition-all duration-500 hover:scale-[1.02] hover:shadow-xl hover:shadow-yellow-400/5"
                   >
                     <div className="flex items-center justify-between mb-3">
                       <div>
