@@ -36,6 +36,13 @@ const Sidebar = () => {
         <FaCalendar className='h-6 w-6' />
       )
     },
+    {
+      href: '/admin/dashboard/scoreboard/',
+      label: 'Scoreboard',
+      icon: (
+        <FaHome className='h-6 w-6' />
+      )
+    }
   ];
 
   return (
