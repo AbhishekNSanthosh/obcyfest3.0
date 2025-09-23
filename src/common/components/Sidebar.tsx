@@ -8,6 +8,8 @@ import Image from 'next/image';
 import { FaHome } from "react-icons/fa";
 import { FaCalendar } from "react-icons/fa";
 import { MdGroups } from "react-icons/md";
+import {FaChartLine} from "react-icons/fa";
+
 
 const Sidebar = () => {
   const pathname = usePathname();
@@ -40,7 +42,7 @@ const Sidebar = () => {
       href: '/admin/dashboard/scoreboard/',
       label: 'Scoreboard',
       icon: (
-        <FaHome className='h-6 w-6' />
+        <FaChartLine className='h-6 w-6' />
       )
     }
   ];
