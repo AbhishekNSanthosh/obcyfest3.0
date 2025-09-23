@@ -11,6 +11,7 @@ const nextConfig = {
     includePaths: [path.join(__dirname, 'styles')],
   },
   images: {
+    domains: ['lh3.googleusercontent.com'], // Google user content domain for profile images
     remotePatterns: [
       {
         protocol: 'https',
