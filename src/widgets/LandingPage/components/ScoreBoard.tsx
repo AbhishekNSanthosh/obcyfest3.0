@@ -69,7 +69,7 @@ export default function ScoreBoard() {
           const { id, participants, sem, score } = scoreEntry;
 
           // Update semester total
-          semTotals[sem] = (semTotals[sem] || 0) + (score || 0);
+          semTotals[sem] = (Number(semTotals[sem]) || 0) + (Number(score) || 0);
 
           for (const p of participants) {
             participantScores.push({
