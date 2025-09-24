@@ -357,50 +357,6 @@ export default function ScoreBoard() {
                 );
               })}
             </div>)}
-
-          {/* Statistics */}
-          {scores.length > 0 && (
-            <div className="mt-12 grid grid-cols-1 md:grid-cols-2 gap-6 animate-slide-up">
-              {[
-                {
-                  label: "Overall Average",
-                  value: (
-                    scores.reduce(
-                      (acc, score) => acc + parseFloat("" + score.score),
-                      0
-                    ) / scores.length
-                  ).toFixed(1),
-                  color: "text-yellow-400",
-                  icon: <FaChartLine className="text-yellow-400" />,
-                },
-                {
-                  label: "Highest Score",
-                  value: Math.max(
-                    ...scores.map((score) => parseFloat("" + score.score))
-                  ).toFixed(1),
-                  color: "text-green-400",
-                  icon: <FaStar className="text-yellow-400" />,
-                },
-              ].map((stat, index) => (
-                <div
-                  key={index}
-                  className="bg-gray-800/30 backdrop-blur-lg rounded-2xl p-6 border border-gray-600/30 hover:border-yellow-400/30 transition-all duration-300"
-                >
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-gray-400 text-sm uppercase tracking-wider">
-                        {stat.label}
-                      </p>
-                      <p className={`text-2xl font-bold ${stat.color} mt-1`}>
-                        {stat.value}
-                      </p>
-                    </div>
-                    <div className="text-4xl">{stat.icon}</div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
         </div>
       </div>
 
