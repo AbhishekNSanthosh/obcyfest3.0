@@ -63,34 +63,37 @@ const AdminDashboardLayout = ({ children }: { children: React.ReactNode }) => {
     );
   }
 
-  // ✅ Dashboard layout (admin only)
   return (
-    <div className="flex h-screen bg-black-950 text-white">
-  {/* Sidebar */}
-  <div
-    className={`fixed inset-y-0 left-0 z-30 w-64 bg-black-900 border-r border-yellow-400/20 transform lg:translate-x-0 transition-transform ${
-      isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
-    }`}
-  >
-    <Sidebar />
-  </div>
+    <div className="flex h-screen bg-gray-950 text-white">
+      {/* Sidebar */}
+      <Sidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />
 
-  {/* Main content */}
-  <div className="flex-1 flex flex-col lg:ml-64"> 
-    {/* Top bar (mobile only) */}
-    <div className="bg-black-900 border-b border-yellow-400/20 shadow-md lg:hidden">
-      <button
-        onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-        className="p-4 text-yellow-400"
-      >
-        <IconMenu />
-      </button>
+      {/* Main content */}
+      <div className="flex-1 flex flex-col"> 
+        {/* Top bar (mobile only) */}
+        <div className="bg-black shadow-md lg:hidden sticky top-0 z-30">
+          <button
+            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+            className="p-4 text-yellow-400"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
+        </div>
+
+        {/* Dashboard content */}
+        <main className="flex-1 max-w-screen">{children}</main>
+      </div>
+      
+      {/* Mobile overlay */}
+      {isSidebarOpen && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
     </div>
-
-    {/* Dashboard content */}
-    <main className="flex-1 p-6 overflow-y-auto">{children}</main>
-  </div>
-</div>
   );
 };
 
