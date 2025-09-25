@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import {  collection, query, where, getDocs } from "firebase/firestore";
+import { collection, query, where, getDocs } from "firebase/firestore";
 import { db } from "@lib/firebase";
 
 interface ExtraData {
@@ -9,13 +9,13 @@ interface ExtraData {
   userId?: string;
   name?: string;
   phone?: string;
-  [key: string]: any; // ✅ allows new fields automatically
+  [key: string]: any;
 }
 
 interface Participant {
   displayName: string;
   name: string;
-  phone:string;
+  phone: string;
   email: string;
   semester?: string;
   extraData?: ExtraData;
@@ -42,14 +42,30 @@ const EventRegistrationsPage = ({ eventId }: { eventId: string }) => {
     Registration[]
   >([]);
   const [searchQuery, setSearchQuery] = useState<string>("");
+  const [selectedSemester, setSelectedSemester] = useState<string>(""); // ✅ single select
   const [isLoading, setIsLoading] = useState(true);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
 
-  // Normalize semester string for search
-  const normalizeSemester = (sem: string) =>
-    sem.replace(/\s+/g, "").toLowerCase();
+  // 📌 Semester order
+  const semesterOrder = ["1 A", "1 B", "3 A", "3 B", "5", "7"];
 
-  // Highlight matching text
+  const compareSemesters = (a?: string, b?: string) => {
+    if (!a && !b) return 0;
+    if (!a) return 1;
+    if (!b) return -1;
+    const normA = a.trim().toUpperCase();
+    const normB = b.trim().toUpperCase();
+
+    const idxA = semesterOrder.indexOf(normA);
+    const idxB = semesterOrder.indexOf(normB);
+
+    if (idxA === -1 && idxB === -1) return normA.localeCompare(normB);
+    if (idxA === -1) return 1;
+    if (idxB === -1) return -1;
+    return idxA - idxB;
+  };
+
+  // Highlight search matches
   const highlightText = (text: string, query: string) => {
     if (!query) return text;
     const regex = new RegExp(`(${query})`, "gi");
@@ -97,57 +113,52 @@ const EventRegistrationsPage = ({ eventId }: { eventId: string }) => {
     fetchRegistrations();
   }, [eventId]);
 
-const normalizePhone = (raw:string) => {
-  // Convert to string safely
-  let str = String(raw);
+  // Normalize phone
+  const normalizePhone = (raw: string) => {
+    let str = String(raw);
+    if (/e\+/i.test(str)) {
+      str = Number(str).toFixed(0);
+    }
+    str = str.replace(/\D/g, "");
+    return `+91${str.replace(/^91/, "")}`;
+  };
 
-  // If it came in as scientific notation (e.g., "9.19657E+11")
-  if (/e\+/i.test(str)) {
-    str = Number(str).toFixed(0); // expand scientific to full number
-  }
+  const getUserPhones = async (
+    registrations: Array<{
+      participants: Array<{ email?: string }>;
+    }>
+  ): Promise<Record<string, string>> => {
+    const allEmails = Array.from(
+      new Set(
+        registrations.flatMap(
+          (reg) =>
+            reg.participants.map((p) => p.email).filter(Boolean) as string[]
+        )
+      )
+    );
 
-  // Keep only digits
-  str = str.replace(/\D/g, "");
+    const phoneMap: Record<string, string> = {};
 
-  // Make sure it always has +91 prefix
-  return `+91${str.replace(/^91/, "")}`;
-};
+    for (let i = 0; i < allEmails.length; i += 30) {
+      const chunk = allEmails.slice(i, i + 30);
+      const q = query(collection(db, "users"), where("email", "in", chunk));
+      const snap = await getDocs(q);
 
-const getUserPhones = async (
-  registrations: Array<{
-    participants: Array<{ email?: string }>;
-  }>
-): Promise<Record<string, string>> => {
-  const allEmails = Array.from(
-  new Set(
-    registrations.flatMap((reg) =>
-      reg.participants.map((p) => p.email).filter(Boolean) as string[]
-    )
-  )
-);
+      snap.forEach((doc) => {
+        const data = doc.data() as UserDoc;
+        if (data.email) {
+          phoneMap[data.email] = data.phone ?? "";
+        }
+      });
+    }
 
-  const phoneMap: Record<string, string> = {};
+    return phoneMap;
+  };
 
-  // Firestore "in" queries support up to 30 items
-  for (let i = 0; i < allEmails.length; i += 30) {
-    const chunk = allEmails.slice(i, i + 30);
-    const q = query(collection(db, "users"), where("email", "in", chunk));
-    const snap = await getDocs(q);
-
-    snap.forEach((doc) => {
-      const data = doc.data() as UserDoc; // ✅ tell TS what shape this is
-      if (data.email) {
-        phoneMap[data.email] = data.phone ?? "";
-      }
-    });
-  }
-
-  return phoneMap;
-};
-  
-  // Apply search
+  // Apply search + filters + sort
   useEffect(() => {
     let filtered = [...registrations];
+
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
       filtered = filtered.filter(
@@ -159,7 +170,7 @@ const getUserPhones = async (
               p.displayName?.toLowerCase().includes(query) ||
               p.name?.toLowerCase().includes(query) ||
               p.email?.toLowerCase().includes(query) ||
-              normalizeSemester(p.semester || "").includes(query) ||
+              p.semester?.toLowerCase().includes(query) ||
               (p.extraData &&
                 Object.values(p.extraData).some((val) =>
                   String(val).toLowerCase().includes(query)
@@ -167,67 +178,83 @@ const getUserPhones = async (
           )
       );
     }
+
+    // 📌 Semester filter
+    if (selectedSemester) {
+      filtered = filtered.filter(
+        (reg) =>
+          reg.participants[0]?.semester?.toUpperCase() ===
+          selectedSemester.toUpperCase()
+      );
+    }
+
+    // 📌 Sort by semester
+    filtered.sort((a, b) =>
+      compareSemesters(a.participants[0]?.semester, b.participants[0]?.semester)
+    );
+
     setFilteredRegistrations(filtered);
-  }, [searchQuery, registrations]);
+  }, [searchQuery, registrations, selectedSemester]);
 
   // Export CSV
-const exportToCsv = async () => {
-  const phoneMap = await getUserPhones(filteredRegistrations);
+  const exportToCsv = async () => {
+    const phoneMap = await getUserPhones(filteredRegistrations);
 
-  const maxParticipants = Math.max(
-    ...filteredRegistrations.map((reg) => reg.participants.length),
-    0
-  );
-
-  const headers = ["Sl. No", "Transaction ID"];
-  for (let i = 0; i < maxParticipants; i++) {
-    headers.push(
-      `Name${i + 1}`,
-      `Email${i + 1}`,
-      `Semester${i + 1}`,
-      `ExtraData${i + 1}`,
-      `PhoneNumber${i + 1}`
+    const maxParticipants = Math.max(
+      ...filteredRegistrations.map((reg) => reg.participants.length),
+      0
     );
-  }
 
-  const rows = filteredRegistrations.map((reg, index) => {
-    const row = [`${index + 1}`, `"${reg.transactionId}"`];
-    reg.participants.forEach((p) => {
-      const extraString = p.extraData
-        ? Object.entries(p.extraData)
-            .map(([k, v]) => `${k}: ${v}`)
-            .join(" | ")
-        : "-";
-
-      const phone = normalizePhone(phoneMap[p.email] || "");
-
-      row.push(
-        `${p.displayName || p.name || ""}`,
-        `${p.email || ""}`,
-        `S${p.semester || ""}`,
-        `${extraString}`,
-        phone
+    const headers = ["Sl. No", "Transaction ID"];
+    for (let i = 0; i < maxParticipants; i++) {
+      headers.push(
+        `Name${i + 1}`,
+        `Email${i + 1}`,
+        `Semester${i + 1}`,
+        `ExtraData${i + 1}`,
+        `PhoneNumber${i + 1}`
       );
-    });
-    while (row.length < headers.length) {
-      row.push("", "", "", "");
     }
-    return row;
-  });
 
-  const csvContent =
-    "data:text/csv;charset=utf-8," +
-    headers.join(",") +
-    "\n" +
-    rows.map((e) => e.join(",")).join("\n");
+    const rows = filteredRegistrations.map((reg, index) => {
+      const row = [`${index + 1}`, `"${reg.transactionId}"`];
+      reg.participants.forEach((p) => {
+        const extraString = p.extraData
+          ? Object.entries(p.extraData)
+              .map(([k, v]) => `${k}: ${v}`)
+              .join(" | ")
+          : "-";
 
-  const encodedUri = encodeURI(csvContent);
-  const link = document.createElement("a");
-  link.setAttribute("href", encodedUri);
-  link.setAttribute("download", `${eventId}-registrations.csv`);
-  document.body.appendChild(link);
-  link.click();
-};
+        const phone = normalizePhone(phoneMap[p.email] || "");
+
+        row.push(
+          `${p.displayName || p.name || ""}`,
+          `${p.email || ""}`,
+          `${p.semester || ""}`,
+          `${extraString}`,
+          phone
+        );
+      });
+      while (row.length < headers.length) {
+        row.push("", "", "", "");
+      }
+      return row;
+    });
+
+    const csvContent =
+      "data:text/csv;charset=utf-8," +
+      headers.join(",") +
+      "\n" +
+      rows.map((e) => e.join(",")).join("\n");
+
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `${eventId}-registrations.csv`);
+    document.body.appendChild(link);
+    link.click();
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br text-gray-100 px-[5vw] mt-[100px]">
       <div className="max-w-7xl mx-auto">
@@ -258,8 +285,9 @@ const exportToCsv = async () => {
           </button>
         </div>
 
-        {/* Search Bar */}
+        {/* Search + Filter Bar */}
         <div className="bg-gray-800/20 rounded-xl p-4 mb-6 shadow-lg flex flex-col md:flex-row gap-4">
+          {/* Search */}
           <div className="flex-1">
             <label
               htmlFor="searchQuery"
@@ -277,14 +305,30 @@ const exportToCsv = async () => {
               className="px-4 py-2 rounded-lg bg-gray-900/50 border border-gray-600 text-white placeholder-gray-400 w-full focus:outline-none focus:ring-2 focus:ring-yellow-500"
             />
           </div>
-          {searchQuery && (
-            <button
-              onClick={() => setSearchQuery("")}
-              className="self-end px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-500 transition-colors"
+
+          {/* Semester Dropdown */}
+          <div className="flex items-end">
+            <select
+              value={selectedSemester}
+              onChange={(e) => setSelectedSemester(e.target.value)}
+              className="px-3 py-2 rounded-lg border bg-gray-700 text-gray-200 border-gray-600 focus:outline-none focus:ring-2 focus:ring-yellow-500"
             >
-              Clear
-            </button>
-          )}
+              <option value="">All Semesters</option>
+              {semesterOrder.map((sem) => (
+                <option key={sem} value={sem}>
+                  S{sem}
+                </option>
+              ))}
+            </select>
+            {selectedSemester && (
+              <button
+                onClick={() => setSelectedSemester("")}
+                className="ml-2 px-3 py-2 rounded-lg bg-red-500 text-white hover:bg-red-400"
+              >
+                Clear
+              </button>
+            )}
+          </div>
         </div>
 
         {/* Table */}
@@ -314,7 +358,6 @@ const exportToCsv = async () => {
                     <th className="py-4 px-6 text-left text-xs font-medium text-gray-300 uppercase">
                       Transaction ID
                     </th>
-                    {/* <th className="py-4 px-6 text-left text-xs font-medium text-gray-300 uppercase">Extra Data</th> */}
                   </tr>
                 </thead>
                 <tbody className="bg-gray-900/10 divide-y divide-gray-700">
@@ -357,15 +400,15 @@ const exportToCsv = async () => {
                       </td>
 
                       <td className="py-4 px-6 text-sm font-medium text-yellow-400">
-                        {reg.participants[0]?.semester
+                        S{reg.participants[0]?.semester
                           ? highlightText(
-                              `S${reg.participants[0].semester}`,
+                              reg.participants[0].semester,
                               searchQuery
                             )
                           : "-"}
                       </td>
 
-                      <td className="py-4 px-6">
+                      <td className="py-4 px-6 text-sm text-gray-300">
                         <div className="flex flex-col gap-2">
                           {reg.participants.map((p, idx) => (
                             <div key={idx} className="text-sm text-gray-300">
@@ -387,29 +430,6 @@ const exportToCsv = async () => {
                           📋
                         </button>
                       </td>
-
-                      {/* Extra Data */}
-                      {/* <td className="py-4 px-6 text-sm text-gray-300">
-                        {reg.participants.some((p) => p.extraData) ? (
-                          <div className="flex flex-col gap-2">
-                            {reg.participants.map(
-                              (p, idx) =>
-                                p.extraData && (
-                                  <div key={idx}>
-                                    {Object.entries(p.extraData).map(([key, value]) => (
-                                      <div key={key} className="flex items-center gap-2">
-                                        <span className="font-medium text-yellow-400">{key}:</span>
-                                        <span>{highlightText(String(value), searchQuery)}</span>
-                                      </div>
-                                    ))}
-                                  </div>
-                                )
-                            )}
-                          </div>
-                        ) : (
-                          <span className="text-gray-500 italic">-</span>
-                        )}
-                      </td> */}
                     </tr>
                   ))}
                 </tbody>
@@ -422,8 +442,8 @@ const exportToCsv = async () => {
               No registrations found
             </h3>
             <p className="text-gray-500">
-              {searchQuery
-                ? `No results match your search`
+              {searchQuery || selectedSemester
+                ? `No results match your filters`
                 : "There are no registrations for this event yet."}
             </p>
           </div>

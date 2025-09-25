@@ -71,7 +71,7 @@ const Loader = ({ text }: { text: string }) => (
   </div>
 );
 
-export default function RegisterPageClient({
+export default function  RegisterPageClient({
   eventId,
   event,
 }: RegisterPageClientProps) {
