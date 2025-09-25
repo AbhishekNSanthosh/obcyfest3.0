@@ -79,7 +79,9 @@ export default function AdminScoreBoard() {
     setLoading(true);
 
     try {
-      const filteredParticipants = participants.filter((p) => p.email && p.name);
+      const filteredParticipants = participants.filter(
+        (p) => p.email && p.name
+      );
 
       if (editingId) {
         await updateDoc(doc(db, "score", editingId), {
@@ -113,15 +115,24 @@ export default function AdminScoreBoard() {
 
   // Calculate statistics
   const totalEntries = entries.length;
-  const averageScore = totalEntries > 0 
-    ? (entries.reduce((acc, entry) => acc + parseFloat("" + entry.score), 0) / totalEntries).toFixed(1)
-    : "0";
-  const highestScore = totalEntries > 0 
-    ? Math.max(...entries.map(entry => parseFloat("" + entry.score))).toFixed(1)
-    : "0";
+  const averageScore =
+    totalEntries > 0
+      ? (
+          entries.reduce(
+            (acc, entry) => acc + parseFloat("" + entry.score),
+            0
+          ) / totalEntries
+        ).toFixed(1)
+      : "0";
+  const highestScore =
+    totalEntries > 0
+      ? Math.max(
+          ...entries.map((entry) => parseFloat("" + entry.score))
+        ).toFixed(1)
+      : "0";
 
   return (
-    <div className="min-h-screen bg-black text-white p-4">
+    <div className="min-h-screen bg-black text-white p-10">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8 animate-fade-in">
@@ -175,27 +186,32 @@ export default function AdminScoreBoard() {
         )}
 
         {/* Form Section */}
-        <div className="grid lg:grid-cols-2 gap-8">
+        <div className="grid lg:grid-cols-2 gap-4 lg:gap-8">
           {/* Existing Entries */}
           {entries.length > 0 && (
             <div className="animate-fade-in-up">
-              <h2 className="text-2xl font-semibold mb-6 text-yellow-400">Existing Entries</h2>
-              <div className="space-y-4 max-h-96 overflow-y-auto pr-2">
+              <h2 className="text-2xl font-semibold mb-6 text-yellow-400">
+                Existing Entries
+              </h2>
+              <div className="space-y-4 max-h-96 overflow-y-auto">
                 {entries.map((entry) => (
                   <div
                     key={entry.id}
-                    className="group relative bg-gray-800/30 backdrop-blur-lg rounded-2xl p-6 mt-2 mx-2 border border-gray-600/30 hover:border-yellow-400/50 transition-all duration-500 hover:scale-[1.02] hover:shadow-xl hover:shadow-yellow-400/5"
+                    className="group relative bg-gray-800/30 backdrop-blur-lg rounded-2xl p-4 sm:p-6 border border-gray-600/30 hover:border-yellow-400/50 transition-all duration-500 hover:scale-[1.02] hover:shadow-xl hover:shadow-yellow-400/5"
                   >
-                    <div className="flex items-center justify-between mb-3">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-3 gap-2">
                       <div>
-                        <span className="font-bold text-yellow-400 text-lg">{entry.sem}</span>
+                        <span className="font-bold text-yellow-400 text-lg">
+                          {entry.sem}
+                        </span>
                         <div className="text-2xl font-bold bg-gradient-to-r from-yellow-400 to-yellow-600 bg-clip-text text-transparent">
                           {entry.score}
                         </div>
                       </div>
                       <div className="text-right">
                         <div className="text-sm text-gray-400">
-                          {entry.participants.length} participant{entry.participants.length !== 1 ? 's' : ''}
+                          {entry.participants.length} participant
+                          {entry.participants.length !== 1 ? "s" : ""}
                         </div>
                       </div>
                     </div>
@@ -203,14 +219,25 @@ export default function AdminScoreBoard() {
                     {/* Participants List */}
                     {entry.participants.length > 0 && (
                       <div className="mt-3 pt-3 border-t border-gray-600/30">
-                        <div className="text-xs text-gray-400 uppercase tracking-wider mb-2">Participants</div>
+                        <div className="text-xs text-gray-400 uppercase tracking-wider mb-2">
+                          Participants
+                        </div>
                         <div className="space-y-1">
-                          {entry.participants.slice(0, 3).map((participant, index) => (
-                            <div key={index} className="flex justify-between text-sm">
-                              <span className="truncate">{participant.name}</span>
-                              <span className="text-gray-400 text-xs truncate ml-2">{participant.email}</span>
-                            </div>
-                          ))}
+                          {entry.participants
+                            .slice(0, 3)
+                            .map((participant, index) => (
+                              <div
+                                key={index}
+                                className="flex flex-col sm:flex-row sm:justify-between text-sm gap-1"
+                              >
+                                <span className="truncate">
+                                  {participant.name}
+                                </span>
+                                <span className="text-gray-400 text-xs truncate">
+                                  {participant.email}
+                                </span>
+                              </div>
+                            ))}
                           {entry.participants.length > 3 && (
                             <div className="text-yellow-400 text-xs">
                               +{entry.participants.length - 3} more
@@ -235,22 +262,28 @@ export default function AdminScoreBoard() {
 
           {/* Add/Edit Form */}
           <div className="animate-fade-in-up">
-            <div className="bg-gray-800/30 backdrop-blur-lg rounded-2xl p-6 border border-gray-600/30">
+            <div className="bg-gray-800/30 backdrop-blur-lg rounded-2xl p-4 sm:p-6 border border-gray-600/30">
+              {" "}
               <h2 className="text-2xl font-semibold mb-6 text-yellow-400">
                 {editingId ? "Edit Entry" : "Add New Entry"}
               </h2>
-
               <form onSubmit={handleSubmit} className="space-y-6">
                 {/* Semester */}
                 <div>
-                  <label className="block text-sm font-medium mb-2 text-gray-300">Semester</label>
+                  <label className="block text-sm font-medium mb-2 text-gray-300">
+                    Semester
+                  </label>
                   <select
                     value={sem}
                     onChange={(e) => setSem(e.target.value)}
                     className="w-full bg-gray-700/50 border border-gray-600/30 rounded-xl px-4 py-3 focus:ring-2 focus:ring-yellow-400/50 focus:border-yellow-400/50 transition-all duration-300"
                   >
                     {semesterOptions.map((s) => (
-                      <option className="bg-gray-900/50 text-white" key={s} value={s}>
+                      <option
+                        className="bg-gray-900/50 text-white"
+                        key={s}
+                        value={s}
+                      >
                         {s}
                       </option>
                     ))}
@@ -259,7 +292,9 @@ export default function AdminScoreBoard() {
 
                 {/* Score */}
                 <div>
-                  <label className="block text-sm font-medium mb-2 text-gray-300">Score</label>
+                  <label className="block text-sm font-medium mb-2 text-gray-300">
+                    Score
+                  </label>
                   <input
                     type="number"
                     min={0}
@@ -273,10 +308,14 @@ export default function AdminScoreBoard() {
                 {/* Participants */}
                 <div>
                   <div className="flex items-center justify-between mb-2">
-                    <label className="block text-sm font-medium text-gray-300">Participants</label>
-                    <span className="text-xs text-gray-400">{participants.length} added</span>
+                    <label className="block text-sm font-medium text-gray-300">
+                      Participants
+                    </label>
+                    <span className="text-xs text-gray-400">
+                      {participants.length} added
+                    </span>
                   </div>
-                  
+
                   <div className="space-y-3 max-h-48 overflow-y-auto pr-2">
                     {participants.map((p, index) => (
                       <div
@@ -289,7 +328,11 @@ export default function AdminScoreBoard() {
                             placeholder="Name"
                             value={p.name}
                             onChange={(e) =>
-                              handleParticipantChange(index, "name", e.target.value)
+                              handleParticipantChange(
+                                index,
+                                "name",
+                                e.target.value
+                              )
                             }
                             className="w-full bg-gray-600/30 border border-gray-500/30 rounded-lg px-3 py-2 text-sm focus:ring-1 focus:ring-yellow-400/50 focus:border-yellow-400/50"
                             required
@@ -299,7 +342,11 @@ export default function AdminScoreBoard() {
                             placeholder="Email"
                             value={p.email}
                             onChange={(e) =>
-                              handleParticipantChange(index, "email", e.target.value)
+                              handleParticipantChange(
+                                index,
+                                "email",
+                                e.target.value
+                              )
                             }
                             className="w-full bg-gray-600/30 border border-gray-500/30 rounded-lg px-3 py-2 text-sm focus:ring-1 focus:ring-yellow-400/50 focus:border-yellow-400/50"
                             required
@@ -333,7 +380,11 @@ export default function AdminScoreBoard() {
                   disabled={loading}
                   className="w-full py-3 bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-white rounded-xl font-semibold transition-all duration-300 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {loading ? "Saving..." : editingId ? "Update Entry" : "Save Entry"}
+                  {loading
+                    ? "Saving..."
+                    : editingId
+                    ? "Update Entry"
+                    : "Save Entry"}
                 </button>
 
                 {editingId && (
