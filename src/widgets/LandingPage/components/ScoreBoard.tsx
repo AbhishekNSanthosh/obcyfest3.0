@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "@lib/firebase";
-import Loader from "@components/Loader";
+import ScoreBoardSkeleton from "@widgets/LandingPage/components/ScoreBoardSkeleton";
 import { query, where } from "firebase/firestore";
 
 import { IoPersonSharp } from "react-icons/io5";
@@ -138,7 +138,7 @@ export default function ScoreBoard() {
     fetchScores();
   }, []);
 
-  if (loading) return <Loader />;
+  if (loading) return <ScoreBoardSkeleton />;
 
   if (!available) return <div></div>;
 
