@@ -3,6 +3,8 @@
 import React, { useEffect, useState } from "react";
 import { collection, query, where, getDocs } from "firebase/firestore";
 import { db } from "@lib/firebase";
+import Link from "next/link";
+import { LuPlus } from "react-icons/lu";
 
 interface ExtraData {
   inGameName?: string;
@@ -36,7 +38,13 @@ interface Registration {
   semester?: string;
 }
 
-const EventRegistrationsPage = ({ eventId }: { eventId: string }) => {
+const EventRegistrationsPage = ({
+  eventId,
+  isAdmin = false,
+}: {
+  eventId: string;
+  isAdmin?: boolean;
+}) => {
   const [registrations, setRegistrations] = useState<Registration[]>([]);
   const [filteredRegistrations, setFilteredRegistrations] = useState<
     Registration[]
@@ -276,13 +284,27 @@ const EventRegistrationsPage = ({ eventId }: { eventId: string }) => {
               </p>
             )}
           </div>
-          <button
-            onClick={exportToCsv}
-            disabled={filteredRegistrations.length === 0}
-            className="px-6 py-3 bg-gradient-to-r from-yellow-500 to-yellow-600 text-black font-semibold rounded-lg shadow-lg hover:from-yellow-400 hover:to-yellow-500 transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            Export to CSV
-          </button>
+
+          <div className="flex flex-col sm:flex-row gap-3">
+            {/* Add New Participant Button - Only for Admins */}
+            {isAdmin && (
+              <Link
+                href={`./${eventId}/register`}
+                className="px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white font-semibold rounded-lg shadow-lg hover:from-green-400 hover:to-green-500 transition-all flex items-center gap-2"
+              >
+                <LuPlus className="text-lg" />
+                Add New
+              </Link>
+            )}
+
+            <button
+              onClick={exportToCsv}
+              disabled={filteredRegistrations.length === 0}
+              className="px-6 py-3 bg-gradient-to-r from-yellow-500 to-yellow-600 text-black font-semibold rounded-lg shadow-lg hover:from-yellow-400 hover:to-yellow-500 transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Export to CSV
+            </button>
+          </div>
         </div>
 
         {/* Search + Filter Bar */}
@@ -400,7 +422,8 @@ const EventRegistrationsPage = ({ eventId }: { eventId: string }) => {
                       </td>
 
                       <td className="py-4 px-6 text-sm font-medium text-yellow-400">
-                        S{reg.participants[0]?.semester
+                        S
+                        {reg.participants[0]?.semester
                           ? highlightText(
                               reg.participants[0].semester,
                               searchQuery

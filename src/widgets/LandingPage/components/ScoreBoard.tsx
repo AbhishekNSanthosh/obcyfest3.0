@@ -1,15 +1,13 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { collection, getDocs, doc, getDoc } from "firebase/firestore";
+import { collection, getDocs } from "firebase/firestore";
 import { db } from "@lib/firebase";
 import Loader from "@components/Loader";
 import { query, where } from "firebase/firestore";
 
 import { IoPersonSharp } from "react-icons/io5";
 import { FaChartSimple } from "react-icons/fa6";
-import { FaChartLine } from "react-icons/fa";
-import { FaStar } from "react-icons/fa6";
 
 type ScoreDoc = {
   id?: string;

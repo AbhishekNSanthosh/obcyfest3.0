@@ -3,7 +3,6 @@ import { notFound } from "next/navigation";
 import React from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { db } from "@lib/firebase";
 import {
   LuMapPin,
   LuCalendar,
