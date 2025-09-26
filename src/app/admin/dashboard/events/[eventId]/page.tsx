@@ -5,7 +5,7 @@ const page = async ({ params }: { params: { eventId: string } }) => {
   const { eventId } = await params;
   return (
     <div>
-      <EventDashboard eventId={eventId} />
+      <EventDashboard isAdmin = {true} eventId={eventId} />
     </div>
   )
 }

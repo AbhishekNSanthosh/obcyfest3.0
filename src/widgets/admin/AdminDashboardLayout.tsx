@@ -64,7 +64,7 @@ const AdminDashboardLayout = ({ children }: { children: React.ReactNode }) => {
   }
 
   return (
-    <div className="flex h-screen bg-gray-950 text-white">
+    <div className="flex max-h-screen bg-gray-950 text-white">
       {/* Sidebar */}
       <Sidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />
 
