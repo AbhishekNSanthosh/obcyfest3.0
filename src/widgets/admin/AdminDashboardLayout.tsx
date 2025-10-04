@@ -1,13 +1,12 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
-import { useRouter, usePathname } from 'next/navigation';
-import { getAuth, onAuthStateChanged } from 'firebase/auth';
-import { doc, getDoc } from 'firebase/firestore';
-import { app, db } from '@lib/firebase';
-import Sidebar from '@components/Sidebar';
-import IconMenu from '@components/IconMenu';
-import Loader from '@components/Loader';
+import React, { useEffect, useState, useCallback } from "react";
+import { useRouter, usePathname } from "next/navigation";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { doc, getDoc } from "firebase/firestore";
+import { app, db } from "@lib/firebase";
+import Sidebar from "@components/Sidebar";
+import Loader from "@components/Loader";
 
 const AdminDashboardLayout = ({ children }: { children: React.ReactNode }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -16,49 +15,71 @@ const AdminDashboardLayout = ({ children }: { children: React.ReactNode }) => {
   const router = useRouter();
   const pathname = usePathname();
 
-  useEffect(() => {
+  // Memoize the auth check to prevent unnecessary re-renders
+  const checkAuth = useCallback(async () => {
     const auth = getAuth(app);
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        const docRef = doc(db, 'users', user.uid);
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists() && docSnap.data().role === 'admin') {
-          setIsAdmin(true);
-          // redirect only if not already in dashboard
-          if (!pathname.startsWith('/admin/dashboard')) {
-            router.replace('/admin/dashboard');
+      try {
+        if (user) {
+          const docRef = doc(db, "users", user.uid);
+          const docSnap = await getDoc(docRef);
+          if (docSnap.exists() && docSnap.data().role === "admin") {
+            setIsAdmin(true);
+            if (!pathname.startsWith("/admin/dashboard")) {
+              router.replace("/admin/dashboard");
+            }
+          } else {
+            setIsAdmin(false);
+            router.replace("/");
           }
         } else {
           setIsAdmin(false);
-          router.replace('/');
+          router.replace("/");
         }
-      } else {
+      } catch (error) {
+        console.error("Auth check error:", error);
         setIsAdmin(false);
-        router.replace('/');
+        router.replace("/?error=auth-failed");
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     });
 
     return () => unsubscribe();
   }, [router, pathname]);
 
-  // 🔄 Show loader while checking auth
+  useEffect(() => {
+    let unsubscribe: (() => void) | undefined;
+    checkAuth().then(fn => {
+      unsubscribe = fn;
+    });
+    return () => {
+      if (unsubscribe) unsubscribe();
+    };
+  }, [checkAuth]);
+
+  // Loading state with improved UI
   if (loading || isAdmin === null) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-black-950 text-yellow-400">
-        <div className="flex flex-col items-center gap-4">
+      <div className="flex min-h-screen items-center justify-center bg-gray-950 text-yellow-400">
+        <div className="flex flex-col items-center gap-4 p-4">
           <Loader />
-          <p className="text-lg font-medium">Loading Dashboard...</p>
+          <p className="text-lg font-medium animate-pulse">
+            Loading Obcyfest Dashboard...
+          </p>
         </div>
       </div>
     );
   }
 
-  // ❌ If not admin → don't render anything (redirect handles it)
+  // Redirect state with improved UI
   if (!isAdmin) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-black-950 text-yellow-400">
-        <p>Redirecting...</p>
+      <div className="flex min-h-screen items-center justify-center bg-gray-950 text-yellow-400">
+        <div className="flex flex-col items-center gap-4 p-4">
+          <Loader />
+          <p className="text-lg font-medium">Redirecting to Home...</p>
+        </div>
       </div>
     );
   }
@@ -69,28 +90,44 @@ const AdminDashboardLayout = ({ children }: { children: React.ReactNode }) => {
       <Sidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />
 
       {/* Main content */}
-      <div className="flex-1 flex flex-col"> 
-        {/* Top bar (mobile only) */}
-        <div className="bg-black shadow-md lg:hidden sticky top-0 z-30">
+      <div className="flex-1 flex flex-col overflow-hidden">
+        {/* Mobile top bar */}
+        <header className="lg:hidden sticky top-0 z-30 bg-gray-900 shadow-lg">
           <button
             onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-            className="p-4 text-yellow-400"
+            className="p-4 text-yellow-400 hover:text-yellow-300 focus:outline-none focus:ring-2 focus:ring-yellow-400 transition-colors"
+            aria-label={isSidebarOpen ? "Close sidebar" : "Open sidebar"}
+            aria-expanded={isSidebarOpen}
           >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-8 w-8"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M4 6h16M4 12h16M4 18h16"
+              />
             </svg>
           </button>
-        </div>
+        </header>
 
         {/* Dashboard content */}
-        <main className="flex-1 max-w-screen">{children}</main>
+        <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
+          {children}
+        </main>
       </div>
-      
+
       {/* Mobile overlay */}
       {isSidebarOpen && (
-        <div 
-          className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
+        <div
+          className="fixed inset-0 bg-black/50 z-40 lg:hidden transition-opacity duration-300"
           onClick={() => setIsSidebarOpen(false)}
+          aria-hidden="true"
         />
       )}
     </div>

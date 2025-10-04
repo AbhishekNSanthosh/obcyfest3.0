@@ -7,6 +7,7 @@ import Image from 'next/image';
 
 import { FaHome, FaCalendar, FaChartLine } from "react-icons/fa";
 import { MdGroups } from "react-icons/md";
+import { IoMdSettings } from "react-icons/io";
 
 interface SidebarProps {
   isOpen: boolean;
@@ -36,6 +37,11 @@ const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
       href: '/admin/dashboard/scoreboard/',
       label: 'Scoreboard',
       icon: <FaChartLine className='h-6 w-6' />
+    },
+    {
+      href: "/admin/dashboard/settings/",
+      label: "Settings",
+      icon: <IoMdSettings className="h-6 w-6" />,
     }
   ];
 
