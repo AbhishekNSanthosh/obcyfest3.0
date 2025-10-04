@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { collection, getDocs } from "firebase/firestore";
+import { collection, getDocs, deleteDoc, doc } from "firebase/firestore";
 import { db } from "@lib/firebase";
 import { Event } from "@lib/types";
 import { eventName } from "@utils/constants";
@@ -10,6 +10,7 @@ import Link from "next/link";
 const AddNewEvent = () => {
   const [error, setError] = useState<string | null>(null);
   const [events, setEvents] = useState<Event[]>([]);
+
   // Fetch events
   useEffect(() => {
     const fetchEvents = async () => {
@@ -27,6 +28,25 @@ const AddNewEvent = () => {
     };
     fetchEvents();
   }, []);
+
+  // Delete event
+  const deleteEvent = async (eventId: string, eventTitle: string) => {
+    if (
+      !window.confirm(
+        `Are you sure you want to delete the event "${eventTitle}"?`
+      )
+    ) {
+      return;
+    }
+    try {
+      setError(null);
+      await deleteDoc(doc(db, "events", eventId));
+      setEvents((prev) => prev.filter((event) => event.id !== eventId));
+    } catch (err) {
+      console.error("Error deleting event:", err);
+      setError("Failed to delete event. Please try again.");
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-950 p-4 sm:p-6 lg:p-8 text-white">
@@ -85,13 +105,22 @@ const AddNewEvent = () => {
                       <span>Venue: {event.venue || "Not set"}</span>
                     </div>
                   </div>
-                  <Link
-                    href={`/admin/dashboard/events/addevent/${event.id}`}
-                    className=" py-2 justify-center text-center bg-yellow-400 text-gray-900 rounded-md hover:bg-yellow-500 focus:outline-none focus:ring-2 focus:ring-yellow-500"
-                    aria-label={`Edit event ${event.title}`}
-                  >
-                    Edit
-                  </Link>
+                  <div className="flex gap-2 justify-center sm:justify-end">
+                    <Link
+                      href={`/admin/dashboard/events/addevent/${event.id}`}
+                      className="px-4 py-2 text-center bg-yellow-400 text-gray-900 rounded-md hover:bg-yellow-500 focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                      aria-label={`Edit event ${event.title}`}
+                    >
+                      Edit
+                    </Link>
+                    <button
+                      onClick={() => deleteEvent(event.id, event.title)}
+                      className="px-4 py-2 text-center bg-red-500 text-white rounded-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500"
+                      aria-label={`Delete event ${event.title}`}
+                    >
+                      Delete
+                    </button>
+                  </div>
                 </div>
               </li>
             ))}

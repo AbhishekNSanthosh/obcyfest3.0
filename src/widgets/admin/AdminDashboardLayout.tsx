@@ -7,6 +7,7 @@ import { doc, getDoc } from "firebase/firestore";
 import { app, db } from "@lib/firebase";
 import Sidebar from "@components/Sidebar";
 import Loader from "@components/Loader";
+import toast from "react-hot-toast";
 
 const AdminDashboardLayout = ({ children }: { children: React.ReactNode }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -15,7 +16,7 @@ const AdminDashboardLayout = ({ children }: { children: React.ReactNode }) => {
   const router = useRouter();
   const pathname = usePathname();
 
-  // Memoize the auth check to prevent unnecessary re-renders
+  // Memoize the auth check
   const checkAuth = useCallback(async () => {
     const auth = getAuth(app);
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
@@ -30,27 +31,30 @@ const AdminDashboardLayout = ({ children }: { children: React.ReactNode }) => {
             }
           } else {
             setIsAdmin(false);
+            toast.error("Access denied. Admin role required.");
             router.replace("/");
           }
         } else {
           setIsAdmin(false);
-          router.replace("/");
+          toast.error("Please sign in to access the admin dashboard.");
+          router.replace("/?error=not-signed-in");
         }
       } catch (error) {
         console.error("Auth check error:", error);
         setIsAdmin(false);
+        toast.error("Authentication failed. Please try again.");
         router.replace("/?error=auth-failed");
       } finally {
         setLoading(false);
       }
     });
 
-    return () => unsubscribe();
+    return unsubscribe;
   }, [router, pathname]);
 
   useEffect(() => {
     let unsubscribe: (() => void) | undefined;
-    checkAuth().then(fn => {
+    checkAuth().then((fn) => {
       unsubscribe = fn;
     });
     return () => {
@@ -58,7 +62,7 @@ const AdminDashboardLayout = ({ children }: { children: React.ReactNode }) => {
     };
   }, [checkAuth]);
 
-  // Loading state with improved UI
+  // Loading state
   if (loading || isAdmin === null) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-gray-950 text-yellow-400">
@@ -72,7 +76,7 @@ const AdminDashboardLayout = ({ children }: { children: React.ReactNode }) => {
     );
   }
 
-  // Redirect state with improved UI
+  // Redirect state
   if (!isAdmin) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-gray-950 text-yellow-400">
@@ -85,12 +89,12 @@ const AdminDashboardLayout = ({ children }: { children: React.ReactNode }) => {
   }
 
   return (
-    <div className="flex max-h-screen bg-gray-950 text-white">
+    <div className="flex min-h-screen bg-gray-950 text-white">
       {/* Sidebar */}
       <Sidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />
 
       {/* Main content */}
-      <div className="flex-1 flex flex-col overflow-hidden">
+      <div className="flex-1 flex flex-col">
         {/* Mobile top bar */}
         <header className="lg:hidden sticky top-0 z-30 bg-gray-900 shadow-lg">
           <button
