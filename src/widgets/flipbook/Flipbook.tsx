@@ -8,6 +8,7 @@ interface FlipbookProps {
   onFlip?: (e: { data: number }) => void;
   isFullscreen?: boolean;
   currentPage?: number;
+  preloadPages?: number; // New prop to define how many next pages to preload
 }
 
 // Define a minimal type for the flipbook ref
@@ -22,10 +23,12 @@ const Flipbook: FC<FlipbookProps> = ({
   onFlip,
   isFullscreen = false,
   currentPage = 0,
+  preloadPages = 2, // Default preload next 2 pages
 }) => {
   const [dimensions, setDimensions] = useState({ width: 500, height: 700 });
   const flipbookRef = useRef<PageFlip>(null);
 
+  // Update dimensions on resize and fullscreen changes
   useEffect(() => {
     const updateDimensions = () => {
       const vw = window.innerWidth;
@@ -55,21 +58,32 @@ const Flipbook: FC<FlipbookProps> = ({
     updateDimensions();
     window.addEventListener("resize", updateDimensions);
 
-    // Reset flipbook state after fullscreen exit with delay
+    // Reset flipbook state after fullscreen exit
     if (!isFullscreen && flipbookRef.current?.pageFlip) {
       const timeoutId = setTimeout(() => {
         const pageFlip = flipbookRef.current?.pageFlip();
         if (pageFlip) {
-          console.log("PageFlip instance:", pageFlip); // Debug the instance
           pageFlip.update();
         }
-      }, 500); // Increased delay for safety
-
+      }, 500);
       return () => clearTimeout(timeoutId);
     }
 
     return () => window.removeEventListener("resize", updateDimensions);
   }, [isFullscreen, currentPage]);
+
+  // Preload next few pages
+  useEffect(() => {
+    if (pages.length === 0) return;
+
+    const start = currentPage + 1;
+    const end = Math.min(currentPage + preloadPages, pages.length - 1);
+
+    for (let i = start; i <= end; i++) {
+      const img = new Image();
+      img.src = pages[i];
+    }
+  }, [currentPage, pages, preloadPages]);
 
   return (
     <div
@@ -78,11 +92,11 @@ const Flipbook: FC<FlipbookProps> = ({
       }`}
     >
       <HTMLFlipBook
+        style={{}}
         width={dimensions.width}
         height={dimensions.height}
         showCover={true}
         className="shadow-2xl rounded-lg border-4 border-black-900 animate-fade-in-up"
-        style={{}}
         startPage={currentPage}
         size="stretch"
         minWidth={280}
