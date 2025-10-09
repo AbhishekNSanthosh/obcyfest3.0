@@ -72,7 +72,7 @@ const PageCounter = React.memo(
     totalPages: number;
   }) => (
     <div className="mt-3 text-center text-sm font-medium text-yellow-500">
-      Page {currentPage + 1} of {totalPages}
+      Page {currentPage} of {totalPages - 1}
     </div>
   )
 );
@@ -126,7 +126,7 @@ const OptimizedFlipbook = React.memo(
 );
 
 // Main component
-export default function Magazine() {
+export default function Magazine({ name }: { name: string }) {
   const [currentPage, setCurrentPage] = useState(0);
   const [showHint, setShowHint] = useTimedState(true, HINT_DISPLAY_TIME);
   const [pages, setPages] = useState<string[]>([]);
@@ -143,7 +143,7 @@ export default function Magazine() {
         setIsLoading(true);
         setError(null);
 
-        const magazineRef = ref(storage, "magazine");
+        const magazineRef = ref(storage, name);
         const result = await listAll(magazineRef);
 
         const sortedItems = result.items.sort((a, b) => {
@@ -159,9 +159,14 @@ export default function Magazine() {
           })
         );
 
-        // Cache URLs in localStorage for faster reloads
-        localStorage.setItem("magazinePages", JSON.stringify(pageUrls));
+        // Cache with timestamp
+        const cacheData = {
+          urls: pageUrls,
+          timestamp: Date.now(),
+          magazineName: name, // Include magazine name to handle different magazines
+        };
 
+        localStorage.setItem("magazinePages", JSON.stringify(cacheData));
         setPages(pageUrls);
       } catch (err) {
         console.error("Error fetching magazine pages:", err);
@@ -171,15 +176,28 @@ export default function Magazine() {
       }
     };
 
-    // Try to load from cache first
     const cached = localStorage.getItem("magazinePages");
+
     if (cached) {
-      setPages(JSON.parse(cached));
-      setIsLoading(false);
+      const cacheData = JSON.parse(cached);
+      const cacheAge = Date.now() - cacheData.timestamp;
+      const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+
+      // Use cache only if it's fresh and for the same magazine
+      if (cacheAge < CACHE_DURATION && cacheData.magazineName === name) {
+        setPages(cacheData.urls);
+        setIsLoading(false);
+
+        // Still fetch fresh data in background
+        fetchAllPages();
+      } else {
+        // Cache expired or different magazine
+        fetchAllPages();
+      }
     } else {
       fetchAllPages();
     }
-  }, []);
+  }, [name]); // Add name as dependency
 
   // Memoized flip handler
   const handleFlip = useCallback((e: { data: number }) => {

@@ -3,6 +3,10 @@
 import HTMLFlipBook from "react-pageflip";
 import { FC, useEffect, useState, useRef } from "react";
 
+        // Set minimum dimensions
+        const minWidth = 849;
+        const minHeight = 1200;
+
 interface FlipbookProps {
   pages: string[];
   onFlip?: (e: { data: number }) => void;
@@ -28,32 +32,76 @@ const Flipbook: FC<FlipbookProps> = ({
   const [dimensions, setDimensions] = useState({ width: 500, height: 700 });
   const flipbookRef = useRef<PageFlip>(null);
 
-  // Update dimensions on resize and fullscreen changes
-  useEffect(() => {
-    const updateDimensions = () => {
-      const vw = window.innerWidth;
-      const vh = window.innerHeight;
-      let newWidth = Math.min(vw * 0.9, 800);
-      let newHeight = newWidth * (7 / 5);
 
-      if (vw < 640) {
+  useEffect(() => {
+ const updateDimensions = () => {
+  try {
+    const vw = window.innerWidth-10;
+    const vh = window.innerHeight-10;
+
+    const aspectRatio = minWidth / minHeight;
+    let newWidth;
+    let newHeight;
+
+    if (isFullscreen) {
+      const vwAspectRatio = vw / vh;
+
+      if (vwAspectRatio > aspectRatio) {
+        // Screen is wider → limit by height
+        newHeight = vh * 0.95; // Increased margin for better safety
+        newWidth = newHeight * aspectRatio;
+      } else {
+        // Screen is taller → limit by width
+        newWidth = vw * 0.95; // Increased margin for better safety
+        newHeight = newWidth / aspectRatio;
+      }
+
+      // Additional safety check to ensure it fits within viewport
+      if (newWidth > vw) {
         newWidth = vw * 0.95;
-        newHeight = vh * 0.6;
+        newHeight = newWidth / aspectRatio;
+      }
+      if (newHeight > vh) {
+        newHeight = vh * 0.95;
+        newWidth = newHeight * aspectRatio;
+      }
+    } else {
+      // Default (non-fullscreen) responsive scaling
+      if (vw < 480) {
+        newWidth = vw * 0.95;
+      } else if (vw < 640) {
+        newWidth = vw * 0.92;
+      } else if (vw < 768) {
+        newWidth = vw * 0.85;
       } else if (vw < 1024) {
         newWidth = vw * 0.8;
-        newHeight = newWidth * (7 / 5);
+      } else if (vw < 1280) {
+        newWidth = Math.min(vw * 0.75, 900);
+      } else {
+        newWidth = Math.min(vw * 0.9, 800);
       }
 
-      if (isFullscreen) {
-        newWidth = vw * 0.98;
-        newHeight = vh * 0.98;
-      }
+      newHeight = newWidth * (7 / 5);
+      newWidth = Math.min(newWidth, vw - 20);
+      newHeight = Math.min(newHeight, vh - 20);
 
-      setDimensions({
-        width: Math.floor(newWidth),
-        height: Math.floor(newHeight),
-      });
-    };
+      // Enforce minimum only in normal mode (not fullscreen)
+      newWidth = Math.max(newWidth, minWidth);
+      newHeight = Math.max(newHeight, minHeight);
+    }
+
+    setDimensions({
+      width: Math.floor(newWidth),
+      height: Math.floor(newHeight),
+    });
+  } catch (error) {
+    console.error("Error updating dimensions:", error);
+    setDimensions({
+      width: 800,
+      height: 560,
+    });
+  }
+};
 
     updateDimensions();
     window.addEventListener("resize", updateDimensions);
@@ -65,7 +113,7 @@ const Flipbook: FC<FlipbookProps> = ({
         if (pageFlip) {
           pageFlip.update();
         }
-      }, 500);
+      }, 5);
       return () => clearTimeout(timeoutId);
     }
 
@@ -88,7 +136,7 @@ const Flipbook: FC<FlipbookProps> = ({
   return (
     <div
       className={`flex justify-center items-center w-full ${
-        isFullscreen ? "h-full" : "h-auto"
+        isFullscreen ? "h-screen" : "h-auto"
       }`}
     >
       <HTMLFlipBook
