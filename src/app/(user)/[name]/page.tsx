@@ -1,14 +1,14 @@
 import { redirect } from "next/navigation";
 
 export default function MagazineRedirect({
-  searchParams,
+  params,
 }: {
-  searchParams: { [key: string]: string | string[] | undefined };
+  params: { name?: string };
 }) {
-  const source = searchParams.source || "";
+  const name = (params?.name ?? "").toLowerCase();
 
-  if (source.includes("espero")) {
-    redirect("/magazine");
+  if (name.startsWith("espero")) {
+    redirect(`/magazine/${name}`);
   } else {
     redirect("/");
   }
