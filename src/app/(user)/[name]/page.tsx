@@ -1,11 +1,11 @@
 import { redirect } from "next/navigation";
 
-export default function MagazineRedirect({
+export default async function MagazineRedirect({
   params,
 }: {
-  params: { name?: string };
+  params: { name: string };
 }) {
-  const name = (params?.name ?? "").toLowerCase();
+  const { name } = (await params) || { name: "" };
 
   if (name.startsWith("espero")) {
     redirect(`/magazine/${name}`);
