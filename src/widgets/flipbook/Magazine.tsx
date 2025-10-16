@@ -25,7 +25,12 @@ const useFullscreen = (elementRef: React.RefObject<HTMLDivElement | null>) => {
 
   useEffect(() => {
     const handleFullscreenChange = () => {
-      setIsFullscreen(!!document.fullscreenElement);
+      const active = !!document.fullscreenElement;
+      setIsFullscreen(active);
+      if (typeof document !== "undefined") {
+        document.documentElement.style.overflow = active ? "hidden" : "";
+        document.body.style.overflow = active ? "hidden" : "";
+      }
     };
 
     document.addEventListener("fullscreenchange", handleFullscreenChange);
@@ -256,7 +261,7 @@ export default function Magazine({ name }: { name: string }) {
         role="region"
         aria-label="Magazine flipbook"
         className={`relative w-full ${
-          isFullscreen ? "h-screen" : "max-w-4xl mx-auto"
+          isFullscreen ? "h-screen overflow-hidden" : "max-w-4xl mx-auto"
         } flex flex-col items-center justify-center flipbook-container`}
       >
         {isLoading ? (
