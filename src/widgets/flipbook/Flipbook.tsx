@@ -3,6 +3,10 @@
 import HTMLFlipBook from "react-pageflip";
 import { FC, useEffect, useState, useRef } from "react";
 
+// Set minimum dimensions
+const minWidth = 849;
+const minHeight = 1200;
+
 interface FlipbookProps {
   pages: string[];
   onFlip?: (e: { data: number }) => void;
@@ -23,53 +27,96 @@ const Flipbook: FC<FlipbookProps> = ({
   onFlip,
   isFullscreen = false,
   currentPage = 0,
-  preloadPages = 2, // Default preload next 2 pages
+  preloadPages = 3, // Default preload next 2 pages
 }) => {
   const [dimensions, setDimensions] = useState({ width: 500, height: 700 });
   const flipbookRef = useRef<PageFlip>(null);
 
-  // Update dimensions on resize and fullscreen changes
   useEffect(() => {
     const updateDimensions = () => {
-      const vw = window.innerWidth;
-      const vh = window.innerHeight;
-      let newWidth = Math.min(vw * 0.9, 800);
-      let newHeight = newWidth * (7 / 5);
+      try {
+        const vw = window.innerWidth;
+        const vh = window.innerHeight;
 
-      if (vw < 640) {
-        newWidth = vw * 0.95;
-        newHeight = vh * 0.6;
-      } else if (vw < 1024) {
-        newWidth = vw * 0.8;
-        newHeight = newWidth * (7 / 5);
+        const aspectRatio = minWidth / minHeight;
+        let newWidth;
+        let newHeight;
+
+        if (isFullscreen) {
+          const viewportAspectRatio = vw / vh;
+
+          if (viewportAspectRatio > aspectRatio) {
+            // Viewport is wider than book aspect ratio - fit to height with small margin
+            newHeight = vh ; // 98% of viewport height
+            newWidth = newHeight * aspectRatio;
+          } else {
+            // Viewport is taller than book aspect ratio - fit to width with small margin
+            newWidth = vw; // 98% of viewport width
+            newHeight = newWidth / aspectRatio;
+          }
+
+          // Additional safety margin to ensure no cutting
+          if (newWidth > vw) {
+            newWidth = vw;
+            newHeight = newWidth / aspectRatio;
+          }
+          if (newHeight > vh) {
+            newHeight = vh;
+            newWidth = newHeight * aspectRatio;
+          }
+        } else {
+          // Default (non-fullscreen) responsive scaling
+          if (vw < 480) {
+            newWidth = vw * 0.95;
+          } else if (vw < 640) {
+            newWidth = vw * 0.92;
+          } else if (vw < 768) {
+            newWidth = vw * 0.85;
+          } else if (vw < 1024) {
+            newWidth = vw * 0.8;
+          } else if (vw < 1280) {
+            newWidth = Math.min(vw * 0.75, 900);
+          } else {
+            newWidth = Math.min(vw * 0.9, 800);
+          }
+
+          newHeight = newWidth * (minHeight / minWidth);
+          newWidth = Math.min(newWidth, vw - 20);
+          newHeight = Math.min(newHeight, vh - 20);
+
+          // Enforce minimum only in normal mode (not fullscreen)
+          newWidth = Math.max(newWidth, minWidth);
+          newHeight = Math.max(newHeight, minHeight);
+        }
+
+        setDimensions({
+          width: Math.floor(newWidth),
+          height: Math.floor(newHeight),
+        });
+      } catch (error) {
+        console.error("Error updating dimensions:", error);
+        setDimensions({
+          width: 800,
+          height: 560,
+        });
       }
-
-      if (isFullscreen) {
-        newWidth = vw * 0.98;
-        newHeight = vh * 0.98;
-      }
-
-      setDimensions({
-        width: Math.floor(newWidth),
-        height: Math.floor(newHeight),
-      });
     };
 
     updateDimensions();
     window.addEventListener("resize", updateDimensions);
 
-    // Reset flipbook state after fullscreen exit
-    if (!isFullscreen && flipbookRef.current?.pageFlip) {
-      const timeoutId = setTimeout(() => {
-        const pageFlip = flipbookRef.current?.pageFlip();
-        if (pageFlip) {
-          pageFlip.update();
-        }
-      }, 500);
-      return () => clearTimeout(timeoutId);
-    }
+    // Ensure internal layout refresh on any mode change
+    const timeoutId = setTimeout(() => {
+      const pageFlip = flipbookRef.current?.pageFlip();
+      if (pageFlip) {
+        pageFlip.update();
+      }
+    }, 5);
 
-    return () => window.removeEventListener("resize", updateDimensions);
+    return () => {
+      clearTimeout(timeoutId);
+      window.removeEventListener("resize", updateDimensions);
+    };
   }, [isFullscreen, currentPage]);
 
   // Preload next few pages
@@ -88,10 +135,11 @@ const Flipbook: FC<FlipbookProps> = ({
   return (
     <div
       className={`flex justify-center items-center w-full ${
-        isFullscreen ? "h-full" : "h-auto"
+        isFullscreen ? "" : "h-auto"
       }`}
     >
       <HTMLFlipBook
+        key={`${dimensions.width}x${dimensions.height}-${isFullscreen}`}
         style={{}}
         width={dimensions.width}
         height={dimensions.height}
@@ -100,9 +148,9 @@ const Flipbook: FC<FlipbookProps> = ({
         startPage={currentPage}
         size="stretch"
         minWidth={280}
-        maxWidth={1200}
+        maxWidth={isFullscreen ? dimensions.width : 1200} // Allow full width in fullscreen
         minHeight={360}
-        maxHeight={1600}
+        maxHeight={isFullscreen ? dimensions.height : 1600} // Allow full height in fullscreen
         drawShadow={true}
         flippingTime={600}
         useMouseEvents={true}
@@ -123,7 +171,7 @@ const Flipbook: FC<FlipbookProps> = ({
             <img
               src={page}
               alt={`Magazine page ${i + 1}`}
-              className="w-full h-full object-cover"
+              className="w-full h-full object-contain"
               loading="lazy"
             />
             {isFullscreen && (

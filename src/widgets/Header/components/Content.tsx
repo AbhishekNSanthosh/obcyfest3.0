@@ -28,6 +28,7 @@ export default function HeaderContent() {
   const navItems = [
     { title: "About", link: "/#about" },
     { title: "Events", link: "/events" },
+    { title: "Magazine", link: "/magazine" },
     { title: "FAQs", link: "/#faqs" },
     { title: "Community Partners", link: "#community" },
     { title: "Contact", link: "/#contact" },
