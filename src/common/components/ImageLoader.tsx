@@ -11,6 +11,8 @@ interface ImageLoaderProps {
   onError?: () => void;
   showProgress?: boolean;
   placeholder?: React.ReactNode;
+  isLowEndDevice?: boolean;
+  priority?: 'high' | 'low';
 }
 
 const ImageLoader: React.FC<ImageLoaderProps> = ({
@@ -20,11 +22,14 @@ const ImageLoader: React.FC<ImageLoaderProps> = ({
   onLoad,
   onError,
   showProgress = false,
-  placeholder
+  placeholder,
+  isLowEndDevice = false,
+  priority = 'high'
 }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [hasLoaded, setHasLoaded] = useState(false);
   const imgRef = useRef<HTMLImageElement>(null);
 
   useEffect(() => {
@@ -34,38 +39,53 @@ const ImageLoader: React.FC<ImageLoaderProps> = ({
     setError(false);
     setProgress(0);
 
-    const img = new Image();
-    
-    const handleLoad = () => {
-      setLoading(false);
-      setProgress(100);
-      onLoad?.();
-    };
+    // For low-end devices, add delay for low priority images
+    const loadDelay = isLowEndDevice && priority === 'low' ? 1000 : 0;
 
-    const handleError = () => {
-      setLoading(false);
-      setError(true);
-      onError?.();
-    };
-
-    const handleProgress = (e: ProgressEvent) => {
-      if (e.lengthComputable) {
-        const percentComplete = (e.loaded / e.total) * 100;
-        setProgress(percentComplete);
+    const loadImage = () => {
+      const img = new Image();
+      
+      // For low-end devices, optimize image loading
+      if (isLowEndDevice) {
+        img.loading = 'lazy';
+        img.decoding = 'async';
       }
+      
+      const handleLoad = () => {
+        setLoading(false);
+        setProgress(100);
+        setHasLoaded(true);
+        onLoad?.();
+      };
+
+      const handleError = () => {
+        setLoading(false);
+        setError(true);
+        onError?.();
+      };
+
+      const handleProgress = (e: ProgressEvent) => {
+        if (e.lengthComputable) {
+          const percentComplete = (e.loaded / e.total) * 100;
+          setProgress(percentComplete);
+        }
+      };
+
+      img.onload = handleLoad;
+      img.onerror = handleError;
+      img.onprogress = handleProgress;
+      img.src = src;
     };
 
-    img.onload = handleLoad;
-    img.onerror = handleError;
-    img.onprogress = handleProgress;
-    img.src = src;
-
-    return () => {
-      img.onload = null;
-      img.onerror = null;
-      img.onprogress = null;
-    };
-  }, [src, onLoad, onError]);
+    if (loadDelay > 0) {
+      const timeoutId = setTimeout(loadImage, loadDelay);
+      return () => {
+        clearTimeout(timeoutId);
+      };
+    } else {
+      loadImage();
+    }
+  }, [src, onLoad, onError, isLowEndDevice, priority]);
 
   const defaultPlaceholder = (
     <div className="w-full h-full relative">
@@ -117,15 +137,15 @@ const ImageLoader: React.FC<ImageLoaderProps> = ({
 
   return (
     <div className={`relative ${className}`}>
-      {loading && (placeholder || defaultPlaceholder)}
+      {loading && !hasLoaded && (placeholder || defaultPlaceholder)}
       <img
         ref={imgRef}
         src={src}
         alt={alt}
         className={`w-full h-full object-contain transition-opacity duration-300 ${
-          loading ? 'opacity-0 absolute' : 'opacity-100'
+          loading && !hasLoaded ? 'opacity-0 absolute' : 'opacity-100'
         }`}
-        style={{ display: loading ? 'none' : 'block' }}
+        style={{ display: loading && !hasLoaded ? 'none' : 'block' }}
       />
     </div>
   );

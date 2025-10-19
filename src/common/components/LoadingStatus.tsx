@@ -32,7 +32,7 @@ const LoadingStatus: React.FC<LoadingStatusProps> = ({
       <div className="space-y-1">
         <div className="flex justify-between text-xs">
           <span>Progress: {Math.round(progress)}%</span>
-          <span>{loadedPages.size}/{totalPages}</span>
+          {/* <span>{loadedPages.size}/{totalPages}</span> */}
         </div>
         
         <div className="w-32 bg-gray-700 rounded-full h-1">
@@ -41,22 +41,18 @@ const LoadingStatus: React.FC<LoadingStatusProps> = ({
             style={{ width: `${progress}%` }}
           ></div>
         </div>
-        
+{/*         
         {loadingPages > 0 && (
           <div className="text-xs text-yellow-400">
             {loadingPages} page{loadingPages !== 1 ? 's' : ''} loading...
           </div>
-        )}
+        )} */}
         
         {failedPages.size > 0 && (
           <div className="text-xs text-red-400">
             {failedPages.size} page{failedPages.size !== 1 ? 's' : ''} failed
           </div>
         )}
-        
-        <div className="text-xs text-gray-400">
-          Current: Page {currentPage + 1}
-        </div>
       </div>
     </div>
   );

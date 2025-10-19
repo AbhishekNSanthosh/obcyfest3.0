@@ -1,7 +1,7 @@
 "use client";
 
 import HTMLFlipBook from "react-pageflip";
-import { FC, useEffect, useState, useRef } from "react";
+import { FC, useEffect, useState, useRef, useCallback } from "react";
 import ImageLoader from "@components/ImageLoader";
 
 // Set minimum dimensions
@@ -13,8 +13,10 @@ interface FlipbookProps {
   onFlip?: (e: { data: number }) => void;
   isFullscreen?: boolean;
   currentPage?: number;
+  preloadPages?: number; // New prop to define how many next pages to preload
   onImageLoad?: (pageIndex: number) => void;
   onImageError?: (pageIndex: number) => void;
+  isLowEndDevice?: boolean; // Add device performance prop
 }
 
 // Define a minimal type for the flipbook ref
@@ -29,11 +31,15 @@ const Flipbook: FC<FlipbookProps> = ({
   onFlip,
   isFullscreen = false,
   currentPage = 0,
+  preloadPages = 3, // Default preload next 2 pages
   onImageLoad,
   onImageError,
+  isLowEndDevice = false,
 }) => {
   const [dimensions, setDimensions] = useState({ width: 500, height: 700 });
+  const [visiblePages, setVisiblePages] = useState<Set<number>>(new Set());
   const flipbookRef = useRef<PageFlip>(null);
+  const observerRef = useRef<IntersectionObserver | null>(null);
 
   useEffect(() => {
     const updateDimensions = () => {
@@ -50,7 +56,7 @@ const Flipbook: FC<FlipbookProps> = ({
 
           if (viewportAspectRatio > aspectRatio) {
             // Viewport is wider than book aspect ratio - fit to height with small margin
-            newHeight = vh; // 98% of viewport height
+            newHeight = vh ; // 98% of viewport height
             newWidth = newHeight * aspectRatio;
           } else {
             // Viewport is taller than book aspect ratio - fit to width with small margin
@@ -122,6 +128,60 @@ const Flipbook: FC<FlipbookProps> = ({
     };
   }, [isFullscreen, currentPage]);
 
+  // Intersection Observer for lazy loading on low-end devices
+  const setupIntersectionObserver = useCallback(() => {
+    if (!isLowEndDevice || typeof window === 'undefined') return;
+
+    if (observerRef.current) {
+      observerRef.current.disconnect();
+    }
+
+    observerRef.current = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          const pageIndex = parseInt(entry.target.getAttribute('data-page-index') || '0');
+          if (entry.isIntersecting) {
+            setVisiblePages(prev => new Set([...Array.from(prev), pageIndex]));
+          }
+        });
+      },
+      {
+        rootMargin: '50px', // Start loading when page is 50px away from viewport
+        threshold: 0.1
+      }
+    );
+
+    // Observe all page elements
+    const pageElements = document.querySelectorAll('[data-page-index]');
+    pageElements.forEach(el => observerRef.current?.observe(el));
+  }, [isLowEndDevice]);
+
+  // Setup intersection observer for low-end devices
+  useEffect(() => {
+    if (isLowEndDevice) {
+      setupIntersectionObserver();
+    }
+
+    return () => {
+      if (observerRef.current) {
+        observerRef.current.disconnect();
+      }
+    };
+  }, [isLowEndDevice, setupIntersectionObserver]);
+
+  // Priority-based preloading is now handled by the parent component
+  // This effect is kept for backward compatibility but is less aggressive
+  useEffect(() => {
+    if (pages.length === 0) return;
+
+    // Only preload the immediate next page to avoid conflicts with priority loading
+    const nextPage = Math.min(currentPage + 1, pages.length - 1);
+    if (nextPage !== currentPage && (!isLowEndDevice || visiblePages.has(nextPage))) {
+      const img = new Image();
+      img.src = pages[nextPage];
+    }
+  }, [currentPage, pages, isLowEndDevice, visiblePages]);
+
   return (
     <div
       className={`flex justify-center items-center w-full ${
@@ -156,23 +216,43 @@ const Flipbook: FC<FlipbookProps> = ({
         onFlip={onFlip}
         ref={flipbookRef}
       >
-        {pages.map((page, i) => (
-          <div key={i} className="bg-white relative">
-            <ImageLoader
-              src={page}
-              alt={`Magazine page ${i + 1}`}
-              className="w-full h-full"
-              onLoad={() => onImageLoad?.(i)}
-              onError={() => onImageError?.(i)}
-              showProgress={i === currentPage || i === currentPage + 1}
-            />
-            {/* {isFullscreen && (
-              <div className="absolute bottom-2 right-2 bg-black-900 text-yellow-400 px-2 py-1 rounded text-sm">
-                {i + 1}
-              </div>
-            )} */}
-          </div>
-        ))}
+        {pages.map((page, i) => {
+          // For low-end devices, only render visible pages or current page vicinity
+          const shouldRender = !isLowEndDevice || 
+            visiblePages.has(i) || 
+            Math.abs(i - currentPage) <= 1 ||
+            i < 2; // Always render first 2 pages
+
+          return (
+            <div 
+              key={i} 
+              className="bg-white relative"
+              data-page-index={i}
+            >
+              {shouldRender ? (
+                <ImageLoader
+                  src={page}
+                  alt={`Magazine page ${i + 1}`}
+                  className="w-full h-full"
+                  onLoad={() => onImageLoad?.(i)}
+                  onError={() => onImageError?.(i)}
+                  showProgress={false} // Disable progress for all pages to prevent skeleton flicker
+                  isLowEndDevice={isLowEndDevice}
+                  priority={i < 2 || Math.abs(i - currentPage) <= 1 ? 'high' : 'low'}
+                />
+              ) : (
+                <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+                  <div className="text-gray-500 text-sm">Loading...</div>
+                </div>
+              )}
+              {isFullscreen && (
+                <div className="absolute bottom-2 right-2 bg-black-900 text-yellow-400 px-2 py-1 rounded text-sm">
+                  {i + 1}
+                </div>
+              )}
+            </div>
+          );
+        })}
       </HTMLFlipBook>
     </div>
   );
