@@ -2,6 +2,7 @@
 
 import HTMLFlipBook from "react-pageflip";
 import { FC, useEffect, useState, useRef } from "react";
+import ImageLoader from "@components/ImageLoader";
 
 // Set minimum dimensions
 const minWidth = 849;
@@ -13,6 +14,8 @@ interface FlipbookProps {
   isFullscreen?: boolean;
   currentPage?: number;
   preloadPages?: number; // New prop to define how many next pages to preload
+  onImageLoad?: (pageIndex: number) => void;
+  onImageError?: (pageIndex: number) => void;
 }
 
 // Define a minimal type for the flipbook ref
@@ -28,6 +31,8 @@ const Flipbook: FC<FlipbookProps> = ({
   isFullscreen = false,
   currentPage = 0,
   preloadPages = 3, // Default preload next 2 pages
+  onImageLoad,
+  onImageError,
 }) => {
   const [dimensions, setDimensions] = useState({ width: 500, height: 700 });
   const flipbookRef = useRef<PageFlip>(null);
@@ -168,11 +173,13 @@ const Flipbook: FC<FlipbookProps> = ({
       >
         {pages.map((page, i) => (
           <div key={i} className="bg-white relative">
-            <img
+            <ImageLoader
               src={page}
               alt={`Magazine page ${i + 1}`}
-              className="w-full h-full object-contain"
-              loading="lazy"
+              className="w-full h-full"
+              onLoad={() => onImageLoad?.(i)}
+              onError={() => onImageError?.(i)}
+              showProgress={i === currentPage || i === currentPage + 1}
             />
             {isFullscreen && (
               <div className="absolute bottom-2 right-2 bg-black-900 text-yellow-400 px-2 py-1 rounded text-sm">

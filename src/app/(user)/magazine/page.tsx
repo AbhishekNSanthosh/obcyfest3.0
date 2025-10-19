@@ -36,7 +36,7 @@ const EbooksDataLoader = async () => {
     }
 
     return (
-      <div className="grid m-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 lg:gap-10 scrolldiv">
+      <div className="grid m-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 lg:gap-20 scrolldiv">
         {ebooks.map((ebook) => (
           <div
             key={ebook.id}
@@ -81,7 +81,7 @@ const EbooksDataLoader = async () => {
                       clipRule="evenodd"
                     />
                   </svg>
-                  {ebook.author}
+                  By, {ebook.author}
                 </p>
                 {/* Description with Better Typography */}
                 <p className="text-gray-300 text-xs md:text-sm line-clamp-2 leading-relaxed opacity-90 group-hover:opacity-100 transition-opacity duration-300">
