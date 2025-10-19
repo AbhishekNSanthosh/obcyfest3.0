@@ -100,7 +100,7 @@ const FullscreenButton = React.memo(
     >
       <IconFullscreen 
         isFullscreen={isFullscreen} 
-        className="w-4 h-4 group-hover:scale-110 transition-transform duration-200" 
+        className="w-4 h-4 group-hover:scale-110 animate-pulse transition-transform duration-200" 
       />
     </button>
   )
