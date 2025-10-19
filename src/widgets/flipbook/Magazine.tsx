@@ -79,12 +79,9 @@ const PageCounter = React.memo(
     totalPages: number;
   }) => (
     <>
-    <div className="mt-3 text-center text-sm font-medium text-yellow-500 sm:hidden">
-      Page {currentPage-1} of {totalPages}
-    </div>
-    <div className="mt-3 text-center text-sm font-medium text-yellow-500 hidden sm:block">
-      Page {currentPage} of {totalPages}
-    </div>
+      <div className="mt-3 text-center text-sm font-medium text-yellow-500">
+        Page {currentPage} of {totalPages - 1}
+      </div>
     </>
   )
 );

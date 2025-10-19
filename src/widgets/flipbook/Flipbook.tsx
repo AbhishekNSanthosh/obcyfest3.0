@@ -181,11 +181,11 @@ const Flipbook: FC<FlipbookProps> = ({
               onError={() => onImageError?.(i)}
               showProgress={i === currentPage || i === currentPage + 1}
             />
-            {isFullscreen && (
+            {/* {isFullscreen && (
               <div className="absolute bottom-2 right-2 bg-black-900 text-yellow-400 px-2 py-1 rounded text-sm">
                 {i + 1}
               </div>
-            )}
+            )} */}
           </div>
         ))}
       </HTMLFlipBook>
