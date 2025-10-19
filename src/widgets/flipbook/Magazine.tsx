@@ -144,7 +144,6 @@ const OptimizedFlipbook = React.memo(
       onFlip={onFlip}
       isFullscreen={isFullscreen}
       currentPage={currentPage}
-      preloadPages={2} // Add preload property for smoother transitions
       onImageLoad={onImageLoad}
       onImageError={onImageError}
     />
@@ -237,8 +236,8 @@ export default function Magazine({ name }: { name: string }) {
 
   // Handle individual image loading
   const handleImageLoad = useCallback((pageIndex: number) => {
-    setLoadedImages(prev => new Set([...Array.from(prev), pageIndex]));
-    setFailedImages(prev => {
+    setLoadedImages((prev) => new Set([...Array.from(prev), pageIndex]));
+    setFailedImages((prev) => {
       const newSet = new Set(prev);
       newSet.delete(pageIndex);
       return newSet;
@@ -246,7 +245,7 @@ export default function Magazine({ name }: { name: string }) {
   }, []);
 
   const handleImageError = useCallback((pageIndex: number) => {
-    setFailedImages(prev => new Set([...Array.from(prev), pageIndex]));
+    setFailedImages((prev) => new Set([...Array.from(prev), pageIndex]));
   }, []);
 
   // Update loading progress based on loaded images
@@ -257,24 +256,36 @@ export default function Magazine({ name }: { name: string }) {
     }
   }, [loadedImages.size, pages.length]);
 
-  // Preload next 2 pages for performance
+  // Prioritized preloading: first pages initially, then near current page
   useEffect(() => {
     if (pages.length === 0) return;
 
-    const preloadImages = async () => {
-      const nextPages = [
-        pages[Math.min(currentPage + 1, pages.length - 1)],
-        pages[Math.min(currentPage + 2, pages.length - 1)],
-      ];
+    const unloaded = Array.from({ length: pages.length }, (_, i) => i).filter(
+      (i) => !loadedImages.has(i) && !failedImages.has(i)
+    );
 
-      nextPages.forEach((src) => {
-        const img = new Image();
-        img.src = src;
-      });
-    };
+    if (unloaded.length === 0) return;
 
-    preloadImages();
-  }, [currentPage, pages]);
+    // Sort by distance to currentPage (prioritize closest)
+    unloaded.sort(
+      (a, b) => Math.abs(a - currentPage) - Math.abs(b - currentPage)
+    );
+
+    // Preload batch of 5 closest unloaded pages
+    unloaded.slice(0, 5).forEach((i) => {
+      const img = new Image();
+      img.src = pages[i];
+      img.onload = () => handleImageLoad(i);
+      img.onerror = () => handleImageError(i);
+    });
+  }, [
+    currentPage,
+    pages,
+    loadedImages,
+    failedImages,
+    handleImageLoad,
+    handleImageError,
+  ]);
 
   if (error) {
     return (
@@ -316,33 +327,33 @@ export default function Magazine({ name }: { name: string }) {
           <LoadingSpinner progress={loadingProgress} />
         ) : pages.length > 0 ? (
           <>
-             <OptimizedFlipbook
-               {...{ 
-                 pages, 
-                 onFlip: handleFlip, 
-                 isFullscreen, 
-                 currentPage,
-                 onImageLoad: handleImageLoad,
-                 onImageError: handleImageError
-               }}
-             />
+            <OptimizedFlipbook
+              {...{
+                pages,
+                onFlip: handleFlip,
+                isFullscreen,
+                currentPage,
+                onImageLoad: handleImageLoad,
+                onImageError: handleImageError,
+              }}
+            />
 
-             {/* Fullscreen Button - Positioned on the book */}
-             <FullscreenButton
-               isFullscreen={isFullscreen}
-               onToggle={toggleFullscreen}
-             />
+            {/* Fullscreen Button - Positioned on the book */}
+            <FullscreenButton
+              isFullscreen={isFullscreen}
+              onToggle={toggleFullscreen}
+            />
 
-             {/* Page-Turning Hint */}
-             {!isFullscreen && showHint && <PageHint />}
+            {/* Page-Turning Hint */}
+            {!isFullscreen && showHint && <PageHint />}
 
-             {/* Page Counter */}
-             {!isFullscreen && (
-               <PageCounter
-                 currentPage={currentPage}
-                 totalPages={pages.length}
-               />
-             )}
+            {/* Page Counter */}
+            {!isFullscreen && (
+              <PageCounter
+                currentPage={currentPage}
+                totalPages={pages.length}
+              />
+            )}
           </>
         ) : (
           <div className="text-center text-yellow-400">
@@ -350,7 +361,6 @@ export default function Magazine({ name }: { name: string }) {
           </div>
         )}
       </div>
-
 
       {/* Loading Status Indicator */}
       {!isLoading && pages.length > 0 && (

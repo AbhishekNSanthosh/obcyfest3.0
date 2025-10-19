@@ -13,7 +13,6 @@ interface FlipbookProps {
   onFlip?: (e: { data: number }) => void;
   isFullscreen?: boolean;
   currentPage?: number;
-  preloadPages?: number; // New prop to define how many next pages to preload
   onImageLoad?: (pageIndex: number) => void;
   onImageError?: (pageIndex: number) => void;
 }
@@ -30,7 +29,6 @@ const Flipbook: FC<FlipbookProps> = ({
   onFlip,
   isFullscreen = false,
   currentPage = 0,
-  preloadPages = 3, // Default preload next 2 pages
   onImageLoad,
   onImageError,
 }) => {
@@ -52,7 +50,7 @@ const Flipbook: FC<FlipbookProps> = ({
 
           if (viewportAspectRatio > aspectRatio) {
             // Viewport is wider than book aspect ratio - fit to height with small margin
-            newHeight = vh ; // 98% of viewport height
+            newHeight = vh; // 98% of viewport height
             newWidth = newHeight * aspectRatio;
           } else {
             // Viewport is taller than book aspect ratio - fit to width with small margin
@@ -123,19 +121,6 @@ const Flipbook: FC<FlipbookProps> = ({
       window.removeEventListener("resize", updateDimensions);
     };
   }, [isFullscreen, currentPage]);
-
-  // Preload next few pages
-  useEffect(() => {
-    if (pages.length === 0) return;
-
-    const start = currentPage + 1;
-    const end = Math.min(currentPage + preloadPages, pages.length - 1);
-
-    for (let i = start; i <= end; i++) {
-      const img = new Image();
-      img.src = pages[i];
-    }
-  }, [currentPage, pages, preloadPages]);
 
   return (
     <div
