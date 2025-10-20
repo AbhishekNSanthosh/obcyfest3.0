@@ -78,11 +78,9 @@ const PageCounter = React.memo(
     currentPage: number;
     totalPages: number;
   }) => (
-    <>
       <div className="mt-3 text-center text-sm font-medium text-yellow-500">
-        Page {currentPage} of {totalPages - 1}
+        Page {currentPage-1<=0?0:currentPage-1} of {totalPages - 1}
       </div>
-    </>
   )
 );
 
@@ -307,7 +305,7 @@ export default function Magazine({ name }: { name: string }) {
   }
 
   return (
-    <div className="relative min-h-screen bg-black text-white overflow-hidden flex flex-col items-center p-2 sm:p-4">
+    <div className="relative min-h-screen bg-black text-white overflow-hidden flex flex-col items-center p-2 sm:pt-4">
       {/* Background */}
       <div className="absolute inset-0 bg-black" />
 
