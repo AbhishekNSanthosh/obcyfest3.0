@@ -166,11 +166,11 @@ export default function Magazine({ name }: { name: string }) {
   const { isFullscreen, toggleFullscreen } = useFullscreen(flipbookRef);
 
   // Preload page turn sound
-  useEffect(() => {
-    audioRef.current = new Audio("/sounds/page_turn.mp3");
-    audioRef.current.preload = "auto";
-    audioRef.current.volume = 0.5; // Optional: adjust volume
-  }, []);
+  // useEffect(() => {
+  //   audioRef.current = new Audio("/sounds/page_turn.mp3");
+  //   audioRef.current.preload = "auto";
+  //   audioRef.current.volume = 0.5; // Optional: adjust volume
+  // }, []);
 
   // Fetch all pages from Firebase Storage
   useEffect(() => {
