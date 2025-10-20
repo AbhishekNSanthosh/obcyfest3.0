@@ -336,7 +336,7 @@ export default function Magazine({ name }: { name: string }) {
         className={`relative ${
           isFullscreen
             ? "w-full h-screen overflow-hidden"
-            : "w-[85%] max-w-3xl h-[70vh] mx-auto"
+            : "w-[85%] max-w-3xl md:h-[70vh] h-full mx-auto"
         } flex flex-col items-center mt-5 justify-center flipbook-container`}
       >
         {isLoading ? (
