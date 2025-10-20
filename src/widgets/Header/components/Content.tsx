@@ -150,7 +150,7 @@ const handleGoogleLogin = async () => {
         </Link>
       </div>
 
-      <nav className="hidden md:flex flex-2 items-center justify-center gap-[4vw]">
+      <nav className="hidden lg:flex flex-2 items-center justify-center gap-[4vw]">
         <div className="flex flex-row gap-[2vw] rounded-[50px] p-2 px-4">
           {navItems.map((item, index) => (
             <Link
@@ -165,27 +165,26 @@ const handleGoogleLogin = async () => {
         </div>
       </nav>
 
-      <div className="hidden md:flex flex-1 items-center justify-end gap-4">
+      <div className="hidden lg:flex flex-1 items-center justify-end gap-4">
         {user ? (
-            <Link
-              href="/profile"
-              className="flex items-center text-yellow-400 font-medium text-lg"
-              onClick={handleLinkClick}
-            >
-              Hello👋,
-              {user?.displayName ? (
-                user.displayName.length > 12 ? (
-                  /* marquee container: uses CSS classes above */
-                  <span className="ml-2 marquee-container">
-                    <span className="marquee">{user.displayName}</span>
-                  </span>
-                ) : (
-                  <span className="mx-2">{user.displayName}</span>
-                )
+          <Link
+            href="/profile"
+            className="flex items-center text-yellow-400 font-medium text-lg"
+            onClick={handleLinkClick}
+          >
+            Hello👋,
+            {user?.displayName ? (
+              user.displayName.length > 12 ? (
+                /* marquee container: uses CSS classes above */
+                <span className="ml-2 marquee-container">
+                  <span className="marquee">{user.displayName}</span>
+                </span>
               ) : (
-                <span className="ml-2">User</span>
-              )}
-
+                <span className="mx-2">{user.displayName}</span>
+              )
+            ) : (
+              <span className="ml-2">User</span>
+            )}
             <div className="border-[2px] rounded-full p-1 border-yellow-400">
               <Image
                 src={user.photoURL || "/default-avatar.png"}
@@ -231,7 +230,7 @@ const handleGoogleLogin = async () => {
         )}
       </div>
 
-      <div className="md:hidden flex flex-1 items-center justify-end">
+      <div className="lg:hidden flex flex-1 items-center justify-end">
         <button
           onClick={() => setIsMobileMenuOpen(true)}
           className="text-3xl text-yellow-400"
@@ -245,7 +244,7 @@ const handleGoogleLogin = async () => {
       <div
         className={`fixed inset-0 z-50 transition-opacity duration-300 ${
           isMobileMenuOpen ? "opacity-100" : "opacity-0 pointer-events-none"
-        } md:hidden`}
+        } lg:hidden`}
         style={{ top: 0, left: 0, right: 0, bottom: 0 }}
       >
         <div
