@@ -59,8 +59,8 @@ const useTimedState = (initialState: boolean, duration: number) => {
 
 // Memoized Components to prevent unnecessary re-renders
 const Header = React.memo(() => (
-  <h1 className="text-4xl sm:text-4xl mt-20 md:text-5xl lg:text-6xl font-serif font-bold mb-4 sm:mb-6 md:mb-8 text-center text-yellow-400 animate-fade-in-up z-10">
-    Digital Magazine
+  <h1 className="text-2xl lg:text-3xl mt-20  font-bold mb-4 sm:mb-6 md:mb-8 text-center text-yellow-400 animate-fade-in-up z-10">
+    {/* Digital Magazine */}
   </h1>
 ));
 
@@ -78,9 +78,9 @@ const PageCounter = React.memo(
     currentPage: number;
     totalPages: number;
   }) => (
-      <div className="mt-3 text-center text-sm font-medium text-yellow-500">
-        Page {currentPage-1<=0?0:currentPage-1} of {totalPages - 1}
-      </div>
+    <div className="mt-3 text-center text-sm font-medium text-yellow-500">
+      Page {currentPage - 1 <= 0 ? 0 : currentPage - 1} of {totalPages - 1}
+    </div>
   )
 );
 
@@ -95,12 +95,14 @@ const FullscreenButton = React.memo(
     <button
       onClick={onToggle}
       className={`absolute top-4 right-4 p-2 bg-black bg-opacity-80 hover:bg-opacity-90 text-yellow-400 rounded-full shadow-lg hover:shadow-xl transition-all duration-200 z-50 focus:outline-none focus:ring-2 focus:ring-yellow-500 group touch-manipulation`}
-      aria-label={isFullscreen ? "Exit fullscreen mode" : "Enter fullscreen mode"}
+      aria-label={
+        isFullscreen ? "Exit fullscreen mode" : "Enter fullscreen mode"
+      }
       title={isFullscreen ? "Exit Fullscreen" : "Enter Fullscreen"}
     >
-      <IconFullscreen 
-        isFullscreen={isFullscreen} 
-        className="w-4 h-4 group-hover:scale-110 animate-pulse transition-transform duration-200" 
+      <IconFullscreen
+        isFullscreen={isFullscreen}
+        className="w-4 h-4 group-hover:scale-110 animate-pulse transition-transform duration-200"
       />
     </button>
   )
@@ -111,7 +113,7 @@ const LoadingSpinner = React.memo(({ progress = 0 }: { progress?: number }) => (
     <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-yellow-400 mb-4"></div>
     <p className="text-yellow-400 text-lg mb-4">Loading magazine...</p>
     <div className="w-64 bg-gray-700 rounded-full h-2">
-      <div 
+      <div
         className="bg-yellow-400 h-2 rounded-full transition-all duration-300"
         style={{ width: `${progress}%` }}
       ></div>
@@ -159,8 +161,16 @@ export default function Magazine({ name }: { name: string }) {
   const [loadedImages, setLoadedImages] = useState<Set<number>>(new Set());
   const [failedImages, setFailedImages] = useState<Set<number>>(new Set());
   const flipbookRef = useRef<HTMLDivElement | null>(null);
+  const audioRef = useRef<HTMLAudioElement>(null);
 
   const { isFullscreen, toggleFullscreen } = useFullscreen(flipbookRef);
+
+  // Preload page turn sound
+  useEffect(() => {
+    audioRef.current = new Audio("/sounds/page_turn.mp3");
+    audioRef.current.preload = "auto";
+    audioRef.current.volume = 0.5; // Optional: adjust volume
+  }, []);
 
   // Fetch all pages from Firebase Storage
   useEffect(() => {
@@ -230,6 +240,12 @@ export default function Magazine({ name }: { name: string }) {
   // Memoized flip handler
   const handleFlip = useCallback((e: { data: number }) => {
     setCurrentPage(e.data);
+    if (audioRef.current) {
+      audioRef.current.currentTime = 0;
+      audioRef.current.play().catch((err) => {
+        console.warn("Page turn sound play failed:", err);
+      });
+    }
   }, []);
 
   // Handle individual image loading
@@ -317,9 +333,11 @@ export default function Magazine({ name }: { name: string }) {
         ref={flipbookRef}
         role="region"
         aria-label="Magazine flipbook"
-        className={`relative w-full ${
-          isFullscreen ? "h-screen overflow-hidden" : "max-w-4xl mx-auto"
-        } flex flex-col items-center justify-center flipbook-container`}
+        className={`relative ${
+          isFullscreen
+            ? "w-full h-screen overflow-hidden"
+            : "w-[85%] max-w-3xl h-[70vh] mx-auto"
+        } flex flex-col items-center mt-5 justify-center flipbook-container`}
       >
         {isLoading ? (
           <LoadingSpinner progress={loadingProgress} />
